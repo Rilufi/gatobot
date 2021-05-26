@@ -1,5 +1,5 @@
 name: Automatizando o Gatobot
-on: 
+on: [push]
   schedule:
     - cron: "5 * * * *"
 jobs:
