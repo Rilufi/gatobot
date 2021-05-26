@@ -5,8 +5,6 @@ import tweepy
 import os
 import random
 import time
-
-import requests
 import requests
 import json
 import urllib.request
@@ -60,5 +58,3 @@ api = tweepy.API(auth)
 mystring = f""" Gato Surpresa das {data}"""
 
 api.update_with_media('gato.jpeg', mystring)
-
-#print(mystring)
