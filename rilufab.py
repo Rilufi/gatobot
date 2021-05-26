@@ -2,8 +2,8 @@
 # coding=utf-8
 
 import tweepy
-import os
-import random
+#import os
+#import random
 import time
 import requests
 import json
@@ -34,7 +34,6 @@ r = requests.get(site, allow_redirects=True)
 open('gato.jpeg', 'wb').write(r.content)
 
 
-#today = datetime.date.today()
 data = time.strftime('%H:%M', time.localtime())
 
 consumer_key = 'RD04L1SMWeyNNx62v1tIW8Lof'
