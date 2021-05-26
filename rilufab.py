@@ -4,7 +4,7 @@
 import tweepy
 #import os
 #import random
-import time
+from datetime import datetime, timezone, timedelta
 import requests
 import json
 import urllib.request
@@ -34,7 +34,10 @@ r = requests.get(site, allow_redirects=True)
 open('gato.jpeg', 'wb').write(r.content)
 
 
-data = time.strftime('%H:%M', time.localtime())
+fuso_horario = timezone(timedelta(hours=-3))
+data_e_hora_atuais = datetime.now()
+data_e_hora_sao_paulo = data_e_hora_atuais.astimezone(fuso_horario)
+data = data_e_hora_sao_paulo.strftime('%H:%M')
 
 consumer_key = 'RD04L1SMWeyNNx62v1tIW8Lof'
 consumer_secret = 'BZG1fhoy3KKDRVjrxYjrBWjCsbaZQ6MtQYOEphQtkjqYlwbmMU'
