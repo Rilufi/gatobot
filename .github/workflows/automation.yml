@@ -1,0 +1,21 @@
+name: Automatizando o Gatobot
+on: [push]
+  #schedule:
+   # - cron: "5 * * * *"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content to github runner.
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8 #install the python needed
+      - name: Install Dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install tweepy
+      - name: execute py script # run the run.py to get the latest data
+        run: |
+          python rilufab.py
