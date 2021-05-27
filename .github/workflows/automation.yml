@@ -19,9 +19,9 @@ jobs:
       - name: Setting secrets and executing
         env: # Set credentials secret as an input
           CAT_KEY: ${{ secrets.CAT_KEY }}
-          CONSUMER_KEY: ${{ secrets.TWITTER_KEY }}
-          CONSUMER_SECRET: ${{ secrets.TWITTER_SECRET }}
-          ACCESS_TOKEN: ${{ secrets.TWITTER_TOKEN }}
-          ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_TOKEN_SECRET }}
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
         run: |
           python rilufab.py
