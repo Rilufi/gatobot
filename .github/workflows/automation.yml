@@ -17,8 +17,7 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install tweepy
       - name: Setting secrets and executing
-        env: # Set Azure credentials secret as an input
-          GITHUB_TOKEN: ${{ secrets.MY_TOKEN }}
+        env: # Set credentials secret as an input
           CAT_KEY: ${{ secrets.CAT_KEY }}
           CONSUMER_KEY: ${{ secrets.TWITTER_KEY }}
           CONSUMER_SECRET: ${{ secrets.TWITTER_SECRET }}
