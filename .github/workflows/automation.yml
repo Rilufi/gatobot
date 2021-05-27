@@ -15,7 +15,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python3 -m pip install --upgrade pip
-          pip install tweepy dotenv
+          pip install tweepy python-dotenv
       - name: Setting secrets and executing
         env: # Set credentials secret as an input
           CAT_KEY: ${{ secrets.CAT_KEY }}
