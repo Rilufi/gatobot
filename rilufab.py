@@ -23,13 +23,17 @@ proxies = {
 
 response = requests.request("GET", url, headers=headers, data=payload, proxies=proxies)
 
-print(response.text)
+
+#print(response.text)
 
 todos = json.loads(response.text)
 
+
 site = todos[0].get('url')
 
+
 r = requests.get(site, allow_redirects=True)
+ 
 
 open('gato.jpeg', 'wb').write(r.content)
 
@@ -59,4 +63,11 @@ api = tweepy.API(auth)
 
 mystring = f""" Gato Surpresa das {data}"""
 
-api.update_with_media('gato.jpeg', mystring)
+try:
+	api.update_with_media('gato.jpeg', mystring)
+except:
+	response2 = requests.request("GET", url, headers=headers, data=payload, proxies=proxies)
+	todos2 = json.loads(response2.text)
+	site2 = todos2[0].get('url')
+	open('gato2.jpeg', 'wb').write(r2.content)
+	api.update_with_media('gato2.jpeg', mystring)
