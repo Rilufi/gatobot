@@ -1,0 +1,27 @@
+name: Automatizando o Gatobot
+on:
+  schedule:
+    - cron: "0 * * * *"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content to github runner.
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8 #install the python needed
+      - name: Install Dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install tweepy
+      - name: Setting secrets and executing
+        env: # Set credentials secret as an input
+          CAT_KEY: ${{ secrets.CAT_KEY }}
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+        run: |
+          python rilufab.py
