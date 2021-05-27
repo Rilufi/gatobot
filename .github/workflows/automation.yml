@@ -16,6 +16,13 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install tweepy
+      - name: Setting Secrets
+        with: # Set Azure credentials secret as an input
+          cat_key: ${{ secrets.CAT_KEY }}
+          consumer_key: ${{ secrets.TWITTER_KEY }}
+          consumer_secret: ${{ secrets.TWITTER_SECRET }}
+          access_token: ${{ secrets.TWITTER_TOKEN }}
+          access_token_secret: ${{ secrets.TWITTER_TOKEN_SECRET }}
       - name: execute py script # run the run.py to get the latest data
         run: |
           python rilufab.py
