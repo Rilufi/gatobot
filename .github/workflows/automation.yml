@@ -1,7 +1,7 @@
 name: Automatizando o Gatobot
-on:
-  schedule:
-    - cron: "0 * * * *"
+on: push
+  #schedule:
+ #   - cron: "0 * * * *"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,12 +16,13 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install tweepy
-      - name: Setting secrets and executing
-        env: # Set credentials secret as an input
+      - name: Setting secrets
+        with: # Set credentials secret as an input
           CAT_KEY: ${{ secrets.CAT_KEY }}
           CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
           CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+      - name: executing
         run: |
           python rilufab.py
