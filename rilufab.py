@@ -6,7 +6,16 @@ from datetime import datetime, timezone, timedelta
 import requests
 import json
 import urllib.request
+import os
 
+#calling secret variables
+cat_key = os.environ.get("CAT_KEY")
+consumer_key = os.environ.get("CONSUMER_KEY")
+consumer_secret = os.environ.get("CONSUMER_SECRET")
+access_token = os.environ.get("ACCESS_TOKEN")
+access_token_secret = os.environ.get("ACCESS_TOKEN_SECRET")
+
+#get the cats
 url = "https://api.thecatapi.com/v1/images/search?format=json"
 
 payload={}
@@ -26,13 +35,13 @@ site = todos[0].get('url')
 r = requests.get(site, allow_redirects=True)
 open('gato.jpeg', 'wb').write(r.content)
 
-
+#get the time with timezone
 fuso_horario = timezone(timedelta(hours=-3))
 data_e_hora_atuais = datetime.now()
 data_e_hora_sao_paulo = data_e_hora_atuais.astimezone(fuso_horario)
 data = data_e_hora_sao_paulo.strftime('%H:%M')
 
-
+#post on twitter
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
@@ -40,6 +49,7 @@ api = tweepy.API(auth)
 
 mystring = f""" Gato Surpresa das {data}"""
 
+#failsafe to try again in case the image is too large for twitter or any other problem
 try:
 	api.update_with_media('gato.jpeg', mystring)
 except:
