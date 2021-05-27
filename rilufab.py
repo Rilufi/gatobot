@@ -53,12 +53,12 @@ print(CAT_KEY)
 mystring = f""" Gato Surpresa das {data}"""
 
 #failsafe to try again in case the image is too large for twitter or any other problem
-#try:
-#	api.update_with_media('gato.jpeg', mystring)
-#except:
-#	response2 = requests.request("GET", url, headers=headers, data=payload, proxies=proxies)
-#	todos2 = json.loads(response2.text)
-#	site2 = todos2[0].get('url')
-#	r2 = requests.get(site2, allow_redirects=True)
-#	open('gato2.jpeg', 'wb').write(r2.content)
-#	api.update_with_media('gato2.jpeg', mystring)
+try:
+	api.update_with_media('gato.jpeg', mystring)
+except:
+	response2 = requests.request("GET", url, headers=headers, data=payload, proxies=proxies)
+	todos2 = json.loads(response2.text)
+	site2 = todos2[0].get('url')
+	r2 = requests.get(site2, allow_redirects=True)
+	open('gato2.jpeg', 'wb').write(r2.content)
+  api.update_with_media('gato2.jpeg', mystring)
