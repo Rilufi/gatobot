@@ -1,7 +1,7 @@
 name: Automatizando o Gatobot
-on:
-  schedule:
-    - cron: "0 * * * *"
+on: push
+  #schedule:
+  #  - cron: "0 * * * *"
 jobs:
   build:
     runs-on: ubuntu-latest
