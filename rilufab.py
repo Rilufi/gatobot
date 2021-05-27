@@ -9,11 +9,11 @@ import urllib.request
 import os
 
 #calling secret variables
-CAT_KEY = os.environ.get("CAT_KEY")
-CONSUMER_KEY = os.environ.get("CONSUMER_KEY")
-CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
-ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
-ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
+#CAT_KEY = os.environ.get("CAT_KEY")
+#CONSUMER_KEY = os.environ.get("CONSUMER_KEY")
+#CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
+#ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+#ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 
 #get the cats
 url = "https://api.thecatapi.com/v1/images/search?format=json"
