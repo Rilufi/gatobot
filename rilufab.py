@@ -19,6 +19,7 @@ proxies = {
   'http': 'http://10.10.1.10:3128',
 }
 
+
 response = requests.request("GET", url, headers=headers, data=payload, proxies=proxies)
 todos = json.loads(response.text)
 site = todos[0].get('url')
