@@ -9,11 +9,11 @@ import urllib.request
 import os
 
 #calling secret variables
-cat_key = os.environ.get("CAT_KEY")
-consumer_key = os.environ.get("CONSUMER_KEY")
-consumer_secret = os.environ.get("CONSUMER_SECRET")
-access_token = os.environ.get("ACCESS_TOKEN")
-access_token_secret = os.environ.get("ACCESS_TOKEN_SECRET")
+CAT_KEY = os.environ.get("CAT_KEY")
+CONSUMER_KEY = os.environ.get("CONSUMER_KEY")
+CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+ACCESS_TOKEN_SECRET = os.environ.get("ACCESS_TOKEN_SECRET")
 
 #get the cats
 url = "https://api.thecatapi.com/v1/images/search?format=json"
@@ -21,7 +21,7 @@ url = "https://api.thecatapi.com/v1/images/search?format=json"
 payload={}
 headers = {
   'Content-Type': 'application/json',
-  'x-api-key': cat_key
+  'x-api-key': CAT_KEY
 }
 
 proxies = {
@@ -42,8 +42,8 @@ data_e_hora_sao_paulo = data_e_hora_atuais.astimezone(fuso_horario)
 data = data_e_hora_sao_paulo.strftime('%H:%M')
 
 #post on twitter
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
+auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth)
 
 
