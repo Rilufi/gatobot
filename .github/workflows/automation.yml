@@ -1,27 +1,47 @@
-name: Automatizando o Gatobot
+name: Gatomatizando
+
+
 on:
-   schedule:
-    - cron: "0 * * * *"
+
+    schedule:
+
+        - cron: '0 * * * *'
+
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout repo content
-        uses: actions/checkout@v2 # checkout the repository content to github runner.
-      - name: setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8 #install the python needed
-      - name: Install Dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install tweepy python-dotenv
-      - name: Setting secrets and executing
-        env: # Set credentials secret as an input
-          CAT_KEY: ${{ secrets.CAT_KEY }}
-          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
-          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
-        run: |
-          python rilufab.py
+
+    build:
+
+        runs-on: ubuntu-latest
+
+
+        steps:
+
+            - uses: actions/checkout@v2
+
+
+            - name: Make envfile
+
+              uses: SpicyPizza/create-envfile@v1
+
+              with:
+
+                  envkey_CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+
+                  envkey_CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+
+                  envkey_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+                  envkey_ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+
+                  file_name: .env
+
+
+            - name: Build the docker container
+
+              run: docker build .
+
+
+            - name: Run the script 🚀
+
+              run: docker-compose -f docker-compose-gato.yml up
