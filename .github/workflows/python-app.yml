@@ -1,11 +1,11 @@
 name: Build and Deploy 🚀
 
 
-on: push
+on:
 
-    #schedule:
+    schedule:
 
-   #     - cron: '* * * * *'
+        - cron: '30 * * * *'
 
 
 jobs:
