@@ -41,19 +41,19 @@ def main(message: str, filename: str='temp') -> None:
     try:
 
         api.verify_credentials()
-#        print("Twitter Authentication Succeeded")
+        print("Twitter Authentication Succeeded")
 
  
         try:
             api.update_with_media(filename, status=message)
- #           print('Tweet successfully sent!')
+            print('Tweet successfully sent!')
 
 
         except Exception as e:
-#            print('Error sending tweet \n %s' % e)
+            print('Error sending tweet \n %s' % e)
 
     except:
-#        print("Twitter Authentication Failed")
+        print("Twitter Authentication Failed")
 
 
 
