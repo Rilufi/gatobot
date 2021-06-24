@@ -12,3 +12,7 @@ Utilizando o API do https://thecatapi.com/
 ## de onde vêm os dog
 
 API do https://dog.ceo/dog-api/
+
+## e tem também os gato fake
+
+Gatos gerados por uma GAN do https://thiscatdoesnotexist.com/
