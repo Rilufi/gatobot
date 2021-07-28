@@ -21,5 +21,5 @@ api = tweepy.API(auth)
 queries = ["#CatsOfTwitter"]
 for tweet in tweepy.Cursor(api.search, q=queries).items(1):
     api.create_favorite(tweet.id)
-    tweet.retweet()
     api.create_friendship(tweet.user.screen_name)
+    tweet.retweet()
