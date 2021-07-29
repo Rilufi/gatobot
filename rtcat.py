@@ -17,7 +17,7 @@ auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth)
 
 
-#search hashtag, RT, like an follow
+#search hashtag, RT, like and follow
 #in case I want more hashtags, I'll leave the queries list commented
 #also put two filters, one for only RT the original tweet and other for just media content
 #queries = ["#CatsOfTwitter -filter:retweets"]
