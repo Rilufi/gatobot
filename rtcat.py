@@ -18,8 +18,8 @@ api = tweepy.API(auth)
 
 
 #search hashtag and RT
-queries = ["#CatsOfTwitter -filter:retweets"]
-for tweet in tweepy.Cursor(api.search, q=queries).items(1):
+#queries = ["#CatsOfTwitter -filter:retweets"]
+for tweet in tweepy.Cursor(api.search, q="#CatsOfTwitter -filter:retweets").items(1):
     api.create_favorite(tweet.id)
     api.create_friendship(tweet.user.screen_name)
     tweet.retweet()
