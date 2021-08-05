@@ -19,4 +19,4 @@ Gatos gerados por uma GAN do https://thiscatdoesnotexist.com/
 
 ## e as # de gato
 
-Adicionei a funcionalidade de dar RT e like na #CatsOfTwitter, além de seguir a pessoa que postou. Os filtros são procurar só media (pra impedir de acabar encontrando algum tweet aleatório que tenha só usado a # pra engajamento) e procurar o post original e não algum RT do original (impedindo assim que o bot siga a pessoa errada) por enquanto ele só foca em uma hashtag, mas deixei comentado lá caso queira colocar mais na lista queries = [].
+Adicionei a funcionalidade de dar RT e like na #CatsOfTwitter, além de seguir a pessoa que postou. Os filtros são procurar só media (pra impedir de acabar encontrando algum tweet aleatório que tenha só usado a # pra engajamento) e procurar o post original e não algum RT do original (impedindo assim que o bot siga a pessoa errada) por enquanto ele só foca em uma hashtag por vez, copiei pra fazer tudo de novo com o #DogsOfTwitter pois falhei em fazer uma lista, mas deixei comentado lá caso queira tentar colocar na lista queries = [].
