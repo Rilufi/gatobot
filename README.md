@@ -1,5 +1,5 @@
 # gatobot
-Bot para postar fotos de gato no Twitter (que agora também posta foto de cachorro)
+Bot para postar fotos de gato no Twitter (que agora também posta foto de cachorro e até uns gato falso)
 
 ## wtf???
 
