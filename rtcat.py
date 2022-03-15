@@ -21,13 +21,13 @@ api = tweepy.API(auth)
 #in case I want more hashtags, I'll leave the queries list commented
 #also put two filters, one for only RT the original tweet and other for just media content
 #queries = []
-for tweet in tweepy.Cursor(api.search, q="#CatsOfTwitter -filter:retweets filter:media").items(1):
+for tweet in tweepy.Cursor(api.search, q="#CatsOfTwitter -filter:retweets filter:media filter:safe").items(1):
     api.create_favorite(tweet.id)
     api.create_friendship(tweet.user.screen_name)
     tweet.retweet()
 
  
-for tweet in tweepy.Cursor(api.search, q="#DogsOfTwitter -filter:retweets filter:media").items(1):
+for tweet in tweepy.Cursor(api.search, q="#DogsOfTwitter -filter:retweets filter:media filter:safe").items(1):
     api.create_favorite(tweet.id)
     api.create_friendship(tweet.user.screen_name)
     tweet.retweet()
