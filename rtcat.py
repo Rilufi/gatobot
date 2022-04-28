@@ -19,9 +19,12 @@ queries = ['#CatsOfTwitter', '#DogsOfTwitter', '#Caturday', '#dog', '#cat', '#pe
 
 def rtquery(hash):
     for tweet in tweepy.Cursor(api.search, q=f"{hash} -filter:retweets filter:media filter:safe").items(1):
-        api.create_favorite(tweet.id)
-        api.create_friendship(tweet.user.screen_name)
-        tweet.retweet()
+        try:
+            api.create_favorite(tweet.id)
+            api.create_friendship(tweet.user.screen_name)
+            tweet.retweet()
+        except:
+            pass
     
 for query in queries:
     rtquery(query)
