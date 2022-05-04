@@ -18,7 +18,7 @@ api = tweepy.API(auth)
 queries = ['#CatsOfTwitter', '#DogsOfTwitter', '#Caturday', '#dog', '#cat', '#petlovers', '#CatsOnTwitter', '#DogsOnTwitter']
 
 def rtquery(hash):
-    for tweet in tweepy.Cursor(api.search, q=f"{hash} -filter:retweets filter:media filter:safe").items(1):
+    for tweet in tweepy.Cursor(api.search, q=f"{hash} -filter:retweets filter:media filter:safe", result_type="popular").items(1):
         try:
             api.create_friendship(tweet.user.screen_name)
             api.create_favorite(tweet.id)
