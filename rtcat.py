@@ -43,5 +43,5 @@ today = datetime.date.today() # ex 2015-10-31
 data = today.strftime("%d/%m")
 
 #post on twitter
-mystring = f""" Erro http do dia {data}"""
+mystring = f""" Status http do dia {data}"""
 api.update_with_media('http_pet.jpeg', mystring)
