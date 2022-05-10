@@ -2,8 +2,7 @@ import tweepy
 import os
 import urllib.request
 import random
-import datetime
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date
 
 
 #calling secret variables
@@ -34,7 +33,7 @@ def rtquery(hash):
 for query in queries:
     rtquery(query)
 
-today = datetime.date.today() # ex 2015-10-31
+today = date.today() # ex 2015-10-31
 data = today.strftime("%d/%m")
 
 #get the time with timezone
