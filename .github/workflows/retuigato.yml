@@ -3,7 +3,7 @@ name: Retuigato
 
 on:
 
- #   schedule:
+    schedule:
 
 #        - cron: '45 * * * *'
         - cron: '0 15 * * *'
