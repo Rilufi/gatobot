@@ -1,12 +1,12 @@
 name: Retuigato
 
 
-on: push
+on:
 
  #   schedule:
 
 #        - cron: '45 * * * *'
-   #     - cron: '0 15 * * *'
+        - cron: '0 15 * * *'
 
 
 jobs:
