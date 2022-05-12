@@ -49,10 +49,10 @@ error = [100,101,102,200,201,202,203,204,206,207,300,301,302,303,304,305,307,308
 def http_pet():
     site ="https://http."+random.choice(pet)+"/"+str(random.choice(error))+".jpg"
     urllib.request.urlretrieve(site, 'http_pet.jpg')
-    mystring = f""" Status http do dia {data}"""
+    mystring = f""" HTTP status of the day {data}"""
     api.update_with_media('http_pet.jpg', mystring)
 
-if hora == 12:
+if hora == '12':
     http_pet()
 else:
     pass
