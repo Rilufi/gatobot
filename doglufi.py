@@ -10,7 +10,7 @@ data_e_hora_atuais = datetime.now()
 data_e_hora_sao_paulo = data_e_hora_atuais.astimezone(fuso_horario)
 data = data_e_hora_sao_paulo.strftime('%H:%M')
 
-mystring = f""" Surprise Dog from {data}
+mystring = f""" {data} Surprise Dog
 #DogsOfTwitter #dogs #DogsOnTwitter"""
 
 def get_random_dog(filename: str='temp') -> None:
