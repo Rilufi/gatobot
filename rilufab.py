@@ -47,7 +47,8 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth)
 
-mystring = f""" Gato Surpresa das {data}"""
+mystring = f""" {data} Surprise Cat
+#CatsOfTwitter #cats #caturday #CatsOnTwitter"""
 
 #failsafe to try again in case the image is too large for twitter or any other problem
 try:
