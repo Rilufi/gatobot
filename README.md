@@ -13,9 +13,13 @@ Utilizando o API do https://thecatapi.com/
 
 API do https://dog.ceo/dog-api/
 
-## e tem também os gato fake
+## tem também os gato fake
 
 Gatos gerados por uma GAN do https://thiscatdoesnotexist.com/
+
+## e agora os status http
+
+Pra cada status http existe sua versão gato: https://http.cat e sua versão dog: https://http.dog
 
 ## e as # de gato
 
