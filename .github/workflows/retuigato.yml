@@ -6,7 +6,6 @@ on:
     schedule:
 
         - cron: '45 * * * *'
-  #      - cron: '0 15 * * *'
 
 
 jobs:
