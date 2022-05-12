@@ -18,7 +18,7 @@ api = tweepy.API(auth)
 
 #search last entry on specific account, RT and like
 #three filters: one for only RT the original tweet, other for just media content and last safe images
-queries = ['CatWorkers', 'weirdlilguys']
+queries = ['CatWorkers', 'weirdlilguys', 'PetWorld02']
 
 def rtquery(hash):
     for tweet in tweepy.Cursor(api.search, q=f"from:{hash} -filter:retweets filter:images filter:safe").items(1):
