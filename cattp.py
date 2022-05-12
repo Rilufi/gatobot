@@ -20,7 +20,7 @@ api = tweepy.API(auth)
 queries = ['CatWorkers', 'weirdlilguys']
 
 def rtquery(hash):
-    for tweet in tweepy.Cursor(api.search, from:f"{hash}").items(1):
+    for tweet in tweepy.Cursor(api.search, q=f"from:{hash}").items(1):
         try:
             api.create_favorite(tweet.id)
             tweet.retweet()
