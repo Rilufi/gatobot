@@ -1,6 +1,5 @@
 import tweepy
 import os
-import urllib.request
 
 #calling secret variables
 CONSUMER_KEY = os.environ["CONSUMER_KEY"]
