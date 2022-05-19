@@ -1,9 +1,6 @@
 import tweepy
 import os
 import urllib.request
-import random
-from datetime import datetime, timezone, timedelta, date
-
 
 #calling secret variables
 CONSUMER_KEY = os.environ["CONSUMER_KEY"]
@@ -18,7 +15,6 @@ api = tweepy.API(auth)
 
 #search hashtag, RT, like and follow
 #three filters: one for only RT the original tweet, other for just media content and last safe images
-
 queries = ['#CatsOfTwitter', '#DogsOfTwitter', '#Caturday', '#CatsOnTwitter', '#DogsOnTwitter']
 
 def rtquery(hash):
