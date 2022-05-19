@@ -1,11 +1,6 @@
 import tweepy
 import os
-
-#calling secret variables
-CONSUMER_KEY = os.environ["CONSUMER_KEY"]
-CONSUMER_SECRET = os.environ["CONSUMER_SECRET"]
-ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
-ACCESS_TOKEN_SECRET = os.environ["ACCESS_TOKEN_SECRET"]
+from auth import api
 
 #connect on twitter
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -15,6 +10,7 @@ api = tweepy.API(auth)
 #search hashtag, RT, like and follow
 #three filters: one for only RT the original tweet, other for just media content and last safe images
 queries = ['#CatsOfTwitter', '#DogsOfTwitter', '#Caturday', '#CatsOnTwitter', '#DogsOnTwitter']
+
 
 def rtquery(hash):
     for tweet in tweepy.Cursor(api.search, q=f"{hash} -filter:retweets -filter:replies filter:images filter:safe", result_type="recent").items(1):
