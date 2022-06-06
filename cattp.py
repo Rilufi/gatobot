@@ -21,7 +21,7 @@ data = today.strftime("%d/%m")
 queries = ['CatWorkers', 'weirdlilguys', 'PetWorld02', 'genius_dogs', 'gatinarios', 'Thereisnocat_', 'TranslatedCats', 'TweetsOfCats', 'perritos_qctd']
 
 def rtquery(hash):
-    for tweet in tweepy.Cursor(api.search, q=f"from:{hash} -filter:retweets -filter:replies filter:images filter:safe").items(1):
+    for tweet in tweepy.Cursor(api.search, q=f"from:{hash} -filter:retweets -filter:replies filter:media filter:safe").items(1):
         try:
             api.create_favorite(tweet.id)
             tweet.retweet()
