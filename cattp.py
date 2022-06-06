@@ -18,7 +18,7 @@ data = today.strftime("%d/%m")
 
 #search last entry on specific account, RT and like
 #three filters: one for only RT the original tweet, other for just media content and last safe images
-queries = ['CatWorkers', 'weirdlilguys', 'PetWorld02', 'genius_dogs', 'gatinarios', 'Thereisnocat_', 'TranslatedCats', 'TweetsOfCats']
+queries = ['CatWorkers', 'weirdlilguys', 'PetWorld02', 'genius_dogs', 'gatinarios', 'Thereisnocat_', 'TranslatedCats', 'TweetsOfCats', 'perritos_qctd']
 
 def rtquery(hash):
     for tweet in tweepy.Cursor(api.search, q=f"from:{hash} -filter:retweets -filter:replies filter:images filter:safe").items(1):
