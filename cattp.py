@@ -44,7 +44,7 @@ def http_pet():
     api.update_with_media('http_pet.jpg', mystring)
 
 if hora == '12':
-    rtquery(nasobot)
+    rtquery('nasobot')
     http_pet()
 else:
     pass
