@@ -6,9 +6,19 @@ from datetime import date
 from auth import api
 
 
+#get the time with timezone
+fuso_horario = timezone(timedelta(hours=-3))
+data_e_hora_atuais = datetime.now()
+data_e_hora_sao_paulo = data_e_hora_atuais.astimezone(fuso_horario)
+hora = data_e_hora_sao_paulo.strftime('%H')
+
+#what day is it?
+today = date.today() # ex 2015-10-31
+data = today.strftime("%d/%m")
+
 #search last entry on specific account, RT and like
 #three filters: one for only RT the original tweet, other for just media content and last safe images
-queries = ['CatWorkers', 'weirdlilguys', 'PetWorld02', 'genius_dogs', 'gatinarios', 'Thereisnocat_', 'TranslatedCats', 'TweetsOfCats', 'nasobot']
+queries = ['CatWorkers', 'weirdlilguys', 'PetWorld02', 'genius_dogs', 'gatinarios', 'Thereisnocat_', 'TranslatedCats', 'TweetsOfCats']
 
 def rtquery(hash):
     for tweet in tweepy.Cursor(api.search, q=f"from:{hash} -filter:retweets -filter:replies filter:images filter:safe").items(1):
@@ -21,9 +31,6 @@ def rtquery(hash):
 for query in queries:
     rtquery(query)
 
-#what day is it?
-today = date.today() # ex 2015-10-31
-data = today.strftime("%d/%m")
 
 #list of errors and cat or dog
 pet = ["cat", "dog"]
@@ -36,4 +43,8 @@ def http_pet():
     mystring = f""" HTTP status of the day {data}"""
     api.update_with_media('http_pet.jpg', mystring)
 
-http_pet()
+if hora == '12':
+    rtquery(nasobot)
+    http_pet()
+else:
+    pass
