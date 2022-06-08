@@ -2,11 +2,6 @@ import tweepy
 import os
 from auth import api
 
-#connect on twitter
-auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-api = tweepy.API(auth)
-
 #search hashtag, RT, like and follow
 #three filters: one for only RT the original tweet, other for just media content and last safe images
 queries = ['#CatsOfTwitter', '#DogsOfTwitter', '#Caturday', '#CatsOnTwitter', '#DogsOnTwitter']
