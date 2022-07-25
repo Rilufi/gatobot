@@ -1,11 +1,11 @@
 name: Desfollow
 
 
-on: push
+on:
 
-    #schedule:
+    schedule:
 
-   #     - cron: '0 9 * * *'
+        - cron: '0 9 * * *'
 
 
 jobs:
