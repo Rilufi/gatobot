@@ -4,8 +4,6 @@ import urllib.request
 import random
 from datetime import date, timezone, timedelta, datetime
 from auth import api
-from twitter_unfollow import unfollow
-
 
 #get the time with timezone
 fuso_horario = timezone(timedelta(hours=-3))
@@ -19,7 +17,7 @@ data = today.strftime("%d/%m")
 
 #search last entry on specific account, RT and like
 #three filters: one for only RT the original tweet, other for just media content and last safe images
-queries = ['CatWorkers', 'weirdlilguys', 'PetWorld02', 'genius_dogs', 'gatinarios', 'Thereisnocat_', 'TranslatedCats', 'TweetsOfCats', 'perritos_qctd', 'gatitos_qctd', 'nywolforg', 'hourlywolvesbot', 'HutCat', 'DogsTwt', 'twtCats', 'Bodegacats']
+queries = ['CreatureTikToks', 'CatWorkers', 'weirdlilguys', 'PetWorld02', 'genius_dogs', 'gatinarios', 'Thereisnocat_', 'TranslatedCats', 'TweetsOfCats', 'perritos_qctd', 'gatitos_qctd', 'nywolforg', 'hourlywolvesbot', 'HutCat', 'DogsTwt', 'twtCats', 'Bodegacats']
 
 def rtquery(hash):
     for tweet in tweepy.Cursor(api.search, q=f"from:{hash} -filter:retweets -filter:replies filter:media filter:safe").items(1):
@@ -35,7 +33,6 @@ for query in queries:
 #list of errors and cat or dog
 pet = ["cat", "dog"]
 error = [100,101,102,200,201,202,203,204,206,207,300,301,302,303,304,305,307,308,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,420,421,422,423,424,425,426,429,431,444,450,451,497,498,499,500,501,502,503,504,506,507,508,509,510,511,521,523,525,599]
-unfollow = unfollow()
 
 #get random image from one of this sites and post
 def http_pet():
@@ -47,6 +44,5 @@ def http_pet():
 if hora == '12':
     rtquery('nasobot')
     http_pet()
-    unfollow.unfollow()
 else:
     pass
