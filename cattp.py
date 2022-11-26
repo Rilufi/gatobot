@@ -61,4 +61,3 @@ if hora == '12':
     unfollower()
 else:
     pass
-unfollower()
