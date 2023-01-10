@@ -4,8 +4,8 @@ from auth import api
 
 #search hashtag, RT, like and follow
 #three filters: one for only RT the original tweet, other for just media content and last safe images
-queries = ['#CatsOfTwitter', '#DogsOfTwitter', '#Caturday', '#CatsOnTwitter', '#DogsOnTwitter']
-
+#queries = ['#CatsOfTwitter', '#DogsOfTwitter', '#Caturday', '#CatsOnTwitter', '#DogsOnTwitter']
+queries = ['#CatsOnTwitter', '#DogsOnTwitter']
 
 def rtquery(hash):
     for tweet in tweepy.Cursor(api.search, q=f"{hash} -NFT -filter:retweets -filter:replies filter:images filter:safe", result_type="recent").items(1):
