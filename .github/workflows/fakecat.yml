@@ -3,9 +3,9 @@ name: Gatástico
 
 on:
 
-    schedule:
+ #   schedule:
 
-        - cron: '15 * * * *'
+    #    - cron: '15 * * * *'
 
 
 jobs:
