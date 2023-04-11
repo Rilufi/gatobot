@@ -3,9 +3,9 @@ name: Gatástico
 
 on:
 
- #   schedule:
+    schedule:
 
-    #    - cron: '15 * * * *'
+        - cron: '15 * * * *'
 
 
 jobs:
@@ -49,4 +49,4 @@ jobs:
                   ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
 
                   
-        run: python fakecat.py
+        run: python hepper.py
