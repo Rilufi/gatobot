@@ -1,11 +1,11 @@
 name: Gatástico
 
 
-on:
+on: push
 
-    schedule:
+ #   schedule:
 
-        - cron: '15 * * * *'
+   #     - cron: '15 * * * *'
 
 
 jobs:
