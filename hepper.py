@@ -1,5 +1,3 @@
-import tweepy
-import os
 from auth import api
 import random
 
@@ -10,4 +8,7 @@ mystring = f""" Looking for the perfect way to spoil your furry friend? Look no 
 #PetLovers #CatsOfTwitter #PetProducts
 {status}"""
 
-api.update_status(mystring)
+try:
+    api.update_status(mystring)
+except:
+    pass
