@@ -54,10 +54,23 @@ def http_pet():
     urllib.request.urlretrieve(site, 'http_pet.jpg')
     mystring = f""" HTTP status of the day {data}"""
     api.update_with_media('http_pet.jpg', mystring)
+    
+def hepper():
+    lines=open('products.txt').read().splitlines()
+    status = random.choice(lines)
+    mystring = f""" Looking for the perfect way to spoil your furry friend? Look no further than Hepper! High-quality pet products are designed with both you and your pet in mind.
+    #PetLovers #CatsOfTwitter #PetProducts
+    {status}"""
+
+    try:
+        api.update_status(mystring)
+    except:
+        pass
 
 if hora == '12':
     rtquery('nasobot')
     http_pet()
+    hepper()
     unfollower()
 else:
     pass
