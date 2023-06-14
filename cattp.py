@@ -36,7 +36,7 @@ queries = ['hamstersmp4', 'CreatureTikToks', 'CatWorkers', 'weirdlilguys', 'PetW
 def rtquery(hash):
     for tweet in tweepy.Cursor(api.search, q=f"from:{hash} -filter:retweets -filter:replies filter:media filter:safe").items(1):
         try:
-            api.create_favorite(tweet.id)
+            api.like(tweet.id)
             tweet.retweet()
         except:
             pass
@@ -63,7 +63,7 @@ def hepper():
     {status}"""
 
     try:
-        api.update_status(mystring)
+        api.create_tweet(text = mystring)
     except:
         pass
 
