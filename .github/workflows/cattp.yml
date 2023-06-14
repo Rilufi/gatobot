@@ -1,11 +1,11 @@
 name: Gattp
 
 
-on: push
+on:
 
-#    schedule:
+    schedule:
 
-  #      - cron: '0 * * * *'
+        - cron: '0 * * * *'
 
 
 jobs:
