@@ -20,7 +20,8 @@ data = today.strftime("%d/%m")
 queries = ['hamstersmp4', 'CreatureTikToks', 'CatWorkers', 'weirdlilguys', 'PetWorld02', 'genius_dogs', 'gatinarios', 'Thereisnocat_', 'TranslatedCats', 'TweetsOfCats', 'nywolforg', 'hourlywolvesbot', 'HutCat', 'DogsTwt', 'twtCats', 'Bodegacats']
 
 def rtquery(hash):
-    for tweet in tweepy.Cursor(api.search, q=f"from:{hash} -filter:retweets -filter:replies filter:media filter:safe").items(1):
+#    for tweet in tweepy.Cursor(api.search, q=f"from:{hash} -filter:retweets -filter:replies filter:media filter:safe").items(1):
+    tweet = api.search_recent_tweets(f"{hash} -filter:retweets -filter:replies filter:media filter:safe")
         try:
             api.like(tweet.id)
             tweet.retweet()
@@ -39,7 +40,7 @@ def http_pet():
     site ="https://http."+random.choice(pet)+"/"+str(random.choice(error))+".jpg"
     urllib.request.urlretrieve(site, 'http_pet.jpg')
     mystring = f""" HTTP status of the day {data}"""
-    api.update_with_media('http_pet.jpg', mystring)
+#    api.update_with_media('http_pet.jpg', mystring)
     
 def hepper():
     lines=open('products.txt').read().splitlines()
