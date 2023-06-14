@@ -7,7 +7,7 @@ def bot():
     quote = f'{data["fact"]}'
     length = data["length"]
     if length < 240:
-        api.update_status(quote)
+        api.create_tweet(text = quote)
     else:
         pass
 
