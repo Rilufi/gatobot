@@ -3,9 +3,9 @@ name: Retuigato
 
 on:
 
-    schedule:
+  #  schedule:
 
-        - cron: '45 * * * *'
+ #       - cron: '45 * * * *'
 
 
 jobs:
