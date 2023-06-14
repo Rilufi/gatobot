@@ -22,12 +22,9 @@ queries = ['hamstersmp4', 'CreatureTikToks', 'CatWorkers', 'weirdlilguys', 'PetW
 def rtquery(hash):
 #    for tweet in tweepy.Cursor(api.search, q=f"from:{hash} -filter:retweets -filter:replies filter:media filter:safe").items(1):
     tweet = api.search_recent_tweets(f"{hash} -filter:retweets -filter:replies filter:media filter:safe")
-        try:
-            api.like(tweet.id)
-            tweet.retweet()
-        except:
-            pass
-    
+    api.like(tweet.id)
+    tweet.retweet()
+
 #for query in queries:
 #    rtquery(query)
 
