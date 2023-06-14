@@ -5,20 +5,6 @@ import random
 from datetime import date, timezone, timedelta, datetime
 from auth import api
 
-
-def unfollower():
-    followers = api.followers_ids(screen_name=api.me().screen_name)
-    friends = api.friends_ids(screen_name=api.me().screen_name)
-    print("You follow:", len(friends))      
-    for friend in friends[::-1]:
-        if friend not in followers:
-            api.destroy_friendship(user_id = friend)
-        else:
-            pass
-    friends = api.friends_ids(screen_name=api.me().screen_name)
-    print("Now you're following:", len(friends))
-
-
 #get the time with timezone
 fuso_horario = timezone(timedelta(hours=-3))
 data_e_hora_atuais = datetime.now()
@@ -41,8 +27,8 @@ def rtquery(hash):
         except:
             pass
     
-for query in queries:
-    rtquery(query)
+#for query in queries:
+#    rtquery(query)
 
 #list of errors and cat or dog
 pet = ["cat", "dog"]
@@ -67,10 +53,10 @@ def hepper():
     except:
         pass
 
-if hora == '12':
-    rtquery('nasobot')
-    http_pet()
-    hepper()
-    unfollower()
-else:
-    pass
+#if hora == '12':
+#    rtquery('nasobot')
+#    http_pet()
+hepper()
+#    unfollower()
+#else:
+#    pass
