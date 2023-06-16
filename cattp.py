@@ -38,6 +38,8 @@ def http_pet():
     urllib.request.urlretrieve(site, 'http_pet.jpg')
     mystring = f""" HTTP status of the day {data}"""
 #    api.update_with_media('http_pet.jpg', mystring)
+    media = api.media_upload("http_pet.jpg")
+    api.update_status(status=mystring, media_ids=[media.media_id])
     
 def hepper():
     lines=open('products.txt').read().splitlines()
@@ -55,6 +57,7 @@ def hepper():
 #    rtquery('nasobot')
 #    http_pet()
 hepper()
+http_pet()
 #    unfollower()
 #else:
 #    pass
