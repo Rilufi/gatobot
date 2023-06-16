@@ -46,7 +46,9 @@ def main(message: str, filename: str='temp') -> None:
 
  
         try:
-            api.update_with_media(filename, status=message)
+            media = api.media_upload(filename)
+            client.create_tweet(text=message, media_ids=[media.media_id])
+            #api.update_with_media(filename, status=message)
             print('Tweet successfully sent!')
 
 
