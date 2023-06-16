@@ -3,6 +3,7 @@ import json
 import requests
 import tweepy
 from datetime import datetime, timezone, timedelta
+from auth import api, client
 
 #get the time with timezone
 fuso_horario = timezone(timedelta(hours=-3))
@@ -25,39 +26,17 @@ def get_random_dog(filename: str='temp') -> None:
 
 
 def main(message: str, filename: str='temp') -> None:
-    auth = tweepy.OAuthHandler(
-        os.environ.get('CONSUMER_KEY'), 
-        os.environ.get('CONSUMER_SECRET')
-    )
-
-    auth.set_access_token(
-        os.environ.get('ACCESS_TOKEN'), 
-        os.environ.get("ACCESS_TOKEN_SECRET")
-    )
-
-    api = tweepy.API(auth)
     get_random_dog(filename) 
 
-
     try:
-
-        api.verify_credentials()
-        print("Twitter Authentication Succeeded")
-
- 
-        try:
-            media = api.media_upload(filename)
-            client.create_tweet(text=message, media_ids=[media.media_id])
-            #api.update_with_media(filename, status=message)
-            print('Tweet successfully sent!')
+        media = api.media_upload(filename)
+        client.create_tweet(text=message, media_ids=[media.media_id])
+        #api.update_with_media(filename, status=message)
+        print('Tweet successfully sent!')
 
 
-        except Exception as e:
-            print('Error sending tweet \n %s' % e)
-
-    except:
-        print("Twitter Authentication Failed")
-
+    except Exception as e:
+        print('Error sending tweet \n %s' % e)
 
 
 if __name__ == '__main__':
