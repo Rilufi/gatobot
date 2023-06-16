@@ -1,7 +1,7 @@
 name: Gatomatizando
 
 
-on:
+on: push
 
   #  schedule:
 
