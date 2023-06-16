@@ -3,18 +3,7 @@ import os
 import urllib.request
 import random
 from datetime import date, timezone, timedelta, datetime
-from auth import api
-
-consumer_key = os.environ.get("CONSUMER_KEY")
-consumer_secret = os.environ.get("CONSUMER_SECRET")
-access_token = os.environ.get("ACCESS_TOKEN")
-access_token_secret = os.environ.get("ACCESS_TOKEN_SECRET")
-
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-
-# Controls Twitter account
-client = tweepy.API(auth, wait_on_rate_limit = True)
+from auth import api, client
 
 #get the time with timezone
 fuso_horario = timezone(timedelta(hours=-3))
@@ -49,8 +38,8 @@ def http_pet():
     urllib.request.urlretrieve(site, 'http_pet.jpg')
     mystring = f""" HTTP status of the day {data}"""
 #    api.update_with_media('http_pet.jpg', mystring)
-    media = client.media_upload("http_pet.jpg")
-    api.create_tweet(text=mystring, media_ids=[media.media_id])
+    media = api.media_upload("http_pet.jpg")
+    client.create_tweet(text=mystring, media_ids=[media.media_id])
     
 def hepper():
     lines=open('products.txt').read().splitlines()
@@ -60,7 +49,7 @@ def hepper():
     {status}"""
 
     try:
-        api.create_tweet(text = mystring)
+        client.create_tweet(text = mystring)
     except:
         pass
 
