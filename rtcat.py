@@ -9,12 +9,12 @@ queries = ['#CatsOnTwitter', '#DogsOnTwitter']
 
 def rtquery(hash):
     tweet = client.search_recent_tweets(f"{hash} -NFT -filter:retweets -filter:replies filter:images filter:safe", max_results=1)
-        try:
-            api.create_friendship(tweet.user.screen_name)
-            api.create_favorite(tweet.id)
-            tweet.retweet()
-        except:
-            pass
+    try:
+        api.create_friendship(tweet.user.screen_name)
+        api.create_favorite(tweet.id)
+        tweet.retweet()
+    except:
+        pass
     
 for query in queries:
     rtquery(query)
