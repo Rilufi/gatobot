@@ -50,7 +50,7 @@ def http_pet():
     mystring = f""" HTTP status of the day {data}"""
 #    api.update_with_media('http_pet.jpg', mystring)
     media = client.media_upload("http_pet.jpg")
-    api.create_tweet(status=mystring, media_ids=[media.media_id])
+    api.create_tweet(text=mystring, media_ids=[media.media_id])
     
 def hepper():
     lines=open('products.txt').read().splitlines()
@@ -67,8 +67,8 @@ def hepper():
 #if hora == '12':
 #    rtquery('nasobot')
 #    http_pet()
-hepper()
 http_pet()
+hepper()
 #    unfollower()
 #else:
 #    pass
