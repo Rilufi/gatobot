@@ -5,6 +5,17 @@ import random
 from datetime import date, timezone, timedelta, datetime
 from auth import api
 
+consumer_key = os.environ.get("CONSUMER_KEY")
+consumer_secret = os.environ.get("CONSUMER_SECRET")
+access_token = os.environ.get("ACCESS_TOKEN")
+access_token_secret = os.environ.get("ACCESS_TOKEN_SECRET")
+
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+
+# Controls Twitter account
+client = tweepy.API(auth, wait_on_rate_limit = True)
+
 #get the time with timezone
 fuso_horario = timezone(timedelta(hours=-3))
 data_e_hora_atuais = datetime.now()
@@ -38,7 +49,7 @@ def http_pet():
     urllib.request.urlretrieve(site, 'http_pet.jpg')
     mystring = f""" HTTP status of the day {data}"""
 #    api.update_with_media('http_pet.jpg', mystring)
-    media = api.media_upload("http_pet.jpg")
+    media = client.media_upload("http_pet.jpg")
     api.update_status(status=mystring, media_ids=[media.media_id])
     
 def hepper():
