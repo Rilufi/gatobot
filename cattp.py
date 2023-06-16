@@ -53,11 +53,9 @@ def hepper():
     except:
         pass
 
-#if hora == '12':
+if hora == '12':
 #    rtquery('nasobot')
-#    http_pet()
-http_pet()
-hepper()
+    http_pet()
 #    unfollower()
-#else:
-#    pass
+else:
+    hepper()
