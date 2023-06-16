@@ -1,4 +1,4 @@
-from auth import api
+from auth import api, client
 import requests
 
 def bot():
@@ -7,7 +7,7 @@ def bot():
     quote = f'{data["fact"]}'
     length = data["length"]
     if length < 240:
-        api.create_tweet(text = quote)
+        client.create_tweet(text = quote)
     else:
         pass
 
