@@ -8,7 +8,7 @@ from auth import api
 queries = ['#CatsOnTwitter', '#DogsOnTwitter']
 
 def rtquery(hash):
-    for tweet in tweepy.Cursor(api.search, q=f"{hash} -NFT -filter:retweets -filter:replies filter:images filter:safe", result_type="recent").items(1):
+    tweet = client.search_recent_tweets(f"{hash} -NFT -filter:retweets -filter:replies filter:images filter:safe", max_results=1)
         try:
             api.create_friendship(tweet.user.screen_name)
             api.create_favorite(tweet.id)
