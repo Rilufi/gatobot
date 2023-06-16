@@ -1,6 +1,6 @@
 import tweepy
 import os
-from auth import api
+from auth import api, client
 
 #search hashtag, RT, like and follow
 #three filters: one for only RT the original tweet, other for just media content and last safe images
