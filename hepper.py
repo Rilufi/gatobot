@@ -6,7 +6,9 @@ def bot():
     data = r.json()
     quote = f'{data["fact"]}'
     length = data["length"]
-    if length < 240:
+    if "skins" in quote:
+        pass
+    elif length < 240:
         client.create_tweet(text = quote)
     else:
         pass
