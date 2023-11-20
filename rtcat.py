@@ -57,8 +57,8 @@ def login(username, password):
 
 def like_retweet_follow(keyword):
 	# Search for a keyword
-    search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
-    driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
+        search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
+        driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
 	time.sleep(5)
 
 	# Extract posts
@@ -71,7 +71,7 @@ def like_retweet_follow(keyword):
 	# Like the first post
 	if len(likes) > 0:
 	    driver.execute_script("arguments[0].click();", likes[0])
-	    print("Liked the first post!")
+	    print(f"Liked the {keyword} post!")
 
 	# Retweet the first post
 	if len(retweets) > 0:
@@ -80,7 +80,7 @@ def like_retweet_follow(keyword):
 	    time.sleep(2)
 	    retweet_menu = driver.find_elements(By.XPATH, "//div[@role='menuitem']")
 	    retweet_menu[-1].click()
-	    print("Retweeted the first post!")
+	    print(f"Retweeted the {keyword} post!")
 
 # List of keywords to search and interact with
 keywords_list = ['CatsOfTwitter', 'DogsOfTwitter', 'Caturday', 'CatsOnTwitter', 'DogsOnTwitter']
