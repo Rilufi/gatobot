@@ -3,6 +3,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import chromedriver_autoinstaller
 from pyvirtualdisplay import Display
 import time
@@ -19,12 +21,12 @@ chrome_options = webdriver.ChromeOptions()
 # Add your options as needed    
 options = [
   # Define window size here
-   "--window-size=1200,1200",
+   #"--window-size=1200,1200",
     "--ignore-certificate-errors"
  
-    #"--headless",
+    "--headless",
     #"--disable-gpu",
-    #"--window-size=1920,1200",
+    "--window-size=1920,1200",
     #"--ignore-certificate-errors",
     #"--disable-extensions",
     #"--no-sandbox",
@@ -68,8 +70,9 @@ def like_retweet_follow(keyword):
     search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
     driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
     time.sleep(10)
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, '//div[@data-testid="like"]')))
 
-    # Extract posts
+  # Extract posts
     likes = driver.find_elements(By.XPATH, "//div[@data-testid='like']")
     retweets = driver.find_elements(By.XPATH, "//div[@data-testid='retweet']")
 
