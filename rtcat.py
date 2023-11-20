@@ -4,8 +4,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException 
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
@@ -27,39 +26,41 @@ class TwitterBot:
         self.bot = driver
         self.is_logged_in = False
 
-
     def login(self):
-        driver.get('https://twitter.com')
+        driver.get('https://twitter.com/i/flow/login')
+        time.sleep(6)
+        email = driver.find_element_by_name('text')
+        email.send_keys(self.email)
+        email.send_keys(Keys.ENTER)
+        time.sleep(3)
+        password = driver.find_element_by_name("password")
+        password.send_keys(self.password)
+        password.send_keys(Keys.ENTER)
+        time.sleep(6)
+        driver.get("https://twitter.com/home")  # Redirect to the home page after login
         time.sleep(5)
-    
-        fb_btn = driver.find_element(By.XPATH, '/html/body/div/div/div/div[2]/main/div/div/div[1]/div[1]/div/div[3]/div[5]/a/div/span/span')
-        fb_btn.click()
-        time.sleep(5)
-    
-        # Wait for the username field to be present
-        username_field = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input'))
-        )
-        username_field.send_keys(username)
-        
-        next_button = driver.find_element(By.XPATH, '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]/div')
-        next_button.click()
-        time.sleep(5)
-        
-        # Wait for the password field to be present
-        password_field = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input'))
-        )
-        password_field.send_keys(password)
-    
-        password_field.send_keys(Keys.RETURN)
-        time.sleep(10)
-
-
-        bot = self.bot
-        bot.get('https://twitter.com/home')
-        time.sleep(4)
         self.is_logged_in = True
+
+    def retweet_and_like(self):
+        if not self.is_logged_in:
+            raise Exception("You must log in first!")
+
+        while True:
+            try:
+                retweet_button = driver.find_element_by_xpath("//div[@data-testid='retweet']/div")
+                retweet_button.click()
+                time.sleep(1)
+
+                confirm_retweet_button = driver.find_element_by_xpath("//div[@data-testid='retweetConfirm']/div")
+                confirm_retweet_button.click()
+                time.sleep(2)
+
+                like_button = driver.find_element_by_xpath("//div[@data-testid='like']/div")
+                like_button.click()
+
+                time.sleep(2)
+            except NoSuchElementException:
+                break
 
     def search(self, query=''):
         if not self.is_logged_in:
@@ -78,57 +79,11 @@ class TwitterBot:
         searchbox.send_keys(Keys.RETURN)
         time.sleep(10)
 
-    def like_tweets(self, cycles=10):
-        if not self.is_logged_in:
-            raise Exception("You must log in first!")
-
-        bot = self.bot
-
-        for i in range(cycles):
-            try:
-                bot.find_element(By.XPATH, "//div[@data-testid='like']").click()
-            except NoSuchElementException:
-                time.sleep(3)
-                bot.execute_script('window.scrollTo(0,document.body.scrollHeight/1.5)')
-                time.sleep(3)
-                bot.find_element(By.XPATH, "//div[@data-testid='like']").click()
-
-            time.sleep(1)
-            bot.execute_script('window.scrollTo(0,document.body.scrollHeight/1.5)')
-            time.sleep(5)
-
-    def post_tweets(self, tweetBody):
-        if not self.is_logged_in:
-            raise Exception("You must log in first!")
-
-        bot = self.bot
-
-        try:
-            bot.find_element(By.XPATH, "//a[@data-testid='SideNav_NewTweet_Button']").click()
-        except NoSuchElementException:
-            time.sleep(3)
-            bot.find_element(By.XPATH, "//a[@data-testid='SideNav_NewTweet_Button']").click()
-
-        time.sleep(4)
-        body = tweetBody
-
-        try:
-            bot.find_element(By.XPATH, "//div[@role='textbox']").send_keys(body)
-        except NoSuchElementException:
-            time.sleep(3)
-            bot.find_element(By.XPATH, "//div[@role='textbox']").send_keys(body)
-
-        time.sleep(4)
-        bot.find_element(By.CLASS_NAME, "notranslate").send_keys(Keys.ENTER)
-        bot.find_element(By.XPATH, "//div[@data-testid='tweetButton']").click()
-        time.sleep(4)
-
 # Replace 'YOUR_EMAIL' and 'YOUR_PASSWORD' with your Twitter credentials
 username = os.environ.get("USERNAME")
 password = os.environ.get("PASSWORD")
 twitter_bot = TwitterBot(email=username, password=password)
 twitter_bot.login()
-
 
 # List of keywords to search and interact with
 keywords_list = ['#CatsOfTwitter', '#DogsOfTwitter', '#Caturday', '#CatsOnTwitter', '#DogsOnTwitter']
@@ -136,4 +91,4 @@ keywords_list = ['#CatsOfTwitter', '#DogsOfTwitter', '#Caturday', '#CatsOnTwitte
 for keyword in keywords_list:
     twitter_bot.search(keyword)
     time.sleep(5)  # Adjust sleep time as needed
-    twitter_bot.like_tweets(cycles=1)
+    twitter_bot.retweet_and_like()
