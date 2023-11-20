@@ -45,13 +45,16 @@ def like_retweet_follow(keyword):
     search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
     driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
     
-    # Wait for the search results to load
-    WebDriverWait(driver, 30).until(EC.presence_of_all_elements_located((By.XPATH, '//div[@data-testid="tweet"]')))
-    
-    # Scroll down to load more tweets (modify the range as needed)
+    # Scroll down to load more tweets
     for _ in range(5):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(2)
+
+    # Wait for the tweets to load
+    try:
+        WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, '//div[@data-testid="tweet"]')))
+    except:
+        print(f"No tweets found for {keyword}")
 
     # Extract posts
     likes = WebDriverWait(driver, 20).until(EC.presence_of_all_elements_located((By.XPATH, "//div[@data-testid='like']")))
