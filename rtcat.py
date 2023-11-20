@@ -26,26 +26,31 @@ class TwitterBot:
         self.bot = driver
         self.is_logged_in = False
 
-    def login(self):
-        bot = self.bot
-        bot.get('https://twitter.com/')
-        time.sleep(4)
+def login(self):
+    bot = self.bot
+    bot.get('https://twitter.com/')
+    time.sleep(4)
 
-        try:
-            email_input = bot.find_element(By.NAME, 'session[username_or_email]')
-            password_input = bot.find_element(By.NAME, 'session[password]')
-        except NoSuchElementException:
-            time.sleep(3)
-            email_input = bot.find_element(By.NAME, 'session[username_or_email]')
-            password_input = bot.find_element(By.NAME, 'session[password]')
+    try:
+        email_input = WebDriverWait(bot, 10).until(EC.presence_of_element_located((By.NAME, 'session[username_or_email]')))
+        password_input = WebDriverWait(bot, 10).until(EC.presence_of_element_located((By.NAME, 'session[password]')))
+    except TimeoutException:
+        print("Timed out waiting for login elements to load.")
+        return
 
-        email_input.clear()
-        password_input.clear()
-        email_input.send_keys(self.email)
-        password_input.send_keys(self.password)
-        password_input.send_keys(Keys.RETURN)
-        time.sleep(10)
+    email_input.clear()
+    password_input.clear()
+    email_input.send_keys(self.email)
+    password_input.send_keys(self.password)
+    password_input.send_keys(keys.Keys.RETURN)
+    
+    try:
+        WebDriverWait(bot, 10).until(EC.url_contains("home"))
+        print("Login successful!")
         self.is_logged_in = True
+    except TimeoutException:
+        print("Timed out waiting for login to complete.")
+
 
     def logout(self):
         if not self.is_logged_in:
