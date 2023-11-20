@@ -11,8 +11,9 @@ import chromedriver_autoinstaller
 chromedriver_autoinstaller.install()
 
 chrome_options = Options()
-chrome_options.add_argument("--window-size=1200,1200")
+chrome_options.add_argument("--window-size=1920,1200")
 chrome_options.add_argument("--ignore-certificate-errors")
+chrome_options.add_argument("--headless")
 
 driver = webdriver.Chrome(options=chrome_options)
 
