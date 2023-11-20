@@ -57,7 +57,7 @@ def like_retweet_follow(keyword):
     # Search for a keyword
     search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
     driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
-    time.sleep(5)
+    time.sleep(10)
 
     # Extract posts
     likes = driver.find_elements(By.XPATH, "//div[@data-testid='like']")
