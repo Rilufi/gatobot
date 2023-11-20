@@ -59,31 +59,7 @@ class TwitterBot:
         bot = self.bot
         bot.get('https://twitter.com/home')
         time.sleep(4)
-
-        try:
-            bot.find_element(By.XPATH, "//div[@data-testid='SideNav_AccountSwitcher_Button']").click()
-        except NoSuchElementException:
-            time.sleep(3)
-            bot.find_element(By.XPATH, "//div[@data-testid='SideNav_AccountSwitcher_Button']").click()
-
-        time.sleep(1)
-
-        try:
-            bot.find_element(By.XPATH, "//a[@data-testid='AccountSwitcher_Logout_Button']").click()
-        except NoSuchElementException:
-            time.sleep(2)
-            bot.find_element(By.XPATH, "//a[@data-testid='AccountSwitcher_Logout_Button']").click()
-
-        time.sleep(3)
-
-        try:
-            bot.find_element(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']").click()
-        except NoSuchElementException:
-            time.sleep(3)
-            bot.find_element(By.XPATH, "//div[@data-testid='confirmationSheetConfirm']").click()
-
-        time.sleep(3)
-        self.is_logged_in = False
+        self.is_logged_in = True
 
     def search(self, query=''):
         if not self.is_logged_in:
