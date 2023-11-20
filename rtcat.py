@@ -23,72 +23,69 @@ options = [
 for option in options:
     chrome_options.add_argument(option)
 
-    options = Options()
-    options.headless = True
-    driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
+options = Options()
+options.headless = True
+driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 def login(username, password):
+    # Open Twitter
+    driver.get('https://twitter.com')
+    # Wait for the login page to load
+    time.sleep(5)
 
-            # Open Twitter
-            driver.get('https://twitter.com')
+    fb_btn = driver.find_element("xpath", '/html/body/div/div/div/div[2]/main/div/div/div[1]/div[1]/div/div[3]/div[5]/a/div/span/span')
+    fb_btn.click()
+    time.sleep(5)
+    # Find and fill in the username and password fields
+    username_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input')
+    username_field.send_keys(username)
+    next = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]/div')
+    next.click()
+    time.sleep(5)
+    password_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input')
+    password_field.send_keys(password)
 
-            # Wait for the login page to load
-            time.sleep(5)
+    # Submit the login form
+    password_field.send_keys(Keys.RETURN)
 
-       	    fb_btn = driver.find_element("xpath",'/html/body/div/div/div/div[2]/main/div/div/div[1]/div[1]/div/div[3]/div[5]/a/div/span/span')
-            fb_btn.click()
-            time.sleep(5)
-            # Find and fill in the username and password fields
-            username_field = driver.find_element("xpath",'/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input')
-            username_field.send_keys(username)
-            next = driver.find_element("xpath",'/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]/div')
-            next.click()
-            time.sleep(5)
-            password_field = driver.find_element("xpath",'/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input')
-            password_field.send_keys(password)
-
-
-            # Submit the login form
-            password_field.send_keys(Keys.RETURN)
-
-            # Wait for the login to complete
-            time.sleep(10)
+    # Wait for the login to complete
+    time.sleep(10)
 
 
 def like_retweet_follow(keyword):
-	# Search for a keyword
-        search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
-        driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
-	time.sleep(5)
+    # Search for a keyword
+    search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
+    driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
+    time.sleep(5)
 
-	# Extract posts
-	likes = driver.find_elements(By.XPATH, "//div[@data-testid='like']")
-	retweets = driver.find_elements(By.XPATH, "//div[@data-testid='retweet']")
+    # Extract posts
+    likes = driver.find_elements(By.XPATH, "//div[@data-testid='like']")
+    retweets = driver.find_elements(By.XPATH, "//div[@data-testid='retweet']")
 
-	print("Found:", len(likes), "posts to like!")
-	print("Found:", len(retweets), "posts to retweet!")
+    print("Found:", len(likes), "posts to like!")
+    print("Found:", len(retweets), "posts to retweet!")
 
-	# Like the first post
-	if len(likes) > 0:
-	    driver.execute_script("arguments[0].click();", likes[0])
-	    print(f"Liked the {keyword} post!")
+    # Like the first post
+    if len(likes) > 0:
+        driver.execute_script("arguments[0].click();", likes[0])
+        print(f"Liked the {keyword} post!")
 
-	# Retweet the first post
-	if len(retweets) > 0:
-	    time.sleep(2)
-	    driver.execute_script("arguments[0].click();", retweets[0])
-	    time.sleep(2)
-	    retweet_menu = driver.find_elements(By.XPATH, "//div[@role='menuitem']")
-	    retweet_menu[-1].click()
-	    print(f"Retweeted the {keyword} post!")
+    # Retweet the first post
+    if len(retweets) > 0:
+        time.sleep(2)
+        driver.execute_script("arguments[0].click();", retweets[0])
+        time.sleep(2)
+        retweet_menu = driver.find_elements(By.XPATH, "//div[@role='menuitem']")
+        retweet_menu[-1].click()
+        print(f"Retweeted the {keyword} post!")
 
 # List of keywords to search and interact with
 keywords_list = ['CatsOfTwitter', 'DogsOfTwitter', 'Caturday', 'CatsOnTwitter', 'DogsOnTwitter']
 
 # Replace with your Twitter username and password
-username = os.environ.get("USERNAME") 
+username = os.environ.get("USERNAME")
 password = os.environ.get("PASSWORD")
-login(username,password)
+login(username, password)
 
 for keyword in keywords_list:
     like_retweet_follow(keyword)
