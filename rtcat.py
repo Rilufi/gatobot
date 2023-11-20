@@ -27,18 +27,30 @@ class TwitterBot:
         self.is_logged_in = False
 
     def login(self):
-        self.bot.get('https://twitter.com/i/flow/login')
-        time.sleep(6)
-        email = self.bot.find_element_by_name('text')
-        email.send_keys(self.email)
-        email.send_keys(Keys.ENTER)
-        time.sleep(3)
-        password = self.bot.find_element_by_name("password")
-        password.send_keys(self.password)
-        password.send_keys(Keys.ENTER)
-        time.sleep(6)
-        self.bot.get("https://twitter.com/home")  # Redirect to the home page after login
+        driver.get('https://twitter.com')
         time.sleep(5)
+    
+        fb_btn = driver.find_element(By.XPATH, '/html/body/div/div/div/div[2]/main/div/div/div[1]/div[1]/div/div[3]/div[5]/a/div/span/span')
+        fb_btn.click()
+        time.sleep(5)
+    
+        # Wait for the username field to be present
+        username_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input'))
+        )
+        username_field.send_keys(username)
+        
+        next_button = driver.find_element(By.XPATH, '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]/div')
+        next_button.click()
+        time.sleep(5)
+        
+        # Wait for the password field to be present
+        password_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input'))
+        )
+        password_field.send_keys(password)
+    
+        password_field.send_keys(Keys.RETURN)
         self.is_logged_in = True
 
     def retweet_and_like(self):
