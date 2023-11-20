@@ -27,43 +27,34 @@ class TwitterBot:
         self.bot = driver
         self.is_logged_in = False
 
-    def login(self):
-        bot = self.bot
-        bot.get('https://twitter.com/')
+
+    def login(username, password):
+        driver.get('https://twitter.com')
+        time.sleep(5)
+    
+        fb_btn = driver.find_element(By.XPATH, '/html/body/div/div/div/div[2]/main/div/div/div[1]/div[1]/div/div[3]/div[5]/a/div/span/span')
+        fb_btn.click()
+        time.sleep(5)
+    
+        # Wait for the username field to be present
+        username_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input'))
+        )
+        username_field.send_keys(username)
         
-        try:
-            # Wait for the login elements to be present
-            WebDriverWait(bot, 20).until(
-                EC.presence_of_element_located((By.NAME, 'session[username_or_email]'))
-                and EC.presence_of_element_located((By.NAME, 'session[password]'))
-            )
-        except TimeoutException:
-            raise Exception("Timed out waiting for login elements to load.")
-    
-        email = bot.find_element_by_name('session[username_or_email]')
-        password = bot.find_element_by_name('session[password]')
-    
-        email.clear()
-        password.clear()
-        email.send_keys(self.email)
-        password.send_keys(self.password)
-        password.send_keys(Keys.RETURN)
-    
-        try:
-            # Wait for the login to complete
-            WebDriverWait(bot, 20).until(
-                EC.url_contains('https://twitter.com/home')
-            )
-        except TimeoutException:
-            raise Exception("Timed out waiting for login to complete.")
+        next_button = driver.find_element(By.XPATH, '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]/div')
+        next_button.click()
+        time.sleep(5)
         
-        self.is_logged_in = True
+        # Wait for the password field to be present
+        password_field = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input'))
+        )
+        password_field.send_keys(password)
+    
+        password_field.send_keys(Keys.RETURN)
+        time.sleep(10)
 
-
-
-    def logout(self):
-        if not self.is_logged_in:
-            return
 
         bot = self.bot
         bot.get('https://twitter.com/home')
@@ -170,6 +161,3 @@ for keyword in keywords_list:
     twitter_bot.search(keyword)
     time.sleep(5)  # Adjust sleep time as needed
     twitter_bot.like_tweets(cycles=1)
-    
-# Logout
-twitter_bot.logout()
