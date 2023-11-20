@@ -64,13 +64,20 @@ def login(username, password):
     # Wait for the login to complete
     time.sleep(10)
 
+def scroll_down():
+    for _ in range(5):
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
+
 
 def like_retweet_follow(keyword):
     # Search for a keyword
     search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
     driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
     time.sleep(10)
-    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, '//div[@data-testid="like"]')))
+    scroll_down()
+
+    WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, '//div[@data-testid="like"]')))
 
   # Extract posts
     likes = driver.find_elements(By.XPATH, "//div[@data-testid='like']")
