@@ -9,44 +9,23 @@ on: push
 
 
 jobs:
-  tweet:
-    name: Tweet
-    
+  tasker:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout 🛎
-        uses: actions/checkout@v3
-        
-      - name: Set up Python 🐍
-        uses: actions/setup-python@v3
+      - name: Check out this repo
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          python-version: 3.x
-
-      - name: Cache Python packages 💾
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-            ${{ runner.os }}-
-
-      - name: Install packages ⚙
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      # Use HEREDOC for `run` to escape possible single and double quotes in the message.
-      - name: RT cat 🐦
+          python-version: '3.9'
+      - name: Installed package list
+        run: apt list --installed
+      - name: Remove Chrome
+        run: sudo apt purge google-chrome-stable
+      - name: Install all necessary packages
+        run: pip install requests beautifulsoup4 pandas webdriver_manager selenium
+      - name: Run the rtcat script
         env:
-                  CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
-
-                  CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
-
-                  ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-
-                  ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
-
-                  
+                  USERNAME: ${{ secrets.USERNAME }}
+                  PASSWORD: ${{ secrets.PASSWORD }}
         run: python rtcat.py
