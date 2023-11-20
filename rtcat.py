@@ -79,7 +79,7 @@ class TwitterBot:
         bot = self.bot
 
         search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
-    driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
+        driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
     
     # Scroll down to load more tweets
         for _ in range(5):
