@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 import time
 import os
 
+# For using selenium on GitHub
 chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
 
 chrome_options = Options()
