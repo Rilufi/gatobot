@@ -53,6 +53,7 @@ class TwitterBot:
         password_field.send_keys(Keys.RETURN)
         self.is_logged_in = True
 
+    
     def retweet_and_like(self):
         if not self.is_logged_in:
             raise Exception("You must log in first!")
@@ -74,23 +75,30 @@ class TwitterBot:
             except NoSuchElementException:
                 break
 
-    def search(self, query=''):
-        if not self.is_logged_in:
-            raise Exception("You must log in first!")
-
+    def search(self, keyword):
         bot = self.bot
 
-        try:
-            searchbox = bot.find_element(By.XPATH, "//input[@data-testid='SearchBox_Search_Input']")
-        except NoSuchElementException:
+            search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
+    driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
+    
+    # Scroll down to load more tweets
+        for _ in range(5):
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
-            searchbox = bot.find_element(By.XPATH, "//input[@data-testid='SearchBox_Search_Input']")
-
-        searchbox.clear()
-        searchbox.send_keys(query)
-        searchbox.send_keys(Keys.RETURN)
-        time.sleep(10)
-
+    
+        # Wait for the tweets to load
+        try:
+            WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, '//div[@data-testid="tweet"]')))
+        except:
+            print(f"No tweets found for {keyword}")
+    
+        # Extract posts
+        likes = WebDriverWait(driver, 20).until(EC.presence_of_all_elements_located((By.XPATH, "//div[@data-testid='like']")))
+        retweets = WebDriverWait(driver, 20).until(EC.presence_of_all_elements_located((By.XPATH, "//div[@data-testid='retweet']")))
+    
+        print("Found:", len(likes), "posts to like!")
+        print("Found:", len(retweets), "posts to retweet!")
+    
 # Replace 'YOUR_EMAIL' and 'YOUR_PASSWORD' with your Twitter credentials
 username = os.environ.get("USERNAME")
 password = os.environ.get("PASSWORD")
