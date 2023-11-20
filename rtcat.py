@@ -30,27 +30,35 @@ class TwitterBot:
     def login(self):
         bot = self.bot
         bot.get('https://twitter.com/')
-        time.sleep(4)
-    
-        try:
-            email_input = WebDriverWait(bot, 10).until(EC.presence_of_element_located((By.NAME, 'session[username_or_email]')))
-            password_input = WebDriverWait(bot, 10).until(EC.presence_of_element_located((By.NAME, 'session[password]')))
-        except TimeoutException:
-            print("Timed out waiting for login elements to load.")
-            return
-    
-        email_input.clear()
-        password_input.clear()
-        email_input.send_keys(self.email)
-        password_input.send_keys(self.password)
-        password_input.send_keys(keys.Keys.RETURN)
         
         try:
-            WebDriverWait(bot, 10).until(EC.url_contains("home"))
-            print("Login successful!")
-            self.is_logged_in = True
+            # Wait for the login elements to be present
+            WebDriverWait(bot, 20).until(
+                EC.presence_of_element_located((By.NAME, 'session[username_or_email]'))
+                and EC.presence_of_element_located((By.NAME, 'session[password]'))
+            )
         except TimeoutException:
-            print("Timed out waiting for login to complete.")
+            raise Exception("Timed out waiting for login elements to load.")
+    
+        email = bot.find_element_by_name('session[username_or_email]')
+        password = bot.find_element_by_name('session[password]')
+    
+        email.clear()
+        password.clear()
+        email.send_keys(self.email)
+        password.send_keys(self.password)
+        password.send_keys(Keys.RETURN)
+    
+        try:
+            # Wait for the login to complete
+            WebDriverWait(bot, 20).until(
+                EC.url_contains('https://twitter.com/home')
+            )
+        except TimeoutException:
+            raise Exception("Timed out waiting for login to complete.")
+        
+        self.is_logged_in = True
+
 
 
     def logout(self):
