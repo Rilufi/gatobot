@@ -28,7 +28,7 @@ class TwitterBot:
         self.is_logged_in = False
 
 
-    def login(username, password):
+    def login(self):
         driver.get('https://twitter.com')
         time.sleep(5)
     
