@@ -1,14 +1,10 @@
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.os_manager import ChromeType
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-import time
-import os
 import chromedriver_autoinstaller
 from pyvirtualdisplay import Display
+import time
+import os
 
 display = Display(visible=0, size=(800, 800))  
 display.start()
