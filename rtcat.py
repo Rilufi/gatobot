@@ -7,26 +7,38 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import time
 import os
+import chromedriver_autoinstaller
+from pyvirtualdisplay import Display
 
-# For using selenium on GitHub
-chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+display = Display(visible=0, size=(800, 800))  
+display.start()
 
-chrome_options = Options()
+chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
+                                      # and if it doesn't exist, download it automatically,
+                                      # then add chromedriver to path
+
+chrome_options = webdriver.ChromeOptions()    
+# Add your options as needed    
 options = [
-    "--headless",
-    "--disable-gpu",
-    "--window-size=1920,1200",
-    "--ignore-certificate-errors",
-    "--disable-extensions",
-    "--no-sandbox",
-    "--disable-dev-shm-usage"
+  # Define window size here
+   "--window-size=1200,1200",
+    "--ignore-certificate-errors"
+ 
+    #"--headless",
+    #"--disable-gpu",
+    #"--window-size=1920,1200",
+    #"--ignore-certificate-errors",
+    #"--disable-extensions",
+    #"--no-sandbox",
+    #"--disable-dev-shm-usage",
+    #'--remote-debugging-port=9222'
 ]
+
 for option in options:
     chrome_options.add_argument(option)
 
-options = Options()
-options.headless = True
-driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
+    
+driver = webdriver.Chrome(options = chrome_options)
 
 def login(username, password):
     # Open Twitter
