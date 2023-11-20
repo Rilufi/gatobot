@@ -27,17 +27,17 @@ class TwitterBot:
         self.is_logged_in = False
 
     def login(self):
-        driver.get('https://twitter.com/i/flow/login')
+        self.bot.get('https://twitter.com/i/flow/login')
         time.sleep(6)
-        email = driver.find_element_by_name('text')
+        email = self.bot.find_element_by_name('text')
         email.send_keys(self.email)
         email.send_keys(Keys.ENTER)
         time.sleep(3)
-        password = driver.find_element_by_name("password")
+        password = self.bot.find_element_by_name("password")
         password.send_keys(self.password)
         password.send_keys(Keys.ENTER)
         time.sleep(6)
-        driver.get("https://twitter.com/home")  # Redirect to the home page after login
+        self.bot.get("https://twitter.com/home")  # Redirect to the home page after login
         time.sleep(5)
         self.is_logged_in = True
 
@@ -47,15 +47,15 @@ class TwitterBot:
 
         while True:
             try:
-                retweet_button = driver.find_element_by_xpath("//div[@data-testid='retweet']/div")
+                retweet_button = self.bot.find_element_by_xpath("//div[@data-testid='retweet']/div")
                 retweet_button.click()
                 time.sleep(1)
 
-                confirm_retweet_button = driver.find_element_by_xpath("//div[@data-testid='retweetConfirm']/div")
+                confirm_retweet_button = self.bot.find_element_by_xpath("//div[@data-testid='retweetConfirm']/div")
                 confirm_retweet_button.click()
                 time.sleep(2)
 
-                like_button = driver.find_element_by_xpath("//div[@data-testid='like']/div")
+                like_button = self.bot.find_element_by_xpath("//div[@data-testid='like']/div")
                 like_button.click()
 
                 time.sleep(2)
