@@ -10,43 +10,47 @@ import time
 import os
 import chromedriver_autoinstaller
 
+chromedriver_autoinstaller.install()
 options = Options()
 options.add_argument("start-maximized")
 options.add_argument("disable-infobars")
 options.add_argument("--disable-extensions")
-options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--disable-gpu")
-options.add_argument("--single-process")
-options.add_argument('--headless')
+options.add_argument("--no-sandbox")
+# options.add_argument('--headless')  # Comente esta linha para executar no modo normal
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.binary_location = "/usr/bin/chromium-browser"
-
 driver = webdriver.Chrome(options=options)
 
-
 def login(username, password, email):
+    print("Iniciando o login...")
     # Open Twitter
     driver.get('https://twitter.com')
-    # Wait for the login page to load
+    print("Aguardando a página de login carregar...")
     time.sleep(5)
 
-    fb_btn = driver.find_element("xpath", '/html/body/div/div/div/div[2]/main/div/div/div[1]/div[1]/div/div[3]/div[5]/a/div/span/span')
+    fb_btn = driver.find_element("xpath", '/html/body/div/div/div/div[2]/main/div/div/div[1]/div/\
+        1/div/div[3]/div[5]/a/div/span/span')
     fb_btn.click()
     time.sleep(5)
     # Find and fill in the username and password fields
-    username_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input')
+    username_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/\
+        div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input')
     username_field.send_keys(username)
-    next = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]/div')
+    next = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/\
+        div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]/div')
     next.click()
+    print(f"Inseriu o nome de usuário: {username}")
     time.sleep(5)
-    password_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input')
+    password_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/\
+        div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input')
     password_field.send_keys(password)
 
     # Submit the login form
     password_field.send_keys(Keys.RETURN)
 
     # Wait for the login to complete
+    print("Aguardando o login ser concluído...")
     time.sleep(10)
 
     # Check for a second identification page
@@ -66,17 +70,19 @@ def login(username, password, email):
         print("No second identification page found. Continue with the script.")
 
 def like_retweet_follow(keyword):
+    print(f"Iniciando interação com a hashtag: {keyword}")
     # Search for a keyword
-    search_query = f"{keyword} -filter:retweets -filter:replies filter:images"
+    search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
     driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
+    print("Aguardando a página de resultados de pesquisa carregar...")
     time.sleep(10)
 
     # Extract posts
     likes = driver.find_elements(By.XPATH, "//div[@data-testid='like']")
     retweets = driver.find_elements(By.XPATH, "//div[@data-testid='retweet']")
 
-    print("Found:", len(likes), "posts to like!")
-    print("Found:", len(retweets), "posts to retweet!")
+    print(f"Found: {len(likes)} posts to like!")
+    print(f"Found: {len(retweets)} posts to retweet!")
 
     # Like the first post
     if len(likes) > 0:
@@ -98,8 +104,17 @@ keywords_list = ['CatsOfTwitter', 'DogsOfTwitter', 'Caturday', 'CatsOnTwitter', 
 # Replace with your Twitter username and password
 username = os.environ.get("USERNAME")
 password = os.environ.get("PASSWORD")
-email = os.environ.get("EMAIL")
-login(username, password, email)
+email = os.environ.get("EMAIL")  # Adicione esta linha para obter o email do ambiente
 
-for keyword in keywords_list:
-    like_retweet_follow(keyword)
+# Adicione o bloco try-except para capturar erros e imprimir detalhes do erro
+try:
+    login(username, password, email)
+
+    for keyword in keywords_list:
+        like_retweet_follow(keyword)
+
+except Exception as e:
+    print(f"Erro durante a execução: {e}")
+    raise  # Re-levanta a exceção para que você possa ver o rastreamento completo no GitHub Actions
+finally:
+    driver.quit()
