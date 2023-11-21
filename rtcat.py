@@ -68,7 +68,13 @@ def like_retweet_follow(keyword):
     search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
     driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
     print("Aguardando a página de resultados de pesquisa carregar...")
-    time.sleep(10)
+    
+    # Esperar até que os resultados da pesquisa sejam carregados
+    try:
+        WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, "//div[@data-testid='like']")))
+    except TimeoutException:
+        print("Tempo de espera excedido. Os resultados da pesquisa podem não ter carregado corretamente.")
+        return
 
     # Extract posts
     likes = driver.find_elements(By.XPATH, "//div[@data-testid='like']")
