@@ -12,12 +12,12 @@ import chromedriver_autoinstaller
 
 chromedriver_autoinstaller.install()
 
-chrome_options = Options()
-chrome_options.add_argument("--window-size=1920,1200")
-chrome_options.add_argument("--ignore-certificate-errors")
-chrome_options.add_argument("--headless")
+#chrome_options = Options()
+#chrome_options.add_argument("--window-size=1920,1200")
+#chrome_options.add_argument("--ignore-certificate-errors")
+#chrome_options.add_argument("--headless")
 
-driver = webdriver.Chrome(options=chrome_options)
+driver = webdriver.Chrome()#options=chrome_options)
 
 class TwitterBot:
     def __init__(self, email, password):
