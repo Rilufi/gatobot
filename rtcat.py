@@ -17,7 +17,7 @@ options.add_argument("disable-infobars")
 options.add_argument("--disable-extensions")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--no-sandbox")
-options.add_argument('--headless=new')
+options.add_argument('--headless')
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.binary_location = "/usr/bin/chromium-browser"
 driver = webdriver.Chrome(options=options)
@@ -68,6 +68,8 @@ def like_retweet_follow(keyword):
     search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
     driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
     print("Aguardando a página de resultados de pesquisa carregar...")
+    # Aguardar até que a página seja carregada
+    driver.implicitly_wait(10)  # Ajuste o tempo de espera conforme necessário
     
     # Esperar até que os resultados da pesquisa sejam carregados
     try:
