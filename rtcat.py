@@ -23,34 +23,27 @@ options.binary_location = "/usr/bin/chromium-browser"
 driver = webdriver.Chrome(options=options)
 
 def login(username, password, email):
-    print("Iniciando o login...")
     # Open Twitter
     driver.get('https://twitter.com')
-    print("Aguardando a página de login carregar...")
+    # Wait for the login page to load
     time.sleep(5)
 
-    fb_btn = driver.find_element("xpath", '/html/body/div/div/div/div[2]/main/div/div/div[1]/div/\
-        1/div/div[3]/div[5]/a/div/span/span')
+    fb_btn = driver.find_element("xpath", '/html/body/div/div/div/div[2]/main/div/div/div[1]/div[1]/div/div[3]/div[5]/a/div/span/span')
     fb_btn.click()
     time.sleep(5)
     # Find and fill in the username and password fields
-    username_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/\
-        div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input')
+    username_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input')
     username_field.send_keys(username)
-    next = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/\
-        div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]/div')
+    next = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]/div')
     next.click()
-    print(f"Inseriu o nome de usuário: {username}")
     time.sleep(5)
-    password_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/\
-        div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input')
+    password_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input')
     password_field.send_keys(password)
 
     # Submit the login form
     password_field.send_keys(Keys.RETURN)
 
     # Wait for the login to complete
-    print("Aguardando o login ser concluído...")
     time.sleep(10)
 
     # Check for a second identification page
