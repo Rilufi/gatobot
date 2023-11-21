@@ -11,7 +11,9 @@ import os
 import chromedriver_autoinstaller
 
 chromedriver_autoinstaller.install()
-driver = webdriver.Chrome()
+options = Options()
+options.headless = True
+driver = webdriver.Chrome(options=options)
 
 def login(username, password):
     # Open Twitter
