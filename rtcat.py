@@ -17,10 +17,9 @@ options.add_argument("disable-infobars")
 options.add_argument("--disable-extensions")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--no-sandbox")
-if headless:
-    options.add_argument('--headless')
-    options.binary_location = "/usr/bin/chromium-browser"
-    self.driver = webdriver.Chrome(options=options)
+options.add_argument('--headless')
+options.binary_location = "/usr/bin/chromium-browser"
+driver = webdriver.Chrome(options=options)
 
 def login(username, password):
     # Open Twitter
