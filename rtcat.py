@@ -17,7 +17,7 @@ options.add_argument("disable-infobars")
 options.add_argument("--disable-extensions")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--no-sandbox")
-options.add_argument('--headless')
+options.add_argument('--headless=new')
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.binary_location = "/usr/bin/chromium-browser"
 driver = webdriver.Chrome(options=options)
