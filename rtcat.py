@@ -69,10 +69,13 @@ def like_retweet_follow(keyword):
     driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
     print("Aguardando a página de resultados de pesquisa carregar...")
     
-    # Aguardar até que o título da página seja alterado após a pesquisa
+    # Aguardar até que os botões de curtir e retweetar estejam presentes
     try:
         WebDriverWait(driver, 10).until(
-            EC.staleness_of(driver.find_element(By.TAG_NAME, 'title'))
+            EC.presence_of_element_located((By.XPATH, "//div[@data-testid='like']"))
+        )
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//div[@data-testid='retweet']"))
         )
         print("Página de resultados de pesquisa carregada com sucesso.")
     except TimeoutException:
