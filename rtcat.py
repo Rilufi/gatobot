@@ -13,6 +13,7 @@ import chromedriver_autoinstaller
 chromedriver_autoinstaller.install()
 options = Options()
 options.headless = True
+options.add_argument('--no-sandbox')
 driver = webdriver.Chrome(options=options)
 
 def login(username, password):
