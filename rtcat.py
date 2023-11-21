@@ -22,45 +22,56 @@ options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.binary_location = "/usr/bin/chromium-browser"
 driver = webdriver.Chrome(options=options)
 
+def find_element_with_retry(by, value, max_retries=5):
+    retries = 0
+    while retries < max_retries:
+        try:
+            element = driver.find_element(by, value)
+            return element
+        except NoSuchElementException:
+            retries += 1
+            time.sleep(2)  # Aguarde por 2 segundos antes de tentar novamente
+    raise NoSuchElementException(f"Elemento não encontrado após {max_retries} tentativas.")
+
 def login(username, password, email):
     # Open Twitter
     driver.get('https://twitter.com')
     # Wait for the login page to load
     time.sleep(5)
 
-    fb_btn = driver.find_element("xpath", '/html/body/div/div/div/div[2]/main/div/div/div[1]/div[1]/div/div[3]/div[5]/a/div/span/span')
-    fb_btn.click()
-    time.sleep(5)
-    # Find and fill in the username and password fields
-    username_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[5]/label/div/div[2]/div/input')
-    username_field.send_keys(username)
-    next = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div/div/div/div[6]/div')
-    next.click()
-    time.sleep(5)
-    password_field = driver.find_element("xpath", '/html/body/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[2]/div[2]/div[1]/div/div/div[3]/div/label/div/div[2]/div[1]/input')
-    password_field.send_keys(password)
-
-    # Submit the login form
-    password_field.send_keys(Keys.RETURN)
-
-    # Wait for the login to complete
-    time.sleep(10)
-
-    # Check for a second identification page
     try:
-        second_identification_input = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//input[@data-testid='ocfEnterTextTextInput']"))
-        )
-        # You can handle the second identification here
-        print("Second identification page found. Handle it here.")
-        # For example, you can fill in the input and submit
-        second_identification_input.send_keys(email)
-        second_identification_input.send_keys(Keys.RETURN)
+        username_field = find_element_with_retry(By.XPATH, "//input[@name='session[username_or_email]']")
+        username_field.send_keys(username)
+    
+        next_button = find_element_with_retry(By.XPATH, "//div[@data-testid='LoginForm_Login_Button']")
+        next_button.click()
+    
+        password_field = find_element_with_retry(By.XPATH, "//input[@name='session[password]']")
+        password_field.send_keys(password)
+    
+        # Submit the login form
+        password_field.send_keys(Keys.RETURN)
+    
         # Wait for the login to complete
         time.sleep(10)
-    except TimeoutException:
-        # No second identification page, continue with the script
-        print("No second identification page found. Continue with the script.")
+    
+        # Check for a second identification page
+        try:
+            second_identification_input = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "//input[@data-testid='ocfEnterTextTextInput']"))
+            )
+            # You can handle the second identification here
+            print("Second identification page found. Handle it here.")
+            # For example, you can fill in the input and submit
+            second_identification_input.send_keys(email)
+            second_identification_input.send_keys(Keys.RETURN)
+            # Wait for the login to complete
+            time.sleep(10)
+        except TimeoutException:
+            # No second identification page, continue with the script
+            print("No second identification page found. Continue with the script.")
+    except NoSuchElementException as e:
+        print(f"Erro durante a execução: {e}")
 
 def like_retweet_follow(keyword):
     print(f"Iniciando interação com a hashtag: {keyword}")
