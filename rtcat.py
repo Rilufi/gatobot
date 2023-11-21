@@ -22,7 +22,8 @@ options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.binary_location = "/usr/bin/chromium-browser"
 driver = webdriver.Chrome(options=options)
 
-def login(username, password):
+
+def login(username, password, email):
     # Open Twitter
     driver.get('https://twitter.com')
     # Wait for the login page to load
@@ -46,6 +47,21 @@ def login(username, password):
     # Wait for the login to complete
     time.sleep(10)
 
+    # Check for a second identification page
+    try:
+        second_identification_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//input[@data-testid='ocfEnterTextTextInput']"))
+        )
+        # You can handle the second identification here
+        print("Second identification page found. Handle it here.")
+        # For example, you can fill in the input and submit
+        second_identification_input.send_keys(email)
+        second_identification_input.send_keys(Keys.RETURN)
+        # Wait for the login to complete
+        time.sleep(10)
+    except TimeoutException:
+        # No second identification page, continue with the script
+        print("No second identification page found. Continue with the script.")
 
 def like_retweet_follow(keyword):
     # Search for a keyword
@@ -80,7 +96,8 @@ keywords_list = ['CatsOfTwitter', 'DogsOfTwitter', 'Caturday', 'CatsOnTwitter', 
 # Replace with your Twitter username and password
 username = os.environ.get("USERNAME")
 password = os.environ.get("PASSWORD")
-login(username, password)
+email = os.environ.get("EMAIL")
+login(username, password, email)
 
 for keyword in keywords_list:
     like_retweet_follow(keyword)
