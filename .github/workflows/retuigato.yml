@@ -25,35 +25,6 @@ jobs:
         #python -m pip install --upgrade pip
         #pip install -r requirements.txt  # Se você tiver um arquivo requirements.txt com as dependências
         pip install chromedriver-autoinstaller selenium pyvirtualdisplay webdriver_manager
-    - name: Install Chrome
-      run: |
-        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-        sudo apt-get update
-        sudo apt-get install google-chrome-stable
-
-    - name: Install ChromeDriver
-      run: |
-        LATEST_VERSION=$(wget -q -O - https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-        CHROME_VERSION=$(google-chrome-stable --version | grep -oP "[0-9]+")
-    
-        # Use a specific version of ChromeDriver compatible with your Chrome version
-        CHROMEDRIVER_VERSION="119.0.6045.159"
-    
-        if [ -e "/usr/local/bin/chromedriver" ]; then
-          sudo rm /usr/local/bin/chromedriver
-        fi
-        wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-        unzip chromedriver_linux64.zip
-        sudo mv chromedriver /usr/local/bin/
-        sudo chmod +x /usr/local/bin/chromedriver
-        chromedriver --version
-        google-chrome-stable --version
-        if [ "$CHROMEDRIVER_VERSION" != "$CHROME_VERSION" ]; then
-          echo "Chrome and ChromeDriver versions do not match. Exiting."
-          exit 1
-        fi
-
 
     - name: Run the rtcat script
       env:
