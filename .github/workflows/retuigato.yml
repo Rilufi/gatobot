@@ -35,8 +35,10 @@ jobs:
     - name: Install ChromeDriver
       run: |
         LATEST_VERSION=$(wget -q -O - https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
-        sudo rm /usr/local/bin/chromedriver  # Remova a versão antiga
-        wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/119.0.6045.105/linux64/chrome-linux64.zip
+        if [ -e "/usr/local/bin/chromedriver" ]; then
+          sudo rm /usr/local/bin/chromedriver
+        fi
+        wget https://chromedriver.storage.googleapis.com/$LATEST_VERSION/chromedriver_linux64.zip
         unzip chromedriver_linux64.zip
         sudo mv chromedriver /usr/local/bin/
         sudo chmod +x /usr/local/bin/chromedriver
