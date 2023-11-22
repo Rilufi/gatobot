@@ -38,7 +38,7 @@ jobs:
         CHROME_VERSION=$(google-chrome-stable --version | grep -oP "[0-9]+")
     
         # Use a specific version of ChromeDriver compatible with your Chrome version
-        CHROMEDRIVER_VERSION="119.0.6045.105"
+        CHROMEDRIVER_VERSION="119.0.6045.159"
     
         if [ -e "/usr/local/bin/chromedriver" ]; then
           sudo rm /usr/local/bin/chromedriver
