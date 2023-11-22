@@ -9,18 +9,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
 import chromedriver_autoinstaller
+import undetected_chromedriver as uc
 
-chromedriver_autoinstaller.install()
-options = Options()
-options.add_argument("start-maximized")
-options.add_argument("disable-infobars")
-options.add_argument("--disable-extensions")
-options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--no-sandbox")
-options.add_argument('--headless')
-options.add_experimental_option("excludeSwitches", ["enable-automation"])
-options.binary_location = "/usr/bin/chromium-browser"
-driver = webdriver.Chrome(options=options)
+
+driver = uc.Chrome(headless=True,use_subprocess=False)
 
 def find_element_with_retry(by, value, max_retries=5):
     retries = 0
