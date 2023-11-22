@@ -12,7 +12,17 @@ import chromedriver_autoinstaller
 import undetected_chromedriver as uc
 
 
-driver = uc.Chrome(headless=True,use_subprocess=False)
+# Define a custom user agent
+user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
+#my_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
+ 
+# Set up Chrome options
+options = uc.ChromeOptions()
+options.add_argument("--headless")
+options.add_argument(f"user-agent={user_agent}")
+ 
+# Initialize Chrome WebDriver with the specified options
+driver = uc.Chrome(options=options)
 
 def find_element_with_retry(by, value, max_retries=5):
     retries = 0
