@@ -74,10 +74,10 @@ def like_retweet_follow(keyword):
     
     # Aguardar até que os botões de curtir e retweetar estejam visíveis
     try:
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 60).until(
             EC.visibility_of_element_located((By.XPATH, "//div[@data-testid='like']"))
         )
-        WebDriverWait(driver, 20).until(
+        WebDriverWait(driver, 60).until(
             EC.visibility_of_element_located((By.XPATH, "//div[@data-testid='retweet']"))
         )
         print("Página de resultados de pesquisa carregada com sucesso.")
