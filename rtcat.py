@@ -78,7 +78,7 @@ def login(username, password, email):
 def like_retweet_follow(keyword):
     print(f"Iniciando interação com a hashtag: {keyword}")
     # Search for a keyword
-    search_query = f"{keyword} -filter:retweets -filter:replies filter:images filter:safe"
+    search_query = f"{keyword} -filter:retweets -filter:replies filter:images"
     driver.get(f"https://twitter.com/search?q=%23{search_query}&src=recent_search_click&f=live")
     print("Aguardando a página de resultados de pesquisa carregar...")
     
