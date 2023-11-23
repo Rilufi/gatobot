@@ -84,10 +84,10 @@ def like_retweet_follow(keyword):
     
     # Aguardar até que os botões de curtir e retweetar estejam visíveis
     try:
-        WebDriverWait(driver, 60).until(
+        WebDriverWait(driver, 20).until(
             EC.visibility_of_element_located((By.XPATH, "//div[@data-testid='like']"))
         )
-        WebDriverWait(driver, 60).until(
+        WebDriverWait(driver, 20).until(
             EC.visibility_of_element_located((By.XPATH, "//div[@data-testid='retweet']"))
         )
         print("Página de resultados de pesquisa carregada com sucesso.")
@@ -127,8 +127,8 @@ email = os.environ.get("EMAIL")  # Adicione esta linha para obter o email do amb
 try:
     login(username, password, email)
 
-    for keyword in keywords_list:
-        like_retweet_follow(keyword)
+   # for keyword in keywords_list:
+        #like_retweet_follow(keyword)
 
 except Exception as e:
     print(f"Erro durante a execução: {e}")
