@@ -21,7 +21,6 @@ username = os.environ.get("USERNAME")
 password = os.environ.get("PASSWORD")
 email = os.environ.get("EMAIL")
 
-
 def obter_codigo_verificacao():
     # Configurações do servidor IMAP
     email_user = os.environ.get("EMAIL")
