@@ -8,7 +8,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
-import chromedriver_autoinstaller
+#import chromedriver_autoinstaller
 import undetected_chromedriver as uc
 import imaplib
 import email
