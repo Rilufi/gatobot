@@ -21,11 +21,13 @@ username = os.environ.get("USERNAME")
 password = os.environ.get("PASSWORD")
 email = os.environ.get("EMAIL")
 
+
+
 def obter_codigo_verificacao():
-    # Configurações do servidor IMAP
+    # Configurações do servidor IMAP do Gmail
     email_user = os.environ.get("EMAIL")
     email_pass = os.environ.get("PASS")
-    server = "outlook.office365.com"
+    server = "imap.gmail.com"
 
     # Conectar ao servidor IMAP
     mail = imaplib.IMAP4_SSL(server)
@@ -36,8 +38,8 @@ def obter_codigo_verificacao():
     # Selecionar a caixa de entrada
     mail.select("inbox")
 
-    # Pesquisar por todos os emails de info@x.com
-    status, messages = mail.search(None, '(FROM "info@x.com")')
+    # Pesquisar por todos os e-mails
+    status, messages = mail.search(None, "ALL")
 
     # Obter o ID do último e-mail
     latest_email_id = messages[0].split()[-1]
@@ -69,13 +71,10 @@ def obter_codigo_verificacao():
                 if matches:
                     # Salvar o resultado único em uma variável
                     resultado_final = matches[0]
-                    print(f"Código de verificação: {resultado_final}")
+                    return resultado_final
 
     # Fechar a conexão
     mail.logout()
-
-    return resultado_final
-
 
 # Define a custom user agent
 user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
