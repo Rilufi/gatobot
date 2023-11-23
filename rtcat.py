@@ -10,6 +10,74 @@ import time
 import os
 import chromedriver_autoinstaller
 import undetected_chromedriver as uc
+import imaplib
+import email
+import re
+from email.header import decode_header
+
+
+# Replace with your Twitter username and password
+username = os.environ.get("USERNAME")
+password = os.environ.get("PASSWORD")
+email = os.environ.get("EMAIL")
+
+
+def obter_codigo_verificacao():
+    # Configurações do servidor IMAP
+    email_user = os.environ.get("EMAIL")
+    email_pass = os.environ.get("PASS")
+    server = "outlook.office365.com"
+
+    # Conectar ao servidor IMAP
+    mail = imaplib.IMAP4_SSL(server)
+
+    # Logar na sua conta
+    mail.login(email_user, email_pass)
+
+    # Selecionar a caixa de entrada
+    mail.select("inbox")
+
+    # Pesquisar por todos os emails de info@x.com
+    status, messages = mail.search(None, '(FROM "info@x.com")')
+
+    # Obter o ID do último e-mail
+    latest_email_id = messages[0].split()[-1]
+
+    # Buscar o último e-mail pelo ID
+    status, msg_data = mail.fetch(latest_email_id, "(RFC822)")
+
+    for response_part in msg_data:
+        if isinstance(response_part, tuple):
+            # Parsear a mensagem
+            email_message = email.message_from_bytes(response_part[1])
+
+            # Obter o texto do corpo do e-mail
+            if email_message.is_multipart():
+                for part in email_message.walk():
+                    if part.get_content_type() == "text/plain":
+                        body = part.get_payload(decode=True).decode(part.get_content_charset())
+                        break
+            else:
+                body = email_message.get_payload(decode=True).decode(email_message.get_content_charset())
+
+            # Procurar por todas as palavras com exatamente 8 caracteres
+            matches = re.findall(r'\b[a-zA-Z0-9]{8}\b', body)
+
+            if matches:
+                # Excluir palavras especificadas
+                matches = [match for match in matches if match.lower() not in {'suspeita', 'proteger', 'managing', 'settings', 'articles'}]
+
+                if matches:
+                    # Salvar o resultado único em uma variável
+                    resultado_final = matches[0]
+                    print(f"Código de verificação: {resultado_final}")
+
+    # Fechar a conexão
+    mail.logout()
+
+    return resultado_final
+
+# Chamar a função e obter o resultado
 
 
 # Define a custom user agent
@@ -67,7 +135,8 @@ def login(username, password, email):
         # You can handle the second identification here
         print("Second identification page found. Handle it here.")
         # For example, you can fill in the input and submit
-        second_identification_input.send_keys(email)
+        code = obter_codigo_verificacao()
+        second_identification_input.send_keys(code)
         second_identification_input.send_keys(Keys.RETURN)
         # Wait for the login to complete
         time.sleep(10)
@@ -117,11 +186,6 @@ def like_retweet_follow(keyword):
 
 # List of keywords to search and interact with
 keywords_list = ['CatsOfTwitter', 'DogsOfTwitter', 'Caturday', 'CatsOnTwitter', 'DogsOnTwitter']
-
-# Replace with your Twitter username and password
-username = os.environ.get("USERNAME")
-password = os.environ.get("PASSWORD")
-email = os.environ.get("EMAIL")  # Adicione esta linha para obter o email do ambiente
 
 # Adicione o bloco try-except para capturar erros e imprimir detalhes do erro
 try:
