@@ -32,6 +32,7 @@ def obter_codigo_verificacao():
 
     # Logar na sua conta
     mail.login(email_user, email_pass)
+    print("Logado no email")
 
     # Selecionar a caixa de entrada
     mail.select("inbox")
