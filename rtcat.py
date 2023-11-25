@@ -8,82 +8,17 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 import time
 import os
 import undetected_chromedriver as uc
-import imaplib
-import email
-import re
-from email.header import decode_header
-
+from sys import exit
 
 # Replace with your Twitter username and password
 username = os.environ.get("USERNAME")
 password = os.environ.get("PASSWORD")
 email = os.environ.get("EMAIL")
 
-
-
-def obter_codigo_verificacao():
-    # Configurações do servidor IMAP do Gmail
-    email_user = os.environ.get("EMAIL")
-    email_pass = os.environ.get("PASS")
-    server = "imap.gmail.com"
-
-    # Conectar ao servidor IMAP
-    mail = imaplib.IMAP4_SSL(server)
-
-    # Logar na sua conta
-    mail.login(email_user, email_pass)
-    print("Logado no email")
-
-    # Selecionar a caixa de entrada
-    mail.select("inbox")
-
-    # Pesquisar por todos os e-mails
-    status, messages = mail.search(None, "ALL")
-
-    # Obter o ID do último e-mail
-    latest_email_id = messages[0].split()[-1]
-
-    # Buscar o último e-mail pelo ID
-    status, msg_data = mail.fetch(latest_email_id, "(RFC822)")
-
-    for response_part in msg_data:
-        if isinstance(response_part, tuple):
-            # Parsear a mensagem
-            email_message = email.message_from_bytes(response_part[1])
-
-            # Obter o texto do corpo do e-mail
-            if email_message.is_multipart():
-                for part in email_message.walk():
-                    if part.get_content_type() == "text/plain":
-                        body = part.get_payload(decode=True).decode(part.get_content_charset())
-                        break
-            else:
-                body = email_message.get_payload(decode=True).decode(email_message.get_content_charset())
-
-            # Procurar por todas as palavras com exatamente 8 caracteres
-            matches = re.findall(r'\b[a-zA-Z0-9]{8}\b', body)
-
-            if matches:
-                # Excluir palavras especificadas
-                matches = [match for match in matches if match.lower() not in {'suspeita', 'proteger', 'managing', 'settings', 'articles'}]
-
-                if matches:
-                    # Salvar o resultado único em uma variável
-                    resultado_final = matches[0]
-                    return resultado_final
-
-    # Fechar a conexão
-    mail.logout()
-
-# Define a custom user agent
-user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
-#my_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
- 
 # Set up Chrome options
 options = uc.ChromeOptions()
 options.add_argument("--headless")
-options.add_argument(f"user-agent={user_agent}")
- 
+
 # Initialize Chrome WebDriver with the specified options
 driver = uc.Chrome(options=options)
 
@@ -128,16 +63,14 @@ def login(username, password, email):
             EC.presence_of_element_located((By.XPATH, "//input[@data-testid='ocfEnterTextTextInput']"))
         )
         # You can handle the second identification here
-        print("Second identification page found. Handle it here.")
-        # For example, you can fill in the input and submit
-        code = obter_codigo_verificacao()
-        second_identification_input.send_keys(code)
-        second_identification_input.send_keys(Keys.RETURN)
-        # Wait for the login to complete
-        time.sleep(10)
+        print("Second identification page found. Gonna exit.")
+        # Bye bye
+        exit()
     except TimeoutException:
         # No second identification page, continue with the script
         print("No second identification page found. Continue with the script.")
+        # Wait for the login to complete
+        time.sleep(10)
 
 def like_retweet_follow(keyword):
     print(f"Iniciando interação com a hashtag: {keyword}")
@@ -186,8 +119,8 @@ keywords_list = ['CatsOfTwitter', 'DogsOfTwitter', 'Caturday', 'CatsOnTwitter', 
 try:
     login(username, password, email)
 
-   # for keyword in keywords_list:
-        #like_retweet_follow(keyword)
+    for keyword in keywords_list:
+        like_retweet_follow(keyword)
 
 except Exception as e:
     print(f"Erro durante a execução: {e}")
