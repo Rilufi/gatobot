@@ -8,49 +8,40 @@ from bs4 import BeautifulSoup
 import re
 
 
-import re
-import requests
-from bs4 import BeautifulSoup
+# HTML com as imagens
+html_content = '''
+<div class="row">
+    <div class="column">
+        <img id="1" style="width:100%" src="https://d2ph5fj80uercy.cloudfront.net/04/cat4267.jpg">
+        <img id="2" style="width:100%" src="https://d2ph5fj80uercy.cloudfront.net/05/cat1704.jpg">
+        <img id="3" style="width:100%" src="https://d2ph5fj80uercy.cloudfront.net/06/cat1224.jpg">
+        <!-- mais imagens -->
+    </div>
+    <!-- outras colunas -->
+</div>
+'''
 
-# URL da página
-url = "https://thesecatsdonotexist.com/"
+# Criar um objeto BeautifulSoup para analisar o HTML
+soup = BeautifulSoup(html_content, 'html.parser')
 
-# Fazer a solicitação HTTP
-response = requests.get(url)
+# Encontrar todas as imagens na página
+all_images = soup.find_all('img')
 
-# Verificar se a solicitação foi bem-sucedida
-if response.status_code == 200:
-    # Criar um objeto BeautifulSoup para analisar o conteúdo HTML
-    soup = BeautifulSoup(response.text, 'html.parser')
-    
-    # Encontrar todas as imagens na página
-    all_images = soup.find_all('img')
-    
-    # Mostrar todos os URLs das imagens encontradas
-    for img in all_images:
-        if 'src' in img.attrs:
-            print(img['src'])
-    
-    # Verificar se uma imagem de gato foi encontrada
-    image_url = None
-    for img in all_images:
-        if 'src' in img.attrs and re.search(r'\.jpg$', img['src']):
-            image_url = img['src']
-            break
-    
-    # Se uma imagem de gato foi encontrada, faça o download dela
-    if image_url:
-        image_data = requests.get(image_url).content
-        with open('cat_image.jpg', 'wb') as f:
-            f.write(image_data)
-        
-        print("Imagem de gato salva com sucesso como 'cat_image.jpg'")
-    else:
-        print("Nenhuma imagem de gato encontrada na página.")
+# Encontrar a primeira imagem de gato
+image_url = None
+for img in all_images:
+    if 'src' in img.attrs and 'https://d2ph5fj80uercy.cloudfront.net/' in img['src']:
+        image_url = img['src']
+        break
+
+# Se uma imagem de gato foi encontrada, faça o download dela
+if image_url:
+    image_data = requests.get(image_url).content
+    with open('cat_image.jpg', 'wb') as f:
+        f.write(image_data)
+    print("Imagem de gato salva com sucesso como 'cat_image.jpg'")
 else:
-    print("Falha ao acessar o site. Código de status:", response.status_code)
-
-
+    print("Nenhuma imagem de gato encontrada na página.")
 
 
 #get the time with timezone
