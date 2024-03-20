@@ -53,5 +53,5 @@ data = data_e_hora_sao_paulo.strftime('%H:%M')
 mystring = f""" {data} AI Cat
 #AI #GAN #thiscatdoesnotexist"""
 
-#media = api.media_upload("cat_image.jpg")
-#client.create_tweet(text=mystring, media_ids=[media.media_id]) 
+media = api.media_upload("cat_image.jpg")
+client.create_tweet(text=mystring, media_ids=[media.media_id]) 
