@@ -32,4 +32,4 @@ jobs:
                   PASSWORD: ${{ secrets.PASSWORD }}
                   EMAIL: ${{ secrets.EMAIL }}
                   PASS: ${{ secrets.PASS }}
-      run: python rtcat.py
+      run: python fakecat.py
