@@ -19,22 +19,24 @@ if response.status_code == 200:
     # Criar um objeto BeautifulSoup para analisar o conteúdo HTML
     soup = BeautifulSoup(response.text, 'html.parser')
     
-    # Encontrar a primeira imagem de gato na página
-    cat_image = soup.find('img', src=re.compile(r'^https://d2ph5fj80uercy\.cloudfront\.net/\d+/cat\d+\.jpg$'))
+    # Encontrar todas as imagens na página
+    all_images = soup.find_all('img')
     
-    # Verificar se foi encontrada uma imagem de gato
-    if cat_image:
-        # Extrair a URL da imagem
-        image_url = cat_image['src']
-        
-        # Baixar a imagem
-        image_data = requests.get(image_url).content
-        
-        # Salvar a imagem no diretório atual
-        with open('cat_image.jpg', 'wb') as f:
-            f.write(image_data)
-        
-        print("Imagem de gato salva com sucesso como 'cat_image.jpg'")
+    # Procurar pela primeira imagem de gato
+    for img in all_images:
+        # Verificar se o src da imagem corresponde ao padrão esperado
+        if re.match(r'^https://d2ph5fj80uercy\.cloudfront\.net/\d+/cat\d+\.jpg$', img['src']):
+            image_url = img['src']
+            
+            # Baixar a imagem
+            image_data = requests.get(image_url).content
+            
+            # Salvar a imagem no diretório atual
+            with open('cat_image.jpg', 'wb') as f:
+                f.write(image_data)
+            
+            print("Imagem de gato salva com sucesso como 'cat_image.jpg'")
+            break
     else:
         print("Nenhuma imagem de gato encontrada na página.")
 else:
