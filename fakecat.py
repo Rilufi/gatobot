@@ -5,9 +5,10 @@ import os
 from auth import api, client
 import requests
 from bs4 import BeautifulSoup
+import re
 
 
-# URL do site
+# URL da página
 url = "https://thesecatsdonotexist.com/"
 
 # Fazer a solicitação HTTP
@@ -19,7 +20,7 @@ if response.status_code == 200:
     soup = BeautifulSoup(response.text, 'html.parser')
     
     # Encontrar a primeira imagem de gato na página
-    cat_image = soup.find('img', {'class': 'img-fluid'})
+    cat_image = soup.find('img', src=re.compile(r'^https://d2ph5fj80uercy\.cloudfront\.net/\d+/cat\d+\.jpg$'))
     
     # Verificar se foi encontrada uma imagem de gato
     if cat_image:
@@ -38,6 +39,7 @@ if response.status_code == 200:
         print("Nenhuma imagem de gato encontrada na página.")
 else:
     print("Falha ao acessar o site. Código de status:", response.status_code)
+
 
 
 #get the time with timezone
