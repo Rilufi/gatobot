@@ -24,19 +24,21 @@ if response.status_code == 200:
     
     # Procurar pela primeira imagem de gato
     for img in all_images:
-        # Verificar se o src da imagem corresponde ao padrão esperado
-        if re.match(r'^https://d2ph5fj80uercy\.cloudfront\.net/\d+/cat\d+\.jpg$', img['src']):
-            image_url = img['src']
-            
-            # Baixar a imagem
-            image_data = requests.get(image_url).content
-            
-            # Salvar a imagem no diretório atual
-            with open('cat_image.jpg', 'wb') as f:
-                f.write(image_data)
-            
-            print("Imagem de gato salva com sucesso como 'cat_image.jpg'")
-            break
+        # Verificar se a tag img possui o atributo 'src'
+        if 'src' in img.attrs:
+            # Verificar se o src da imagem corresponde ao padrão esperado
+            if re.match(r'^https://d2ph5fj80uercy\.cloudfront\.net/\d+/cat\d+\.jpg$', img['src']):
+                image_url = img['src']
+                
+                # Baixar a imagem
+                image_data = requests.get(image_url).content
+                
+                # Salvar a imagem no diretório atual
+                with open('cat_image.jpg', 'wb') as f:
+                    f.write(image_data)
+                
+                print("Imagem de gato salva com sucesso como 'cat_image.jpg'")
+                break
     else:
         print("Nenhuma imagem de gato encontrada na página.")
 else:
