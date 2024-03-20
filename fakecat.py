@@ -50,7 +50,7 @@ data_e_hora_atuais = datetime.now()
 data_e_hora_sao_paulo = data_e_hora_atuais.astimezone(fuso_horario)
 data = data_e_hora_sao_paulo.strftime('%H:%M')
 
-mystring = f""" {data} AI Cat
+mystring = f""" {data} AI-generated Cat
 #AI #GAN #thiscatdoesnotexist"""
 
 media = api.media_upload("cat_image.jpg")
