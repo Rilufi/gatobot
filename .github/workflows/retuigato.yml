@@ -25,10 +25,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt  # Se você tiver um arquivo requirements.txt com as dependências
 
-    - name: Run the rtcat script
+    - name: Run the fakecat script
       env:
-                  USERNAME: ${{ secrets.USERNAME }}
-                  PASSWORD: ${{ secrets.PASSWORD }}
-                  EMAIL: ${{ secrets.EMAIL }}
-                  PASS: ${{ secrets.PASS }}
+                  CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+
+                  CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+
+                  ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+                  ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+   
       run: python fakecat.py
