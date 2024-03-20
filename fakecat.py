@@ -8,6 +8,10 @@ from bs4 import BeautifulSoup
 import re
 
 
+import re
+import requests
+from bs4 import BeautifulSoup
+
 # URL da página
 url = "https://thesecatsdonotexist.com/"
 
@@ -22,25 +26,21 @@ if response.status_code == 200:
     # Encontrar todas as imagens na página
     all_images = soup.find_all('img')
     
-    # Variável para armazenar a URL da imagem a ser baixada
-    image_url = None
-    
-    # Procurar pela primeira imagem com src terminando em .jpg
+    # Mostrar todos os URLs das imagens encontradas
     for img in all_images:
-        # Verificar se a tag img possui o atributo 'src'
         if 'src' in img.attrs:
-            # Verificar se o src da imagem corresponde ao padrão esperado
-            if re.search(r'\.jpg$', img['src']):
-                # Armazenar a URL da imagem e sair do loop
-                image_url = img['src']
-                break
+            print(img['src'])
     
-    # Verificar se uma imagem foi encontrada
+    # Verificar se uma imagem de gato foi encontrada
+    image_url = None
+    for img in all_images:
+        if 'src' in img.attrs and re.search(r'\.jpg$', img['src']):
+            image_url = img['src']
+            break
+    
+    # Se uma imagem de gato foi encontrada, faça o download dela
     if image_url:
-        # Fazer o download da imagem
         image_data = requests.get(image_url).content
-        
-        # Salvar a imagem no diretório atual
         with open('cat_image.jpg', 'wb') as f:
             f.write(image_data)
         
@@ -49,6 +49,7 @@ if response.status_code == 200:
         print("Nenhuma imagem de gato encontrada na página.")
 else:
     print("Falha ao acessar o site. Código de status:", response.status_code)
+
 
 
 
@@ -61,5 +62,5 @@ data = data_e_hora_sao_paulo.strftime('%H:%M')
 mystring = f""" {data} AI Cat
 #AI #GAN #thiscatdoesnotexist"""
 
-media = api.media_upload("cat_image.jpg")
-client.create_tweet(text=mystring, media_ids=[media.media_id]) 
+#media = api.media_upload("cat_image.jpg")
+#client.create_tweet(text=mystring, media_ids=[media.media_id]) 
