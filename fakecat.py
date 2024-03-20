@@ -22,6 +22,9 @@ if response.status_code == 200:
     # Encontrar todas as imagens na página
     all_images = soup.find_all('img')
     
+    # Variável para indicar se uma imagem de gato foi encontrada
+    cat_image_found = False
+    
     # Procurar pela primeira imagem de gato
     for img in all_images:
         # Verificar se a tag img possui o atributo 'src'
@@ -38,8 +41,10 @@ if response.status_code == 200:
                     f.write(image_data)
                 
                 print("Imagem de gato salva com sucesso como 'cat_image.jpg'")
+                cat_image_found = True
                 break
-    else:
+    
+    if not cat_image_found:
         print("Nenhuma imagem de gato encontrada na página.")
 else:
     print("Falha ao acessar o site. Código de status:", response.status_code)
