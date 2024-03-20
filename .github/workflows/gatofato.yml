@@ -49,4 +49,4 @@ jobs:
                   ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
 
                   
-        run: python hepper.py
+        run: python catfact.py
