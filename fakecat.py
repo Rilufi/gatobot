@@ -5,8 +5,7 @@ import os
 from auth import api, client
 import requests
 from bs4 import BeautifulSoup
-import re
-
+import random
 
 # HTML com as imagens
 html_content = '''
@@ -27,22 +26,21 @@ soup = BeautifulSoup(html_content, 'html.parser')
 # Encontrar todas as imagens na página
 all_images = soup.find_all('img')
 
-# Encontrar a primeira imagem de gato
-image_url = None
+# Filtrar apenas as imagens de gato
+cat_images = []
 for img in all_images:
     if 'src' in img.attrs and 'https://d2ph5fj80uercy.cloudfront.net/' in img['src']:
-        image_url = img['src']
-        break
+        cat_images.append(img['src'])
 
-# Se uma imagem de gato foi encontrada, faça o download dela
-if image_url:
-    image_data = requests.get(image_url).content
+# Escolher uma imagem aleatória da lista
+if cat_images:
+    random_image_url = random.choice(cat_images)
+    image_data = requests.get(random_image_url).content
     with open('cat_image.jpg', 'wb') as f:
         f.write(image_data)
     print("Imagem de gato salva com sucesso como 'cat_image.jpg'")
 else:
     print("Nenhuma imagem de gato encontrada na página.")
-
 
 #get the time with timezone
 fuso_horario = timezone(timedelta(hours=-3))
