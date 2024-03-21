@@ -1,11 +1,11 @@
 name: Fatástico
 
 
-on: push
+on:
 
- #   schedule:
+    schedule:
 
-  #      - cron: '15 * * * *'
+        - cron: '15 * * * *'
 
 
 jobs:
