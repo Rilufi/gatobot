@@ -49,7 +49,7 @@ data_e_hora_sao_paulo = data_e_hora_atuais.astimezone(fuso_horario)
 data = data_e_hora_sao_paulo.strftime('%H:%M')
 
 mystring = f""" {data} AI-generated Cat
-#AI #GAN #thiscatdoesnotexist"""
+#AI #GAN #thesecatsdonotexist"""
 
 media = api.media_upload("cat_image.jpg")
 client.create_tweet(text=mystring, media_ids=[media.media_id]) 
