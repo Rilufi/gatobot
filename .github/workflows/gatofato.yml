@@ -1,11 +1,11 @@
-name: Gatástico
+name: Fatástico
 
 
-on:
+on: push
 
-    schedule:
+ #   schedule:
 
-        - cron: '15 * * * *'
+  #      - cron: '15 * * * *'
 
 
 jobs:
@@ -38,7 +38,7 @@ jobs:
           pip install -r requirements.txt
 
       # Use HEREDOC for `run` to escape possible single and double quotes in the message.
-      - name: hepper products 🐦
+      - name: cat fact 📓
         env:
                   CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
 
