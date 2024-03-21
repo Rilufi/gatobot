@@ -8,7 +8,7 @@ def bot():
     length = data["length"]
     if "skins" in quote:
         pass
-    elif length < 240:
+    elif length < 280:
         client.create_tweet(text = quote)
     else:
         pass
