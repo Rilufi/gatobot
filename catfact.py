@@ -28,17 +28,18 @@ def post_tweet_with_replies(text, max_length=280):
             reply_to_id = response.data['id']
 
 def bot():
-    r = requests.get('https://catfact.ninja/fact')
-    data = r.json()
-    fact = data["fact"]
-    length = data["length"]
-    if "skins" in fact:
-        pass  # Skip facts containing "skins"
-    elif length <= 280:
-        # Post the fact directly
-        post_tweet_with_replies(fact)
-    else:
-        # Post the fact in chunks as replies
-        post_tweet_with_replies(fact)
+    # Loop until a fact without the word "skins" is obtained
+    while True:
+        r = requests.get('https://catfact.ninja/fact')
+        data = r.json()
+        fact = data["fact"]
+        length = data["length"]
+        if "skins" not in fact:
+            # If the fact doesn't contain "skins", post it and break the loop
+            if length <= 280:
+                post_tweet_with_replies(fact)
+            else:
+                post_tweet_with_replies(fact)
+            break
 
 bot()
