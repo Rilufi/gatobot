@@ -2,7 +2,7 @@
 Bot para postar fotos de gato no Twitter (que agora também posta foto de cachorro)
 
 ## Atualizações com endpoint v2
-Devido à última atualização, o endpoint v1.1 do API do Twitter não funciona mais, então o jeito agora é usar o v2. Infelizmente, a versão free do v2 não têm quase nada disponível, pelo menos por enquanto, não podendo postar imagens, dar rt ou like e procurar tweets. A solução é ficarmos apenas com as duas funções que só postam texto: fatos de gato e produtos da hepper.
+Devido à última atualização, algumas funcionalidades do endpoint v1.1 do API do Twitter não funcionam mais, sendo necessário utilizar o v2. Infelizmente, a versão free do v2 não têm algumas funcionalidades disponíveis, como o "tweet_lookup" para procurar outros posts de gato para curtir e compartilhar. Mesmo assim, é possivel utilizar uma mistura das funcionalidades do v1, como upar imagens com "media_upload" e do v2 para postar com "creat_tweet". Por fim, as funcionalidades de postar imagens e texto ainda funcionam, só não é possível procurar outros tweets.
 
 ## wtf???
 
