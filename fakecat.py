@@ -1,46 +1,37 @@
 import tweepy
 from datetime import datetime, timezone, timedelta
-import urllib.request
 import os
-from auth import api, client
 import requests
-from bs4 import BeautifulSoup
 import random
 
-# HTML com as imagens
-html_content = '''
-<div class="row">
-    <div class="column">
-        <img id="1" style="width:100%" src="https://d2ph5fj80uercy.cloudfront.net/04/cat4267.jpg">
-        <img id="2" style="width:100%" src="https://d2ph5fj80uercy.cloudfront.net/05/cat1704.jpg">
-        <img id="3" style="width:100%" src="https://d2ph5fj80uercy.cloudfront.net/06/cat1224.jpg">
-        <!-- mais imagens -->
-    </div>
-    <!-- outras colunas -->
-</div>
-'''
 
-# Criar um objeto BeautifulSoup para analisar o HTML
-soup = BeautifulSoup(html_content, 'html.parser')
+def download_random_image():
+    # Gerar valores aleatórios para w, x, y, z
+    w = random.randint(1, 6)
+    x = random.randint(1, 9)
+    y = random.randint(0, 9)
+    z = random.randint(0, 9)
 
-# Encontrar todas as imagens na página
-all_images = soup.find_all('img')
+    # Construir a URL da imagem
+    image_url = f"https://d2ph5fj80uercy.cloudfront.net/0{w}/cat{x}{y}{z}.jpg"
 
-# Filtrar apenas as imagens de gato
-cat_images = []
-for img in all_images:
-    if 'src' in img.attrs and 'https://d2ph5fj80uercy.cloudfront.net/' in img['src']:
-        cat_images.append(img['src'])
+    # Fazer o pedido HTTP para baixar a imagem
+    response = requests.get(image_url)
 
-# Escolher uma imagem aleatória da lista
-if cat_images:
-    random_image_url = random.choice(cat_images)
-    image_data = requests.get(random_image_url).content
-    with open('cat_image.jpg', 'wb') as f:
-        f.write(image_data)
-    print("Imagem de gato salva com sucesso como 'cat_image.jpg'")
-else:
-    print("Nenhuma imagem de gato encontrada na página.")
+    # Verificar se a solicitação foi bem-sucedida
+    if response.status_code == 200:
+        # Salvar a imagem na pasta local
+        #filename = f"cat_{w}{x}{y}{z}.jpg"
+        filename = "cat_image.jpg"
+        with open(filename, 'wb') as f:
+            f.write(response.content)
+
+        print(f"Imagem baixada: {filename}")
+    else:
+        print("Erro ao baixar a imagem.")
+
+if __name__ == "__main__":
+    download_random_image()
 
 #get the time with timezone
 fuso_horario = timezone(timedelta(hours=-3))
