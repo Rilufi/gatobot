@@ -1,11 +1,11 @@
 name: Fakegato
 
 
-on:
+on: push
 
-    schedule:
+  #  schedule:
 
-        - cron: '45 * * * *'
+    #    - cron: '45 * * * *'
 
 jobs:
   run-script:
