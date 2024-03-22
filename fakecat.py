@@ -3,6 +3,7 @@ from datetime import datetime, timezone, timedelta
 import os
 import requests
 import random
+from auth import api, client
 
 
 def download_random_image():
