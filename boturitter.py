@@ -80,7 +80,7 @@ def get_random_dog():
 
     # Check if image exceeds Twitter's size limit (5 MB)
     max_file_size = 5 * 1024 * 1024  # 5 MB in bytes
-    if os.path.getsize('cat_image.jpg') > max_file_size:
+    if os.path.getsize('dog_image.jpg') > max_file_size:
         # Resize the image while maintaining aspect ratio
         img.thumbnail((1600, 1600))  # Resize the image to fit within 1600x1600 pixels
 
@@ -166,7 +166,8 @@ def cattp():
         mystring = f""" HTTP status of the day {datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%d/%m')}"""
         media = api.media_upload("http_pet.jpg")
         client.create_tweet(text=mystring, media_ids=[media.media_id])
-
+    else:
+        pass
 # Main function
 def main():
     # Call necessary functions
