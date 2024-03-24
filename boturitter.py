@@ -60,7 +60,8 @@ def get_random_cat():
 
 # Function to get random dog image
 def get_random_dog():
-    rl = "https://api.thedogapi.com/v1/images/search?format=json"
+    DOG_KEY = os.environ.get("DOG_KEY")
+    url = "https://api.thedogapi.com/v1/images/search?format=json"
     headers = {
         'Content-Type': 'application/json',
         'x-api-key': DOG_KEY,
