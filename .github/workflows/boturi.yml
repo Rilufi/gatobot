@@ -1,12 +1,12 @@
-name: Boturi
+name: Boturi Workflow
 
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Boturi"]
+    workflows: ["Boturi Workflow"]
     types:
       - completed
-      
+
 jobs:
   tweet:
     name: Tweet
