@@ -5,6 +5,7 @@ import json
 import random
 from datetime import datetime, timezone, timedelta
 from auth import api, client
+from PIL import Image
 
 # Functions for posting tweets
 def post_tweet_with_replies(text, max_length=280):
@@ -24,21 +25,38 @@ def post_tweet_with_replies(text, max_length=280):
             # Update the ID for the next reply
             reply_to_id = response.data['id']
 
-# Function to get random cat image
+# Function to get random cat image and resize it if needed
 def get_random_cat():
     CAT_KEY = os.environ.get("CAT_KEY")
     url = "https://api.thecatapi.com/v1/images/search?format=json"
     headers = {
         'Content-Type': 'application/json',
         'x-api-key': CAT_KEY,
-        "width": 1600,
-        "height": 900,
     }
     response = requests.get(url, headers=headers)
     todos = json.loads(response.text)
     site = todos[0].get('url')
     r = requests.get(site, allow_redirects=True)
-    open('cat_image.jpg', 'wb').write(r.content)
+    
+    # Open the downloaded image
+    with open('cat_image.jpg', 'wb') as f:
+        f.write(r.content)
+    
+    # Open the image using Pillow
+    img = Image.open('cat_image.jpg')
+
+    # Check if image exceeds Twitter's size limit (5 MB)
+    max_file_size = 5 * 1024 * 1024  # 5 MB in bytes
+    if os.path.getsize('cat_image.jpg') > max_file_size:
+        # Resize the image while maintaining aspect ratio
+        img.thumbnail((1600, 1600))  # Resize the image to fit within 1600x1600 pixels
+
+        # Save the resized image
+        img.save('cat_image.jpg')
+
+        print("Image resized to fit Twitter's size limit.")
+    else:
+        print("Image size is within Twitter's size limit.")
 
 # Function to get random dog image
 def get_random_dog(filename='temp'):
