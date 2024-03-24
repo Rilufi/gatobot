@@ -3,6 +3,7 @@ import os
 import requests
 import json
 import random
+import urllib.request
 from datetime import datetime, timezone, timedelta
 from auth import api, client
 from PIL import Image
