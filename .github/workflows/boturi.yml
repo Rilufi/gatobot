@@ -1,8 +1,8 @@
 name: Boturi
 
-on:
-  schedule:
-    - cron: '0 * * * *' # Roda o script a cada hora
+on: push
+#  schedule:
+#    - cron: '0 * * * *' # Roda o script a cada hora
 
 jobs:
   tweet:
