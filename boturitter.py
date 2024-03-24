@@ -134,7 +134,7 @@ def post_random_cat_tweet():
 # Function to post random dog tweet
 def post_random_dog_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
-    mystring = f""" {data} Surprise Cat
+    mystring = f""" {data} Surprise Dog
     #DogsOfTwitter #dogs #DogsOnTwitter"""
     media = api.media_upload("dog_image.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
