@@ -16,7 +16,8 @@ url = "https://api.thecatapi.com/v1/images/search?format=json"
 payload={}
 headers = {
   'Content-Type': 'application/json',
-  'x-api-key': CAT_KEY
+  'x-api-key': CAT_KEY,
+  "width":1600,"height":900,
 }
 
 proxies = {
@@ -43,10 +44,4 @@ try:
 	media = api.media_upload("gato.jpeg")
 	client.create_tweet(text=mystring, media_ids=[media.media_id])
 except:
-	response2 = requests.request("GET", url, headers=headers, data=payload, proxies=proxies)
-	todos2 = json.loads(response2.text)
-	site2 = todos2[0].get('url')
-	r2 = requests.get(site2, allow_redirects=True)
-	open('gato2.jpeg', 'wb').write(r2.content)
-	media = api.media_upload("gato2.jpeg")
-	client.create_tweet(text=mystring, media_ids=[media.media_id])
+	print("deu ruim o gato surpresa")
