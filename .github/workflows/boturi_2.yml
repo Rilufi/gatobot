@@ -1,4 +1,4 @@
-name: Boturi2
+name: Boturi_2
 
 on: push
  # workflow_dispatch:
