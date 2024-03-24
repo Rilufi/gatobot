@@ -1,9 +1,12 @@
 name: Boturi
 
-on: push
-#  schedule:
-#    - cron: '0 * * * *' # Roda o script a cada hora
-
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Boturi"]
+    types:
+      - completed
+      
 jobs:
   tweet:
     name: Tweet
