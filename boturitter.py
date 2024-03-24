@@ -119,7 +119,7 @@ def download_random_image():
 def post_ai_generated_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
     mystring = f""" {data} AI-generated Cat
-    #AI #GAN #thesecatsdonotexist"""
+#AI #GAN #thesecatsdonotexist"""
     media = api.media_upload("fakecat.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
 
@@ -127,7 +127,7 @@ def post_ai_generated_cat_tweet():
 def post_random_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
     mystring = f""" {data} Surprise Cat
-    #CatsOfTwitter #cats #CatsOnTwitter"""
+#CatsOfTwitter #cats #CatsOnTwitter"""
     media = api.media_upload("cat_image.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
 
@@ -135,7 +135,7 @@ def post_random_cat_tweet():
 def post_random_dog_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
     mystring = f""" {data} Surprise Dog
-    #DogsOfTwitter #dogs #DogsOnTwitter"""
+#DogsOfTwitter #dogs #DogsOnTwitter"""
     media = api.media_upload("dog_image.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
 
