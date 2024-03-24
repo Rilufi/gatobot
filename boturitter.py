@@ -59,14 +59,36 @@ def get_random_cat():
         print("Image size is within Twitter's size limit.")
 
 # Function to get random dog image
-def get_random_dog(filename='temp'):
-    r = requests.get('https://dog.ceo/api/breeds/image/random')
-    rd = json.loads(r.content)
-    r2 = requests.get(rd['message'])
+def get_random_dog():
+    rl = "https://api.thedogapi.com/v1/images/search?format=json"
+    headers = {
+        'Content-Type': 'application/json',
+        'x-api-key': DOG_KEY,
+    }
+    response = requests.get(url, headers=headers)
+    todos = json.loads(response.text)
+    site = todos[0].get('url')
+    r = requests.get(site, allow_redirects=True)
+    
+    # Open the downloaded image
+    with open('dog_image.jpg', 'wb') as f:
+        f.write(r.content)
+    
+    # Open the image using Pillow
+    img = Image.open('dog_image.jpg')
 
-    with open(filename, 'wb') as image:
-        for chunk in r2:
-            image.write(chunk)
+    # Check if image exceeds Twitter's size limit (5 MB)
+    max_file_size = 5 * 1024 * 1024  # 5 MB in bytes
+    if os.path.getsize('cat_image.jpg') > max_file_size:
+        # Resize the image while maintaining aspect ratio
+        img.thumbnail((1600, 1600))  # Resize the image to fit within 1600x1600 pixels
+
+        # Save the resized image
+        img.save('dog_image.jpg')
+
+        print("Image resized to fit Twitter's size limit.")
+    else:
+        print("Image size is within Twitter's size limit.")
 
 # Function to download a random image
 def download_random_image():
@@ -85,7 +107,7 @@ def download_random_image():
     # Check if the request was successful
     if response.status_code == 200:
         # Save the image locally
-        filename = "cat_image.jpg"
+        filename = "fakecat.jpg"
         with open(filename, 'wb') as f:
             f.write(response.content)
         print(f"Downloaded image: {filename}")
@@ -97,7 +119,7 @@ def post_ai_generated_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
     mystring = f""" {data} AI-generated Cat
     #AI #GAN #thesecatsdonotexist"""
-    media = api.media_upload("cat_image.jpg")
+    media = api.media_upload("fakecat.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
 
 # Function to post random cat tweet
@@ -106,6 +128,14 @@ def post_random_cat_tweet():
     mystring = f""" {data} Surprise Cat
     #CatsOfTwitter #cats #CatsOnTwitter"""
     media = api.media_upload("cat_image.jpg")
+    client.create_tweet(text=mystring, media_ids=[media.media_id])
+
+# Function to post random dog tweet
+def post_random_dog_tweet():
+    data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
+    mystring = f""" {data} Surprise Cat
+    #DogsOfTwitter #dogs #DogsOnTwitter"""
+    media = api.media_upload("dog_image.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
 
 # Function to get a cat fact from catfact.ninja
@@ -148,6 +178,7 @@ def main():
     post_tweet_with_replies(cat_fact)
     post_ai_generated_cat_tweet()
     post_random_cat_tweet()
+    post_random_dog_tweet()
     cattp()
 
 if __name__ == "__main__":
