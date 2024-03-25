@@ -171,14 +171,26 @@ def cattp():
     else:
         pass
 
+# Function to check rate limit status
 def rate_status():
     # Check rate limit status
     rate_limit = api.rate_limit_status()
 
-    # Check if rate limit is exceeded
-    if rate_limit['resources']['statuses']['/statuses/update']['remaining'] == 0:
-        print("Rate limit exceeded. Exiting script.")
-        return
+    # Check if 'statuses' resource exists
+    if 'statuses' in rate_limit['resources']:
+        # Check if '/statuses/update' exists in the 'statuses' resource
+        if '/statuses/update' in rate_limit['resources']['statuses']:
+            # Check remaining limit for '/statuses/update'
+            remaining_limit = rate_limit['resources']['statuses']['/statuses/update']['remaining']
+            if remaining_limit == 0:
+                print("Rate limit for posting tweets exceeded. Exiting script.")
+                exit()
+        else:
+            print("'/statuses/update' not found in rate limit status. Exiting script.")
+            exit()
+    else:
+        print("'statuses' resource not found in rate limit status. Exiting script.")
+        exit()
 
 
 # Main function
