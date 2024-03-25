@@ -5,7 +5,7 @@ import json
 import random
 import urllib.request
 from datetime import datetime, timezone, timedelta
-from auth import api, client
+from auth import auth, api, client
 from PIL import Image
 
 # Functions for posting tweets
