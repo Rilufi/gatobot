@@ -118,12 +118,21 @@ def download_random_image():
 
 # Function to post AI-generated cat tweet
 def post_ai_generated_cat_tweet():
+    # Verificar o limite de taxa antes de interagir com o Twitter
+    response = requests.get('https://api.twitter.com/1.1/application/rate_limit_status.json', auth=auth)
+    if response.status_code == 429:
+        print("Rate limit exceeded. Exiting script.")
+        return False
+
+    # Continuar com a função normalmente se o limite de taxa não foi excedido
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
     mystring = f""" {data} AI-generated Cat
 #AI #GAN #thesecatsdonotexist"""
     media = api.media_upload("fakecat.jpg")
-    client.create_tweet(text=mystring, media_ids=[media.media_id])
+    api.update_status(status=mystring, media_ids=[media.media_id])
 
+    return True
+    
 # Function to post random cat tweet
 def post_random_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
