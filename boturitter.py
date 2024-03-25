@@ -5,8 +5,9 @@ import json
 import random
 import urllib.request
 from datetime import datetime, timezone, timedelta
-from auth import auth, api, client
+from auth import api, client
 from PIL import Image
+
 
 # Functions for posting tweets
 def post_tweet_with_replies(text, max_length=280):
@@ -118,20 +119,11 @@ def download_random_image():
 
 # Function to post AI-generated cat tweet
 def post_ai_generated_cat_tweet():
-    # Verificar o limite de taxa antes de interagir com o Twitter
-    response = requests.get('https://api.twitter.com/1.1/application/rate_limit_status.json', auth=auth)
-    if response.status_code == 429:
-        print("Rate limit exceeded. Exiting script.")
-        return False
-
-    # Continuar com a função normalmente se o limite de taxa não foi excedido
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
     mystring = f""" {data} AI-generated Cat
 #AI #GAN #thesecatsdonotexist"""
     media = api.media_upload("fakecat.jpg")
-    api.update_status(status=mystring, media_ids=[media.media_id])
-
-    return True
+    client.create_tweet(text=mystring, media_ids=[media.media_id])
     
 # Function to post random cat tweet
 def post_random_cat_tweet():
@@ -178,14 +170,28 @@ def cattp():
         client.create_tweet(text=mystring, media_ids=[media.media_id])
     else:
         pass
+
+def rate_status():
+    # Check rate limit status
+    rate_limit = api.rate_limit_status()
+
+    # Check if rate limit is exceeded
+    if rate_limit['resources']['statuses']['/statuses/update']['remaining'] == 0:
+        print("Rate limit exceeded. Exiting script.")
+        return
+
+
 # Main function
 def main():
+    # Checking rate limit before doing anything else
+    rate_status()
+    
     # Call necessary functions
     download_random_image()
     get_random_dog()
     get_random_cat()
     cat_fact = get_cat_fact()
-
+    
     # Post tweets
     post_tweet_with_replies(cat_fact)
     post_ai_generated_cat_tweet()
