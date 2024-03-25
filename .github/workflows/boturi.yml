@@ -1,10 +1,8 @@
 name: Boturi
 
 on:
-
-    schedule:
-
-        - cron: '0 * * * *'
+  schedule:
+    - cron: '0 * * * *'
 
 jobs:
   tweet:
@@ -32,6 +30,15 @@ jobs:
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
 
+      # Etapa para criar a trava de início
+      - name: Create lock file 📁
+        if: !contains(runner.labels, 'locked')
+        run: |
+          touch lockfile.lock
+          echo "Workflow locked" > lockfile.lock
+        continue-on-error: true
+
+      # Etapas para instalar dependências, executar o script Python, etc.
       - name: Install packages ⚙
         run: |
           python -m pip install --upgrade pip
@@ -45,3 +52,9 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
         run: python boturitter.py
+
+      # Etapa para remover a trava de conclusão
+      - name: Remove lock file 📁
+        if: always()  # Garante que esta etapa seja executada mesmo que as etapas anteriores falhem
+        run: |
+          rm -f lockfile.lock
