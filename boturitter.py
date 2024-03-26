@@ -15,17 +15,27 @@ def post_tweet_with_replies(text, max_length=280):
         # Post the tweet directly if it's within the character limit
         client.create_tweet(text=text)
     else:
-        # Cut the text into chunks
-        chunks = [text[i:i+max_length] for i in range(0, len(text), max_length)]
+        # Cut the text into chunks without splitting words
+        chunks = get_chunks(text, max_length)
         # Post the first chunk
-        response = client.create_tweet(text=chunks[0])
+        response = client.create_tweet(text=next(chunks))
         # Save the ID of the first tweet
         reply_to_id = response.data['id']
         # Post subsequent chunks as replies to the first tweet
-        for chunk in chunks[1:]:
+        for chunk in chunks:
             response = client.create_tweet(text=chunk, in_reply_to_tweet_id=reply_to_id)
             # Update the ID for the next reply
             reply_to_id = response.data['id']
+
+# Function to split text into chunks without splitting words
+def get_chunks(s, max_length):
+    start = 0
+    end = 0
+    while start + max_length < len(s) and end != -1:
+        end = s.rfind(" ", start, start + max_length + 1)
+        yield s[start:end]
+        start = end + 1
+    yield s[start:]
 
 # Function to get random cat image and resize it if needed
 def get_random_cat():
