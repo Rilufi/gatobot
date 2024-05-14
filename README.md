@@ -24,6 +24,9 @@ Gatos gerados por uma GAN do https://thesecatsdonotexist.com/
 
 Pra cada status http existe sua versão gato: https://http.cat e sua versão dog: https://http.dog
 
+## legendas geradas pelo API do Gemini
+Estou utilizando a AI do Google, o [Gemini API](https://deepmind.google/technologies/gemini/#introduction), para gerar tweets baseados nas imagens.
+
 ## e as # de gato (descontinuado porque a função de tweet lookup só na versão paga)
 
 Adicionei a funcionalidade de dar RT e like em hashtags como #CatsOfTwitter, além de seguir a pessoa que postou. Os filtros são procurar só media (pra impedir de acabar encontrando algum tweet aleatório que tenha só usado a # pra engajamento), procurar o post original e não algum RT do original (impedindo assim que o bot siga a pessoa errada) e filtrar imagens sensíveis (nudez, etc.).
