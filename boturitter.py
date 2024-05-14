@@ -14,23 +14,28 @@ import google.generativeai as genai
 GOOGLE_API_KEY=os.environ["GOOGLE_API_KEY"]
 genai.configure(api_key=GOOGLE_API_KEY)
 
-# Choose a GenAI model (e.g., 'gemini-pro')
-multimodal_model = genai.GenerativeModel("gemini-pro-vision")
+model = genai.GenerativeModel('gemini-pro-vision')
 
-def gemini_image(prompt, imagem):
-    image = genai.Image.load_from_file(imagem)
-    # Prepare contents
-    contents = [image, prompt]
-    
-    responses = multimodal_model.generate_content(contents, stream=True)
-    
-    #print("-------Prompt--------")
-    #print_multimodal_prompt(contents)
-    
-    #print("\n-------Response--------")
-    for response in responses:
-        print(response.text, end="")
-        return response
+def gemini_image(prompt, image_path):
+    # Carregando a imagem
+    imagem = Image.open(image_path)
+
+    # Convertendo a imagem para bytes
+
+    # Gerando conteúdo com base na imagem e no prompt
+    response = model.generate_content([prompt, imagem], stream=True)
+
+    # Aguarda a conclusão da iteração antes de acessar os candidatos
+    response.resolve()
+
+    # Verificando a resposta
+    if response.candidates and len(response.candidates) > 0:
+        if response.candidates[0].content.parts and len(response.candidates[0].content.parts) > 0:
+            return response.candidates[0].content.parts[0].text
+        else:
+            print("Nenhuma parte de conteúdo encontrada na resposta.")
+    else:
+        print("Nenhum candidato válido encontrado.")
     
 
 # Functions for posting tweets
@@ -154,7 +159,7 @@ def download_random_image():
 # Function to post AI-generated cat tweet
 def post_ai_generated_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
-    gemini_image("Write a tweet analysing this ai generated cat image","fakecat.jpg")
+    response = gemini_image("Write a tweet analysing this ai generated cat image","fakecat.jpg")
     mystring = f""" {data} AI-generated Cat
 {response}"""
     media = api.media_upload("fakecat.jpg")
@@ -163,7 +168,7 @@ def post_ai_generated_cat_tweet():
 # Function to post random cat tweet
 def post_random_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
-    gemini_image("Write a funny and/or cute tweet about this cat image",'cat_image.jpg')
+    response = gemini_image("Write a funny and/or cute tweet about this cat image",'cat_image.jpg')
     mystring = f""" {data} Surprise Cat
 {response}"""
     media = api.media_upload("cat_image.jpg")
@@ -172,7 +177,7 @@ def post_random_cat_tweet():
 # Function to post random dog tweet
 def post_random_dog_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
-    gemini_image("Write a funny and/or cute tweet about this dog image",'dog_image.jpg')
+    response = gemini_image("Write a funny and/or cute tweet about this dog image",'dog_image.jpg')
     mystring = f""" {data} Surprise Dog
 {response}"""
     media = api.media_upload("dog_image.jpg")
