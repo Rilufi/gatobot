@@ -15,7 +15,7 @@ GOOGLE_API_KEY=os.environ["GOOGLE_API_KEY"]
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Choose a GenAI model (e.g., 'gemini-pro')
-multimodal_model = GenerativeModel("gemini-pro-vision")
+multimodal_model = genai.GenerativeModel("gemini-pro-vision")
 
 def gemini_image(prompt, imagem):
     image = Image.load_from_file(imagem)
