@@ -2,3 +2,4 @@
 tweepy
 bs4
 pillow
+google-generativeai
