@@ -160,7 +160,7 @@ def download_random_image():
 def post_ai_generated_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
     response_gemini = gemini_image("Write a funny and/or cute tweet about this ai-generated cat image with hashtags","fakecat.jpg")
-    if response_gemini = None:
+    if response_gemini == None:
         response_gemini = "#AI #GAN #thesecatsdonotexist"
     else:
         pass
@@ -174,7 +174,7 @@ def post_ai_generated_cat_tweet():
 def post_random_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
     response_gemini = gemini_image("Write a funny and/or cute tweet about this cat image with hashtags",'cat_image.jpg')
-    if response_gemini = None:
+    if response_gemini == None:
         response_gemini = "#CatsOfTwitter #cats #CatsOnTwitter"
     else:
         pass
@@ -188,7 +188,7 @@ def post_random_cat_tweet():
 def post_random_dog_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
     response_gemini = gemini_image("Write a funny and/or cute tweet about this dog image with hashtags",'dog_image.jpg')
-    if response_gemini = None:
+    if response_gemini == None:
         response_gemini = "#DogsOfTwitter #dogs #DogsOnTwitter"
     else:
         pass
