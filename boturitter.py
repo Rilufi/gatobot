@@ -159,7 +159,11 @@ def download_random_image():
 # Function to post AI-generated cat tweet
 def post_ai_generated_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
-    response_gemini = gemini_image("Write a funny and/or cute tweet about this ai-generated cat image","fakecat.jpg")
+    response_gemini = gemini_image("Write a funny and/or cute tweet about this ai-generated cat image with hashtags","fakecat.jpg")
+    if response_gemini = None:
+        response_gemini = "#AI #GAN #thesecatsdonotexist"
+    else:
+        pass
     mystring = f""" {data} AI-generated Cat
 {response_gemini}"""
     print(mystring)
@@ -169,7 +173,11 @@ def post_ai_generated_cat_tweet():
 # Function to post random cat tweet
 def post_random_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
-    response_gemini = gemini_image("Write a funny and/or cute tweet about this cat image",'cat_image.jpg')
+    response_gemini = gemini_image("Write a funny and/or cute tweet about this cat image with hashtags",'cat_image.jpg')
+    if response_gemini = None:
+        response_gemini = "#CatsOfTwitter #cats #CatsOnTwitter"
+    else:
+        pass
     mystring = f""" {data} Surprise Cat
 {response_gemini}"""
     print(mystring)
@@ -179,7 +187,11 @@ def post_random_cat_tweet():
 # Function to post random dog tweet
 def post_random_dog_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
-    response_gemini = gemini_image("Write a funny and/or cute tweet about this dog image",'dog_image.jpg')
+    response_gemini = gemini_image("Write a funny and/or cute tweet about this dog image with hashtags",'dog_image.jpg')
+    if response_gemini = None:
+        response_gemini = "#DogsOfTwitter #dogs #DogsOnTwitter"
+    else:
+        pass
     mystring = f""" {data} Surprise Dog
 {response_gemini}"""
     print(mystring)
