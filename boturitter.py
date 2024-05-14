@@ -18,7 +18,7 @@ genai.configure(api_key=GOOGLE_API_KEY)
 multimodal_model = genai.GenerativeModel("gemini-pro-vision")
 
 def gemini_image(prompt, imagem):
-    image = Image.load_from_file(imagem)
+    image = genai.Image.load_from_file(imagem)
     # Prepare contents
     contents = [image, prompt]
     
