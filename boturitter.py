@@ -7,7 +7,31 @@ import urllib.request
 from datetime import datetime, timezone, timedelta
 from auth import api, client
 from PIL import Image
+import google.generativeai as genai
 
+
+# Inicializando api do Gemini
+GOOGLE_API_KEY=os.environ["GOOGLE_API_KEY"]
+genai.configure(api_key=GOOGLE_API_KEY)
+
+# Choose a GenAI model (e.g., 'gemini-pro')
+multimodal_model = GenerativeModel("gemini-pro-vision")
+
+def gemini_image(prompt, imagem)
+    image = Image.load_from_file(imagem)
+    # Prepare contents
+    contents = [image, prompt]
+    
+    responses = multimodal_model.generate_content(contents, stream=True)
+    
+    #print("-------Prompt--------")
+    #print_multimodal_prompt(contents)
+    
+    #print("\n-------Response--------")
+    for response in responses:
+        print(response.text, end="")
+        return response
+    
 
 # Functions for posting tweets
 def post_tweet_with_replies(text, max_length=280):
@@ -130,24 +154,27 @@ def download_random_image():
 # Function to post AI-generated cat tweet
 def post_ai_generated_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
+    gemini_image("Write a tweet analysing this ai generated cat image","fakecat.jpg")
     mystring = f""" {data} AI-generated Cat
-#AI #GAN #thesecatsdonotexist"""
+{response}"""
     media = api.media_upload("fakecat.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
     
 # Function to post random cat tweet
 def post_random_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
+    gemini_image("Write a funny and/or cute tweet about this cat image",'cat_image.jpg')
     mystring = f""" {data} Surprise Cat
-#CatsOfTwitter #cats #CatsOnTwitter"""
+{response}"""
     media = api.media_upload("cat_image.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
 
 # Function to post random dog tweet
 def post_random_dog_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
+    gemini_image("Write a funny and/or cute tweet about this dog image",'dog_image.jpg')
     mystring = f""" {data} Surprise Dog
-#DogsOfTwitter #dogs #DogsOnTwitter"""
+{response}"""
     media = api.media_upload("dog_image.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
 
