@@ -20,7 +20,9 @@ def gemini_image(prompt, image_path):
     # Carregando a imagem
     imagem = Image.open(image_path)
 
-    # Convertendo a imagem para bytes
+    # Convertendo a imagem para o modo 'RGB' caso esteja em modo 'P'
+    if imagem.mode == 'P':
+        imagem = imagem.convert('RGB')
 
     # Gerando conteúdo com base na imagem e no prompt
     response = model.generate_content([prompt, imagem], stream=True)
