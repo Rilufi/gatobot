@@ -252,11 +252,12 @@ def main():
     cat_fact = get_cat_fact()
     
     # Post tweets
-    post_tweet_with_replies(cat_fact)
-    post_ai_generated_cat_tweet()
-    post_random_cat_tweet()
-    post_random_dog_tweet()
-    cattp()
+    tweets = [post_tweet_with_replies(cat_fact), post_ai_generated_cat_tweet(), post_random_cat_tweet(), post_random_dog_tweet(), cattp()]
+    for tweet in tweets:
+        try:
+            tweet
+        except:
+            pass
 
 if __name__ == "__main__":
     main()
