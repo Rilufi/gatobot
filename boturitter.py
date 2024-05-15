@@ -161,7 +161,7 @@ def download_random_image():
 # Function to post AI-generated cat tweet
 def post_ai_generated_cat_tweet():
     data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H:%M')
-    response_gemini = gemini_image("Write a funny and/or cute tweet about this ai-generated cat image with twitter related hashtags","fakecat.jpg")
+    response_gemini = gemini_image("Write a funny tweet rating this ai-generated cat image with twitter related hashtags","fakecat.jpg")
     if response_gemini == None:
         response_gemini = "#AI #GAN #thesecatsdonotexist"
     else:
