@@ -187,8 +187,10 @@ def post_random_cat_tweet():
     response = client.create_tweet(text=mystring, media_ids=[media.media_id])
     cat_id = response.data['id']
     print(cat_id)
-    recipient_id = '1737242580025212928'
-    client.create_direct_message(participant_id = recipient_id, text = cat_id)
+  #  recipient_id = '1737242580025212928'
+  #  client.create_direct_message(participant_id = recipient_id, text = cat_id)
+    client.like(cat_id)
+    client.retweet(cat_id)
 
 # Function to post random dog tweet
 def post_random_dog_tweet():
