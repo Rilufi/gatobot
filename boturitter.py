@@ -254,13 +254,19 @@ def main():
     get_random_cat()
     cat_fact = get_cat_fact()
     
-    # Post tweets
-    tweets = [post_tweet_with_replies(cat_fact), post_ai_generated_cat_tweet(), post_random_cat_tweet(), post_random_dog_tweet(), cattp()]
+    # Posta tweets com pausas de 5 minutos
+    tweets = [
+        lambda: post_tweet_with_replies(get_cat_fact()), 
+        post_ai_generated_cat_tweet,
+        post_random_cat_tweet,
+        post_random_dog_tweet,
+        cattp]
+
     for tweet in tweets:
         try:
-            tweet
-        except:
-            pass
+            tweet_func()
+        except Exception as e:
+            print(f"An error occurred: {e}")
         sleep(300)
 
 if __name__ == "__main__":
