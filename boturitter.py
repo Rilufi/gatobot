@@ -8,13 +8,14 @@ from datetime import datetime, timezone, timedelta
 from auth import api, client
 from PIL import Image
 import google.generativeai as genai
+from time import sleep
 
 
 # Inicializando api do Gemini
 GOOGLE_API_KEY=os.environ["GOOGLE_API_KEY"]
 genai.configure(api_key=GOOGLE_API_KEY)
 
-model = genai.GenerativeModel('gemini-pro-vision')
+model = genai.GenerativeModel('gemini-flash-vision')
 
 def gemini_image(prompt, image_path):
     # Carregando a imagem
@@ -258,6 +259,7 @@ def main():
     for tweet in tweets:
         try:
             tweet
+            sleep(300)
         except:
             pass
 
