@@ -259,9 +259,9 @@ def main():
     for tweet in tweets:
         try:
             tweet
-            sleep(300)
         except:
             pass
+        sleep(300)
 
 if __name__ == "__main__":
     main()
