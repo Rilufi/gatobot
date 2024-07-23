@@ -264,7 +264,7 @@ def main():
 
     for tweet in tweets:
         try:
-            tweets()
+            tweet()
         except Exception as e:
             print(f"An error occurred: {e}")
         sleep(300)
