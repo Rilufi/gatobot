@@ -256,11 +256,12 @@ def main():
     
     # Posta tweets com pausas de 5 minutos
     tweets = [
-        lambda: post_tweet_with_replies(get_cat_fact()), 
+        lambda: post_tweet_with_replies(cat_fact), 
         post_ai_generated_cat_tweet,
         post_random_cat_tweet,
         post_random_dog_tweet,
-        cattp]
+        cattp
+    ]
 
     for tweet in tweets:
         try:
