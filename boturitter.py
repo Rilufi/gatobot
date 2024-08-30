@@ -73,6 +73,26 @@ def post_tweet_with_replies(text, max_length=280):
             # Update the ID for the next reply
             reply_to_id = response.data['id']
 
+# Functions for posting blueskweet
+def post_bk_with_replies(text, max_length=300):
+    if len(text) <= max_length:
+        # Post the tweet directly if it's within the character limit
+        client.send_post(text=text)
+    else:
+        # Cut the text into chunks without splitting words
+        parts = get_chunks(fact, max_length)
+
+        # Inicializa a variável para armazenar o ID do post anterior (se aplicável)
+        parent_post_id = None
+
+        # Posta a primeira parte e mantém o ID
+        response = client.send_post(text=next(parts))
+        parent_post_id = response['uri']
+
+        # Posta cada parte subsequente como uma resposta ao post anterior (se possível)
+        for part in parts:
+            response = client.send_post(text=part)
+	    
 # Function to split text into chunks without splitting words
 def get_chunks(s, max_length):
     start = 0
@@ -250,15 +270,6 @@ def get_cat_fact():
         if "skins" not in fact:
             return fact
 
-# Function to get a cat fact from catfact.ninja for Bluesky
-def bk_cat_fact():
-    # Loop until a fact without the word "skins" is obtained
-	r = requests.get('https://catfact.ninja/fact')
-	data = r.json()
-	fact = data["fact"]
-	length = data["length"]
-	if "skins" not in fact and length <= 300:
-	    client.send_post(text=fact)
 
 # Function to post random dog tweet if the hour is 12
 def cattp():
@@ -305,7 +316,7 @@ def main():
     # Posta tweets com pausas de 5 minutos
     tweets = [
         lambda: post_tweet_with_replies(cat_fact),
-        bk_cat_fact,
+	post_bk_with_replies(cat_fact),
         post_ai_generated_cat_tweet,
         post_random_cat_tweet,
         post_random_dog_tweet,
