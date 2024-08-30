@@ -9,6 +9,20 @@ from auth import api, client
 from PIL import Image
 import google.generativeai as genai
 from time import sleep
+from atproto import Client
+
+
+# Inicializando o cliente do Bluesky
+BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
+BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
+
+client = Client()
+client.login(BSKY_HANDLE, BSKY_PASSWORD)
+
+def post_to_bluesky(text, image_path):
+    with open(image_path, 'rb') as f:
+        img_data = f.read()
+    client.send_image(text=text, image=img_data, image_alt='Pet image (ALT)')
 
 
 # Inicializando api do Gemini
@@ -172,6 +186,12 @@ def post_ai_generated_cat_tweet():
     print(mystring)
     media = api.media_upload("fakecat.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
+    response_gemini = gemini_image("Write a funny tweet rating this ai-generated cat image without hashtags", "fakecat.jpg")
+    if response_gemini is None:
+        response_gemini = "HBFC - Hourly Bluesky Fake Cat"
+    mystring = f"{data} AI-generated Cat\n{response_gemini}"
+    print(mystring)
+    post_to_bluesky(mystring, "fakecat.jpg")
     
 # Function to post random cat tweet
 def post_random_cat_tweet():
@@ -186,6 +206,15 @@ def post_random_cat_tweet():
     print(mystring)
     media = api.media_upload("cat_image.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
+    response_gemini = gemini_image("Write a funny and/or cute tweet about this cat image without hashtags",'cat_image.jpg')
+    if response_gemini == None or response_gemini == '"':
+        response_gemini = "HBC - Hourly Bluesky Cat"
+    else:
+        pass
+    mystring = f"""{data} Surprise Cat
+{response_gemini}"""
+    print(mystring)
+    post_to_bluesky(mystring, "cat_image.jpg")
 
 # Function to post random dog tweet
 def post_random_dog_tweet():
@@ -200,8 +229,17 @@ def post_random_dog_tweet():
     print(mystring)
     media = api.media_upload("dog_image.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
+    response_gemini = gemini_image("Write a funny and/or cute tweet about this dog image without hashtags",'dog_image.jpg')
+    if response_gemini == None:
+        response_gemini = "HBD - Hourly Bluesky Dog"
+    else:
+        pass
+    mystring = f"""{data} Surprise Dog
+{response_gemini}"""
+    print(mystring)
+    post_to_bluesky(mystring, "dog_image.jpg")
 
-# Function to get a cat fact from catfact.ninja
+# Function to get a cat fact from catfact.ninja for twitter
 def get_cat_fact():
     # Loop until a fact without the word "skins" is obtained
     while True:
@@ -211,6 +249,16 @@ def get_cat_fact():
         length = data["length"]
         if "skins" not in fact:
             return fact
+
+# Function to get a cat fact from catfact.ninja for Bluesky
+def bk_cat_fact():
+    # Loop until a fact without the word "skins" is obtained
+	r = requests.get('https://catfact.ninja/fact')
+	data = r.json()
+	fact = data["fact"]
+	length = data["length"]
+	if "skins" not in fact and length <= 300:
+	    client.send_post(text=fact)
 
 # Function to post random dog tweet if the hour is 12
 def cattp():
@@ -256,7 +304,8 @@ def main():
     
     # Posta tweets com pausas de 5 minutos
     tweets = [
-        lambda: post_tweet_with_replies(cat_fact), 
+        lambda: post_tweet_with_replies(cat_fact),
+        bk_cat_fact,
         post_ai_generated_cat_tweet,
         post_random_cat_tweet,
         post_random_dog_tweet,
