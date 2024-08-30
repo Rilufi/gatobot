@@ -16,13 +16,13 @@ from atproto import Client
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 
-client = Client()
-client.login(BSKY_HANDLE, BSKY_PASSWORD)
+blsk = Client()
+blsk.login(BSKY_HANDLE, BSKY_PASSWORD)
 
 def post_to_bluesky(text, image_path):
     with open(image_path, 'rb') as f:
         img_data = f.read()
-    client.send_image(text=text, image=img_data, image_alt='Pet image (ALT)')
+    blsk.send_image(text=text, image=img_data, image_alt='Pet image (ALT)')
 
 
 # Inicializando api do Gemini
@@ -77,7 +77,7 @@ def post_tweet_with_replies(text, max_length=280):
 def post_bk_with_replies(text, max_length=300):
     if len(text) <= max_length:
         # Post the tweet directly if it's within the character limit
-        client.send_post(text=text)
+        blsk.send_post(text=text)
     else:
         # Cut the text into chunks without splitting words
         parts = get_chunks(fact, max_length)
@@ -86,12 +86,12 @@ def post_bk_with_replies(text, max_length=300):
         parent_post_id = None
 
         # Posta a primeira parte e mantém o ID
-        response = client.send_post(text=next(parts))
+        response = blsk.send_post(text=next(parts))
         parent_post_id = response['uri']
 
         # Posta cada parte subsequente como uma resposta ao post anterior (se possível)
         for part in parts:
-            response = client.send_post(text=part)
+            response = blsk.send_post(text=part)
 	    
 # Function to split text into chunks without splitting words
 def get_chunks(s, max_length):
