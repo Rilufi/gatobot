@@ -19,10 +19,103 @@ BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 blsk = Client()
 blsk.login(BSKY_HANDLE, BSKY_PASSWORD)
 
+
+# Tudo do Bluesky daqui pra frente, client pra imagem e o resto pro texto
 def post_to_bluesky(text, image_path):
     with open(image_path, 'rb') as f:
         img_data = f.read()
     blsk.send_image(text=text, image=img_data, image_alt='Pet image (ALT)')
+
+def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
+    resp = requests.post(
+        pds_url + "/xrpc/com.atproto.server.createSession",
+        json={"identifier": handle, "password": password},
+    )
+    resp.raise_for_status()
+    return resp.json()
+
+def parse_uri(uri: str) -> Dict:
+    # Função para analisar a URI, separando em partes relevantes
+    repo, collection, rkey = uri.split("/")[2:5]
+    return {"repo": repo, "collection": collection, "rkey": rkey}
+
+def get_reply_refs(pds_url: str, parent_uri: str) -> Dict:
+    uri_parts = parse_uri(parent_uri)
+    resp = requests.get(
+        pds_url + "/xrpc/com.atproto.repo.getRecord",
+        params=uri_parts,
+    )
+    resp.raise_for_status()
+    parent = resp.json()
+    parent_reply = parent["value"].get("reply")
+
+    # Retorna as referências corretas para o root e parent
+    if parent_reply:
+        return {
+            "root": parent_reply["root"],
+            "parent": {"uri": parent["uri"], "cid": parent["cid"]},
+        }
+    else:
+        return {
+            "root": {"uri": parent["uri"], "cid": parent["cid"]},
+            "parent": {"uri": parent["uri"], "cid": parent["cid"]},
+        }
+
+def split_text(text: str, max_length: int = 300) -> List[str]:
+    words = text.split()
+    chunks = []
+    current_chunk = ""
+
+    for word in words:
+        if len(current_chunk) + len(word) + 1 <= max_length:
+            current_chunk += (word if current_chunk == "" else " " + word)
+        else:
+            chunks.append(current_chunk)
+            current_chunk = word
+
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    return chunks
+
+def post_chunk(pds_url: str, access_token: str, did: str, text: str, reply_to: Dict = None) -> Tuple[str, str]:
+    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    post = {
+        "$type": "app.bsky.feed.post",
+        "text": text,
+        "createdAt": now,
+    }
+
+    if reply_to:
+        post["reply"] = reply_to
+
+    resp = requests.post(
+        pds_url + "/xrpc/com.atproto.repo.createRecord",
+        headers={"Authorization": "Bearer " + access_token},
+        json={
+            "repo": did,
+            "collection": "app.bsky.feed.post",
+            "record": post,
+        },
+    )
+    resp.raise_for_status()
+    response_data = resp.json()
+    return response_data["uri"], response_data["cid"]
+
+def post_bk_with_replies(text: str):
+    pds_url = "https://bsky.social"
+    handle = BSKY_HANDLE
+    password = BSKY_PASSWORD
+    session = bsky_login_session(pds_url, handle, password)
+    access_token = session["accessJwt"]
+    did = session["did"]
+
+    chunks = split_text(text)
+    reply_to = None
+
+    for chunk in chunks:
+        uri, cid = post_chunk(pds_url, access_token, did, chunk, reply_to)
+        reply_to = get_reply_refs(pds_url, uri)  # Atualiza a referência para a próxima parte do thread
 
 
 # Inicializando api do Gemini
@@ -73,26 +166,6 @@ def post_tweet_with_replies(text, max_length=280):
             # Update the ID for the next reply
             reply_to_id = response.data['id']
 
-# Functions for posting blueskweet
-def post_bk_with_replies(text, max_length=300):
-    if len(text) <= max_length:
-        # Post the tweet directly if it's within the character limit
-        blsk.send_post(text=text)
-    else:
-        # Cut the text into chunks without splitting words
-        parts = get_chunks(fact, max_length)
-
-        # Inicializa a variável para armazenar o ID do post anterior (se aplicável)
-        parent_post_id = None
-
-        # Posta a primeira parte e mantém o ID
-        response = blsk.send_post(text=next(parts))
-        parent_post_id = response['uri']
-
-        # Posta cada parte subsequente como uma resposta ao post anterior (se possível)
-        for part in parts:
-            response = blsk.send_post(text=part)
-	    
 # Function to split text into chunks without splitting words
 def get_chunks(s, max_length):
     start = 0
@@ -315,8 +388,8 @@ def main():
     
     # Posta tweets com pausas de 5 minutos
     tweets = [
-        lambda: post_tweet_with_replies(cat_fact),
-	post_bk_with_replies(cat_fact),
+        lambda: post_bk_with_replies(cat_fact),
+	post_tweet_with_replies(cat_fact),
         post_ai_generated_cat_tweet,
         post_random_cat_tweet,
         post_random_dog_tweet,
