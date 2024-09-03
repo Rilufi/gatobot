@@ -16,12 +16,7 @@ from typing import Dict, List, Tuple
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 
-# Tudo do Bluesky daqui pra frente, client pra imagem e o resto pro texto
-def post_to_bluesky(text, image_path):
-    with open(image_path, 'rb') as f:
-        img_data = f.read()
-    blsk.send_image(text=text, image=img_data, image_alt='Pet image (ALT)')
-
+# Tudo do Bluesky daqui pra frente, sem precisar do pacote atpro (ou algo assim)
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
     resp = requests.post(
         pds_url + "/xrpc/com.atproto.server.createSession",
@@ -369,7 +364,7 @@ def post_ai_generated_cat_tweet():
     mystring = f"{data} AI-generated Cat\n{response_gemini}"
     print(mystring)
     resize_bluesky("fakecat.jpg")
-    post_thread_with_image(pds_url, handle, password, mystring, "fakecat.jpg", alt_text)
+    post_thread_with_image(pds_url, handle, password, mystring, "fakecat.jpg", "AI-generated image of a cat.")
     
 # Function to post random cat tweet
 def post_random_cat_tweet():
@@ -393,7 +388,7 @@ def post_random_cat_tweet():
 {response_gemini}"""
     print(mystring)
     resize_bluesky("cat_image.jpg")
-    post_thread_with_image(pds_url, handle, password, mystring, "cat_image.jpg", alt_text)
+    post_thread_with_image(pds_url, handle, password, mystring, "cat_image.jpg", "Cat Picture.")
 
 # Function to post random dog tweet
 def post_random_dog_tweet():
@@ -417,7 +412,7 @@ def post_random_dog_tweet():
 {response_gemini}"""
     print(mystring)
     resize_bluesky("dog_image.jpg")
-    post_thread_with_image(pds_url, handle, password, mystring, "dog_image.jpg", alt_text)
+    post_thread_with_image(pds_url, handle, password, mystring, "dog_image.jpg", "Dog Picture.")
 
 # Function to get a cat fact from catfact.ninja for twitter
 def get_cat_fact():
@@ -464,10 +459,6 @@ def rate_status():
 pds_url = "https://bsky.social"
 handle = BSKY_HANDLE
 password = BSKY_PASSWORD
-initial_text = mystring
-long_text = explanation
-image_path = image_path
-alt_text = "Pet Picture"
 
 # Main function
 def main():
