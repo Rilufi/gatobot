@@ -9,13 +9,11 @@ from auth import api, client
 from PIL import Image
 import google.generativeai as genai
 from time import sleep
-from atproto import Client
 
 
 # Inicializando o cliente do Bluesky
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
-
 
 # Tudo do Bluesky daqui pra frente, client pra imagem e o resto pro texto
 def post_to_bluesky(text, image_path):
