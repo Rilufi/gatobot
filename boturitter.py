@@ -16,9 +16,6 @@ from atproto import Client
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 
-blsk = Client()
-blsk.login(BSKY_HANDLE, BSKY_PASSWORD)
-
 
 # Tudo do Bluesky daqui pra frente, client pra imagem e o resto pro texto
 def post_to_bluesky(text, image_path):
@@ -78,7 +75,43 @@ def split_text(text: str, max_length: int = 300) -> List[str]:
 
     return chunks
 
-def post_chunk(pds_url: str, access_token: str, did: str, text: str, reply_to: Dict = None) -> Tuple[str, str]:
+def upload_file(pds_url: str, access_token: str, filename: str, img_bytes: bytes) -> Dict:
+    suffix = filename.split(".")[-1].lower()
+    mimetype = "application/octet-stream"
+    if suffix in ["png"]:
+        mimetype = "image/png"
+    elif suffix in ["jpeg", "jpg"]:
+        mimetype = "image/jpeg"
+    elif suffix in ["webp"]:
+        mimetype = "image/webp"
+
+    resp = requests.post(
+        pds_url + "/xrpc/com.atproto.repo.uploadBlob",
+        headers={
+            "Content-Type": mimetype,
+            "Authorization": "Bearer " + access_token,
+        },
+        data=img_bytes,
+    )
+    resp.raise_for_status()
+    return resp.json()["blob"]
+
+
+def upload_image(pds_url: str, access_token: str, image_path: str, alt_text: str) -> Dict:
+    with open(image_path, "rb") as f:
+        img_bytes = f.read()
+
+    if len(img_bytes) > 1000000:
+        raise Exception(f"Imagem muito grande. Máximo permitido é 1000000 bytes, obtido: {len(img_bytes)}")
+
+    blob = upload_file(pds_url, access_token, image_path, img_bytes)
+    return {
+        "$type": "app.bsky.embed.images",
+        "images": [{"alt": alt_text or "", "image": blob}],
+    }
+
+
+def post_chunk(pds_url: str, access_token: str, did: str, text: str, reply_to: Dict = None, embed: Dict = None) -> Tuple[str, str]:
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     post = {
         "$type": "app.bsky.feed.post",
@@ -88,6 +121,9 @@ def post_chunk(pds_url: str, access_token: str, did: str, text: str, reply_to: D
 
     if reply_to:
         post["reply"] = reply_to
+
+    if embed:
+        post["embed"] = embed
 
     resp = requests.post(
         pds_url + "/xrpc/com.atproto.repo.createRecord",
@@ -117,6 +153,26 @@ def post_bk_with_replies(text: str):
         uri, cid = post_chunk(pds_url, access_token, did, chunk, reply_to)
         reply_to = get_reply_refs(pds_url, uri)  # Atualiza a referência para a próxima parte do thread
 
+def post_thread_with_image(pds_url: str, handle: str, password: str, long_text: str, image_path: str, alt_text: str):
+    session = bsky_login_session(pds_url, handle, password)
+    access_token = session["accessJwt"]
+    did = session["did"]
+
+    # Corta o texto em chunks
+    chunks = split_text(long_text)
+    
+    # Posta o primeiro chunk com a imagem
+    embed = upload_image(pds_url, access_token, image_path, alt_text)
+    uri, cid = post_chunk(pds_url, access_token, did, chunks[0], embed=embed)
+
+    # Posta o restante dos chunks como thread
+    reply_to = get_reply_refs(pds_url, uri)
+
+    for chunk in chunks[1:]:
+        uri, cid = post_chunk(pds_url, access_token, did, chunk, reply_to)
+        reply_to = get_reply_refs(pds_url, uri)
+
+    print("Thread com imagem postada com sucesso!")
 
 # Inicializando api do Gemini
 GOOGLE_API_KEY=os.environ["GOOGLE_API_KEY"]
@@ -175,6 +231,35 @@ def get_chunks(s, max_length):
         yield s[start:end]
         start = end + 1
     yield s[start:]
+
+# Function to resize image for Bluesky
+def resize_bluesky(image_path, max_file_size=1 * 1024 * 1024):
+    """
+    Redimensiona e comprime uma imagem para ficar dentro do limite de tamanho aceito pela rede social Bluesky.
+    Substitui a imagem original se necessário.
+
+    :param image_path: Caminho da imagem original.
+    :param max_file_size: Tamanho máximo permitido da imagem em bytes (default: 1 MB).
+    """
+    # Abre a imagem usando o Pillow
+    img = Image.open(image_path)
+
+    # Redimensiona a imagem mantendo a proporção se necessário
+    if os.path.getsize(image_path) > max_file_size:
+        # Define o tamanho máximo para redimensionar
+        img.thumbnail((1600, 1600))  # Redimensiona para caber dentro de 1600x1600 pixels
+
+        # Reduz a qualidade gradualmente para atingir o tamanho desejado
+        quality = 95
+        while os.path.getsize(image_path) > max_file_size and quality > 10:
+            img.save(image_path, quality=quality)
+            quality -= 5
+            img = Image.open(image_path)  # Recarrega a imagem para verificar o tamanho
+
+        print(f"Imagem redimensionada e comprimida para o limite do Bluesky de {max_file_size} bytes.")
+    else:
+        img.save(image_path)
+        print("Imagem já está dentro do limite de tamanho do Bluesky.")
 
 # Function to get random cat image and resize it if needed
 def get_random_cat():
@@ -284,7 +369,8 @@ def post_ai_generated_cat_tweet():
         response_gemini = "HBFC - Hourly Bluesky Fake Cat"
     mystring = f"{data} AI-generated Cat\n{response_gemini}"
     print(mystring)
-    post_to_bluesky(mystring, "fakecat.jpg")
+    resize_bluesky("fakecat.jpg")
+    post_thread_with_image(pds_url, handle, password, mystring, "fakecat.jpg", alt_text)
     
 # Function to post random cat tweet
 def post_random_cat_tweet():
@@ -307,7 +393,8 @@ def post_random_cat_tweet():
     mystring = f"""{data} Surprise Cat
 {response_gemini}"""
     print(mystring)
-    post_to_bluesky(mystring, "cat_image.jpg")
+    resize_bluesky("cat_image.jpg")
+    post_thread_with_image(pds_url, handle, password, mystring, "cat_image.jpg", alt_text)
 
 # Function to post random dog tweet
 def post_random_dog_tweet():
@@ -330,7 +417,8 @@ def post_random_dog_tweet():
     mystring = f"""{data} Surprise Dog
 {response_gemini}"""
     print(mystring)
-    post_to_bluesky(mystring, "dog_image.jpg")
+    resize_bluesky("dog_image.jpg")
+    post_thread_with_image(pds_url, handle, password, mystring, "dog_image.jpg", alt_text)
 
 # Function to get a cat fact from catfact.ninja for twitter
 def get_cat_fact():
@@ -374,6 +462,13 @@ def rate_status():
         print("'/statuses/update' found in rate limit status. Exiting script.")
         exit()
 
+pds_url = "https://bsky.social"
+handle = BSKY_HANDLE
+password = BSKY_PASSWORD
+initial_text = mystring
+long_text = explanation
+image_path = image_path
+alt_text = "Pet Picture"
 
 # Main function
 def main():
