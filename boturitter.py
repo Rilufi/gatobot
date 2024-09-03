@@ -359,9 +359,12 @@ def post_ai_generated_cat_tweet():
     media = api.media_upload("fakecat.jpg")
     client.create_tweet(text=mystring, media_ids=[media.media_id])
     response_gemini = gemini_image("Write a funny tweet rating this ai-generated cat image without hashtags", "fakecat.jpg")
-    if response_gemini is None:
+    if response_gemini == None:
         response_gemini = "HBFC - Hourly Bluesky Fake Cat"
-    mystring = f"{data} AI-generated Cat\n{response_gemini}"
+    else:
+        pass
+    mystring = f"""{data} AI-generated Cat
+{response_gemini}"""
     print(mystring)
     resize_bluesky("fakecat.jpg")
     post_thread_with_image(pds_url, handle, password, mystring, "fakecat.jpg", "AI-generated image of a cat.")
