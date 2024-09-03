@@ -9,6 +9,7 @@ from auth import api, client
 from PIL import Image
 import google.generativeai as genai
 from time import sleep
+from typing import Dict, List, Tuple
 
 
 # Inicializando o cliente do Bluesky
