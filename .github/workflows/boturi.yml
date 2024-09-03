@@ -1,12 +1,12 @@
 name: Boturi
 
-on: push
- # schedule:
-  #  - cron: '0 * * * *'
+on:
+  schedule:
+    - cron: '0 * * * *'
 
 jobs:
   tweet:
-    name: Tweet
+    name: Tweet and Skeet
     runs-on: ubuntu-latest
 
     concurrency:
