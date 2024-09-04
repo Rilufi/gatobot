@@ -360,10 +360,9 @@ def main():
     get_random_cat()
     cat_fact = get_cat_fact()
     
-    # Posta tweets com pausas de 5 minutos
+    # Posta skeets com pausas de 5 minutos
     tweets = [
         lambda: post_bk_with_replies(cat_fact),
-	      post_tweet_with_replies(cat_fact),
         post_ai_generated_cat_tweet,
         post_random_cat_tweet,
         post_random_dog_tweet,
