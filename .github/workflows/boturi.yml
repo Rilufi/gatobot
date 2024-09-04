@@ -41,11 +41,7 @@ jobs:
       # Use HEREDOC for `run` to escape possible single and double quotes in the message.
       - name: Run all cat scripts 🐦
         env:
-          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
-          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
           GOOGLE_API_KEY:  ${{ secrets.GOOGLE_API_KEY }}
           BSKY_HANDLE:  ${{ secrets.BSKY_HANDLE }}
           BSKY_PASSWORD:  ${{ secrets.BSKY_PASSWORD }}
-        run: python boturitter.py
+        run: python catsky.py
