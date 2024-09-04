@@ -364,6 +364,7 @@ def post_ai_generated_cat_tweet():
     else:
         pass
     mystring = f"""{data} AI-generated Cat
+
 {response_gemini}"""
     print(mystring)
     resize_bluesky("fakecat.jpg")
@@ -388,6 +389,7 @@ def post_random_cat_tweet():
     else:
         pass
     mystring = f"""{data} Surprise Cat
+
 {response_gemini}"""
     print(mystring)
     resize_bluesky("cat_image.jpg")
@@ -412,6 +414,7 @@ def post_random_dog_tweet():
     else:
         pass
     mystring = f"""{data} Surprise Dog
+
 {response_gemini}"""
     print(mystring)
     resize_bluesky("dog_image.jpg")
