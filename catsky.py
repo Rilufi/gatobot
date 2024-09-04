@@ -283,7 +283,7 @@ def download_random_image():
     else:
         print("Error downloading image.")
 
-# Function to post AI-generated cat tweet
+# Function to post AI-generated cat skeet
 def post_ai_generated_cat():
     response_gemini = gemini_image("Write a funny tweet rating this ai-generated cat image without hashtags", "fakecat.jpg")
     if response_gemini == None:
@@ -295,7 +295,7 @@ def post_ai_generated_cat():
     resize_bluesky("fakecat.jpg")
     post_thread_with_image(pds_url, handle, password, mystring, "fakecat.jpg", "AI-generated image of a cat.")
     
-# Function to post random cat tweet
+# Function to post random cat skeet
 def post_random_cat():
     response_gemini = gemini_image("Write a funny and/or cute tweet about this cat image without hashtags",'cat_image.jpg')
     if response_gemini == None or response_gemini == '"':
@@ -307,7 +307,7 @@ def post_random_cat():
     resize_bluesky("cat_image.jpg")
     post_thread_with_image(pds_url, handle, password, mystring, "cat_image.jpg", "Cat Picture.")
 
-# Function to post random dog tweet
+# Function to post random dog skeet
 def post_random_dog():
     response_gemini = gemini_image("Write a funny and/or cute tweet about this dog image without hashtags",'dog_image.jpg')
     if response_gemini == None:
@@ -319,7 +319,7 @@ def post_random_dog():
     resize_bluesky("dog_image.jpg")
     post_thread_with_image(pds_url, handle, password, mystring, "dog_image.jpg", "Dog Picture.")
 
-# Function to get a cat fact from catfact.ninja for twitter
+# Function to get a cat fact from catfact.ninja
 def get_cat_fact():
     # Loop until a fact without the word "skins" is obtained
     while True:
@@ -330,7 +330,7 @@ def get_cat_fact():
         if "skins" not in fact:
             return fact
 
-# Function to post random dog tweet if the hour is 12
+# Function to post random dog skeet if the hour is 12
 def cattp():
     # Get current hour
     hora = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H')
@@ -361,17 +361,17 @@ def main():
     cat_fact = get_cat_fact()
     
     # Posta skeets com pausas de 5 minutos
-    tweets = [
+    skeets = [
         lambda: post_bk_with_replies(cat_fact),
-        post_ai_generated_cat_tweet,
-        post_random_cat_tweet,
-        post_random_dog_tweet,
+        post_ai_generated_cat,
+        post_random_cat,
+        post_random_dog,
         cattp
     ]
 
-    for tweet in tweets:
+    for skeet in skeets:
         try:
-            tweet()
+            skeet()
         except Exception as e:
             print(f"An error occurred: {e}")
         sleep(300)
