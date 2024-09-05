@@ -1,15 +1,15 @@
 import requests
 import os
 
-BSKY_HANDLE = os.environ.get("BSKY_HANDLE")
-BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")
+BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
+BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 PDS_URL = "https://bsky.social"
 PET_KEYWORDS = ["cat", "dog", "gato", "cachorro", "kitty", "puppy", "kitten"]
 
 # Autenticação
 resp = requests.post(
     "https://bsky.social/xrpc/com.atproto.server.createSession",
-    json={"identifier": BLUESKY_HANDLE, "password": BLUESKY_APP_PASSWORD},
+    json={"identifier": BSKY_HANDLE, "password": BSKY_PASSWORD},
 )
 resp.raise_for_status()
 session = resp.json()
