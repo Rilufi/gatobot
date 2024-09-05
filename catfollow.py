@@ -60,15 +60,15 @@ if __name__ == "__main__":
 
     # Define the hashtags to search for (without #)
     hashtags = [
-        "#cat",
-        "#dog",
-        "#gato",
-        "#cachorro",
-        "#doglife",
-        "#catvibes",
-        "#catsofbluesky",
-        "#dogsofbluesky",
-        "#caturday"
+        "#cat"#,
+        #"#dog",
+        #"#gato",
+        #"#cachorro",
+       # "#doglife",
+      #  "#catvibes",
+     #   "#catsofbluesky",
+    #    "#dogsofbluesky",
+   #     "#caturday"
     ]
 
     # Search for posts
