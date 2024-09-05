@@ -1,23 +1,20 @@
 import os
-import requests
 from typing import Dict, List
+
+from atproto.client import Client
 
 # Assuming your Bluesky credentials are stored in environment variables
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")
 PDS_URL = "https://bsky.social"
 
-def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
-    print("Tentando autenticar no Bluesky...")
-    resp = requests.post(
-        pds_url + "/xrpc/com.atproto.server.createSession",
-        json={"identifier": handle, "password": password},
-    )
-    resp.raise_for_status()
-    print("Autenticação bem-sucedida.")
-    return resp.json()
+def create_atproto_client():
+  """Cria um cliente atproto para interagir com a API do Bluesky."""
+  client = Client(base_url=PDS_URL)
+  client.login(BSKY_HANDLE, BSKY_PASSWORD)
+  return client
 
-def get_pet_posts(api_client: str, author_did: str) -> List[Dict]:
+def get_pet_posts(api_client: Client, author_did: str) -> List[Dict]:
     """
     Busca posts com imagens de gatos e/ou cachorros na rede social Bluesky.
     """
@@ -25,12 +22,12 @@ def get_pet_posts(api_client: str, author_did: str) -> List[Dict]:
     pet_posts = []
 
     try:
-        # Fetch posts with media using the filter parameter
-        response = api_client.get_author_feed(
+        # Fetch posts with media using the get_author_feed method
+        response = api_client.app.bsky.feed.get_author_feed(
             actor=author_did,
-            filter="posts_with_media",
+            filter="posts_with_media"
         )
-        data = response.get('data', [])  # Handle potential missing data key
+        data = response.data  # Assuming the response structure aligns with the documentation
     except Exception as e:
         print(f"Erro ao buscar posts: {e}")
         return []
@@ -48,15 +45,11 @@ def get_pet_posts(api_client: str, author_did: str) -> List[Dict]:
 
 def main():
     try:
-        session = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
-        access_token = session.get("accessJwt")
-
-        if not access_token:
-            print("Token de acesso não encontrado. Verifique suas credenciais ou permissões de conta.")
-            return
+        # Cria um cliente atproto
+        client = create_atproto_client()
 
         # Procura por posts de pets
-        pet_posts = get_pet_posts(PDS_URL, access_token)
+        pet_posts = get_pet_posts(client, client.session.access_jwt)
 
         # Exibe os posts encontrados
         for post in pet_posts:
