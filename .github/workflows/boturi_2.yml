@@ -1,8 +1,10 @@
 name: Boturi_2
 
-on: push
- # schedule:
-  #  - cron: '0 * * * *'
+on:
+  workflow_run:
+    workflows: ["Boturi"]
+    types:
+      - completed
 
 jobs:
   tweet:
