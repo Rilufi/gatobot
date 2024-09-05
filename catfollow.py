@@ -22,7 +22,7 @@ resp = requests.get(
     f"{PDS_URL}/xrpc/app.bsky.feed.getAuthorFeed",
     headers=headers
 )
-resp.raise_for_status()
+#resp.raise_for_status()
 feed = resp.json()["data"]
 
 # Filtrar posts por palavras-chave relacionadas a pets
