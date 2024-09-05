@@ -1,4 +1,5 @@
 import requests
+import os
 
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")
