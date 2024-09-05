@@ -56,10 +56,16 @@ def search_pet_posts(pds_url: str, access_token: str, limit: int = 100) -> List[
             print("Resposta completa:", feed_data)
             break
 
+        # Exibindo detalhes para depuração
+        print("Posts recebidos para análise:", len(feed_data.get("feed", [])))
+        
         # Filtra posts que mencionam gatos ou cachorros e possuem mídia
         for post in feed_data.get("feed", []):
             post_text = post.get("text", "").lower()
             media = post.get("embed", {}).get("images", [])
+
+            print(f"Analisando post: {post_text}")
+            print(f"Mídia associada: {media}")
 
             if (
                 any(keyword in post_text for keyword in ["cat", "dog", "kitty", "puppy", "kitten", "#cat", "#dog", "#puppy", "#kitten"])
@@ -78,6 +84,7 @@ def search_pet_posts(pds_url: str, access_token: str, limit: int = 100) -> List[
         print(f"Encontrados {len(pet_posts)} posts com mídia de gatos ou cachorros.")
 
     return pet_posts
+
 
 
 def main():
