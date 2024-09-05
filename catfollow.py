@@ -8,56 +8,81 @@ BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 PDS_URL = "https://bsky.social"  # URL do Bluesky
 
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
+    print("Tentando autenticar no Bluesky...")
     resp = requests.post(
         pds_url + "/xrpc/com.atproto.server.createSession",
         json={"identifier": handle, "password": password},
     )
     resp.raise_for_status()
+    print("Autenticação bem-sucedida.")
     return resp.json()
 
 def search_pet_posts(pds_url: str, access_token: str, limit: int = 30) -> List[Dict]:
     """
     Procura por posts com mídia contendo fotos de gatos e cachorros no feed do usuário autenticado.
     """
+    print("Buscando posts no feed do usuário autenticado...")
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Accept-Language": "en",  # Pode ajustar para múltiplos idiomas, se necessário
     }
 
-    # Busca posts no timeline do usuário autenticado
-    resp = requests.get(
-        f"{pds_url}/xrpc/app.bsky.feed.getTimeline",
-        headers=headers,
-        params={"limit": limit}
-    )
-    resp.raise_for_status()
-    feed_data = resp.json()
+    try:
+        # Busca posts no timeline do usuário autenticado
+        resp = requests.get(
+            f"{pds_url}/xrpc/app.bsky.feed.getTimeline",
+            headers=headers,
+            params={"limit": limit}
+        )
+        resp.raise_for_status()
+        feed_data = resp.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao buscar o feed: {e}")
+        return []
 
     pet_posts = []
 
+    # Verifica se a resposta contém o campo "feed"
+    if "feed" not in feed_data:
+        print("A resposta da API não contém o campo 'feed'.")
+        print("Resposta completa:", feed_data)
+        return []
+
+    # Filtra posts que mencionam gatos ou cachorros e possuem mídia
     for post in feed_data.get("feed", []):
         post_text = post.get("text", "").lower()
         media = post.get("embed", {}).get("images", [])
 
-        # Filtra posts que mencionam gatos ou cachorros e possuem mídia
         if ("cat" in post_text or "dog" in post_text or "#cat" in post_text or "#dog" in post_text) and media:
             pet_posts.append(post)
+
+    if not pet_posts:
+        print("Nenhum post com mídia de gatos ou cachorros foi encontrado.")
+    else:
+        print(f"Encontrados {len(pet_posts)} posts com mídia de gatos ou cachorros.")
 
     return pet_posts
 
 def main():
-    session = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
-    access_token = session["accessJwt"]
+    try:
+        session = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
+        access_token = session.get("accessJwt")
 
-    # Procura por posts de pets
-    pet_posts = search_pet_posts(PDS_URL, access_token, limit=30)
+        if not access_token:
+            print("Token de acesso não encontrado.")
+            return
 
-    # Exibe os posts encontrados
-    for post in pet_posts:
-        print(f"Autor: {post.get('author', {}).get('displayName', 'Desconhecido')}")
-        print(f"Texto: {post.get('text')}")
-        print(f"Mídia: {post.get('embed', {}).get('images', [])}")
-        print("-----\n")
+        # Procura por posts de pets
+        pet_posts = search_pet_posts(PDS_URL, access_token, limit=30)
+
+        # Exibe os posts encontrados
+        for post in pet_posts:
+            print(f"Autor: {post.get('author', {}).get('displayName', 'Desconhecido')}")
+            print(f"Texto: {post.get('text')}")
+            print(f"Mídia: {post.get('embed', {}).get('images', [])}")
+            print("-----\n")
+    except Exception as e:
+        print(f"Erro durante a execução: {e}")
 
 if __name__ == "__main__":
     main()
