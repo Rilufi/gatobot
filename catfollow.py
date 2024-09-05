@@ -24,8 +24,7 @@ def get_pet_posts(api_client, author_did):
     # Fetch posts with media using the filter parameter
     response = api_client.get_author_feed(
         actor=author_did,
-        filter="posts_with_media",  # Fetch only posts with media
-        limit=10  # Adjust as necessary
+        filter="posts_with_media"  # Fetch only posts with media
     )
 
     # Iterate over the posts and filter based on keywords
