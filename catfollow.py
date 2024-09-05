@@ -1,7 +1,8 @@
 import requests
 
-BLUESKY_HANDLE = "example.bsky.social"
-BLUESKY_APP_PASSWORD = "123-456-789"
+BSKY_HANDLE = os.environ.get("BSKY_HANDLE")
+BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")
+PDS_URL = "https://bsky.social"
 PET_KEYWORDS = ["cat", "dog", "gato", "cachorro", "kitty", "puppy", "kitten"]
 
 # Autenticação
