@@ -50,7 +50,7 @@ def main():
             return
 
         # Procura por posts de pets
-        pet_posts = get_pet_posts(PDS_URL, access_token, limit=30)
+        pet_posts = get_pet_posts(PDS_URL, access_token)
 
         # Exibe os posts encontrados
         for post in pet_posts:
