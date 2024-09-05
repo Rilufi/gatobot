@@ -17,73 +17,27 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
     print("Autenticação bem-sucedida.")
     return resp.json()
 
-def search_pet_posts(pds_url: str, access_token: str, limit: int = 100) -> List[Dict]:
-    """
-    Procura por posts com mídia contendo fotos de gatos e cachorros no feed do usuário autenticado.
-    """
-    print("Buscando posts no feed do usuário autenticado...")
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Accept-Language": "en",  # Pode ajustar para múltiplos idiomas, se necessário
-    }
-
-    cursor = None
+def get_pet_posts(api_client, author_did):
+    pet_keywords = ["cat", "dog", "kitty", "puppy", "kitten", "#cat", "#dog", "#puppy", "#kitten"]
     pet_posts = []
 
-    while True:
-        params = {
-            "limit": limit,
-        }
-        if cursor:
-            params["cursor"] = cursor
+    # Fetch posts with media using the filter parameter
+    response = api_client.get_author_feed(
+        actor=author_did,
+        filter="posts_with_media",  # Fetch only posts with media
+        limit=10  # Adjust as necessary
+    )
 
-        try:
-            # Busca posts no timeline do usuário autenticado
-            resp = requests.get(
-                f"{pds_url}/xrpc/app.bsky.feed.getTimeline",
-                headers=headers,
-                params=params
-            )
-            resp.raise_for_status()
-            feed_data = resp.json()
-        except requests.exceptions.RequestException as e:
-            print(f"Erro ao buscar o feed: {e}")
-            break
+    # Iterate over the posts and filter based on keywords
+    for post in response['data']:
+        post_text = post.get('text', '').lower()  # Assuming text is in a 'text' field
 
-        # Verifica se a resposta contém o campo "feed"
-        if "feed" not in feed_data:
-            print("A resposta da API não contém o campo 'feed'.")
-            print("Resposta completa:", feed_data)
-            break
-
-        # Exibindo detalhes para depuração
-        print("Posts recebidos para análise:", len(feed_data.get("feed", [])))
-        
-        # Filtra posts que mencionam gatos ou cachorros e possuem mídia
-        for post in feed_data.get("feed", []):
-            post_text = post.get("text", "").lower()
-            media = post.get("embed", {}).get("images", [])
-
-            print(f"Analisando post: {post_text}")
-            print(f"Mídia associada: {media}")
-
-            if (
-                any(keyword in post_text for keyword in ["cat", "dog", "kitty", "puppy", "kitten", "#cat", "#dog", "#puppy", "#kitten"])
-                and media
-            ):
-                pet_posts.append(post)
-
-        # Verifica se há mais páginas para processar
-        cursor = feed_data.get("cursor")
-        if not cursor or len(pet_posts) >= limit:
-            break
-
-    if not pet_posts:
-        print("Nenhum post com mídia de gatos ou cachorros foi encontrado.")
-    else:
-        print(f"Encontrados {len(pet_posts)} posts com mídia de gatos ou cachorros.")
+        # Check if any keyword is in the post text
+        if any(keyword in post_text for keyword in pet_keywords):
+            pet_posts.append(post)
 
     return pet_posts
+
 
 
 
@@ -97,7 +51,7 @@ def main():
             return
 
         # Procura por posts de pets
-        pet_posts = search_pet_posts(PDS_URL, access_token, limit=30)
+        pet_posts = get_pet_posts(PDS_URL, access_token, limit=30)
 
         # Exibe os posts encontrados
         for post in pet_posts:
