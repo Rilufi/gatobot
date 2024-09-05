@@ -30,6 +30,16 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
     print("Autenticação bem-sucedida.")
     return resp.json()
 
+def search_posts_by_hashtags(session: Dict, hashtags: List[str]) -> Dict:
+    """Searches for posts containing the given hashtags."""
+    hashtag_query = " OR ".join(hashtags)
+    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
+    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
+    params = {"q": hashtag_query, "limit": 5}  # Ajuste o limite conforme necessário
+
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
+    return response.json()
 
 def find_images_with_keywords(post: Dict, keywords: List[str]) -> List[Dict]:
     """Finds images in the post that contain specified keywords in their 'alt' descriptions."""
