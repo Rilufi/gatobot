@@ -47,7 +47,7 @@ def search_posts_by_hashtags(session: Dict, hashtags: List[str]) -> Dict:
 
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
     headers = {"Authorization": f"Bearer {session['accessJwt']}"}  # Use accessJwt key
-    params = {"q": hashtag_query, "limit": 100}  # You can adjust the limit as needed
+    params = {"q": hashtag_query, "limit": 1}  # You can adjust the limit as needed
 
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
@@ -60,28 +60,29 @@ if __name__ == "__main__":
 
     # Define the hashtags to search for (without #)
     hashtags = [
-        "#cat"#,
-        #"#dog",
-        #"#gato",
-        #"#cachorro",
-       # "#doglife",
-      #  "#catvibes",
-     #   "#catsofbluesky",
-    #    "#dogsofbluesky",
-   #     "#caturday"
+        "#cat",
+        "#dog",
+        "#gato",
+        "#cachorro",
+        "#doglife",
+        "#catvibes",
+        "#catsofbluesky",
+        "#dogsofbluesky",
+        "#caturday"
     ]
 
     # Search for posts
-    search_results = search_posts_by_hashtags(session, hashtags)
-    
-    # Print more detailed information about the search results
-    print("Resultados da pesquisa:")
-    if not search_results.get('posts'):
-        print("Nenhum resultado encontrado.")
-    else:
-        for post in search_results["posts"]:
-            print(f"Post ID: {post.get('id')}")
-            print(f"Title: {post.get('title', 'No Title')}")
-            print(f"Author: {post.get('author', {}).get('displayName', 'Unknown')}")
-            print(f"Content: {post.get('content', {}).get('text', 'No Text')}")
-            print("-----\n")
+    for hashtag in hashtags:    
+        search_results = search_posts_by_hashtags(session, hashtag)
+        
+        # Print more detailed information about the search results
+        print("Resultados da pesquisa:")
+        if not search_results.get('posts'):
+            print("Nenhum resultado encontrado.")
+        else:
+            for post in search_results["posts"]:
+                print(f"Post ID: {post.get('id')}")
+                print(f"Title: {post.get('title', 'No Title')}")
+                print(f"Author: {post.get('author', {}).get('displayName', 'Unknown')}")
+                print(f"Content: {post.get('content', {}).get('text', 'No Text')}")
+                print("-----\n")
