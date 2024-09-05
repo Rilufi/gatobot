@@ -103,12 +103,43 @@ def upload_image(pds_url: str, access_token: str, image_path: str, alt_text: str
     }
 
 
+def find_hashtags(text: str) -> List[Dict]:
+    """
+    Encontra hashtags no texto e retorna uma lista de facets para incluir no post.
+    """
+    facets = []
+    words = text.split()
+    byte_index = 0
+
+    for word in words:
+        if word.startswith("#"):
+            start = byte_index
+            end = byte_index + len(word)
+            facets.append({
+                "index": {
+                    "byteStart": start,
+                    "byteEnd": end
+                },
+                "features": [{
+                    "$type": "app.bsky.richtext.facet#tag",
+                    "tag": word[1:]  # Remove o '#' para a tag
+                }]
+            })
+        byte_index += len(word) + 1  # +1 para o espaço após a palavra
+
+    return facets
+
 def post_chunk(pds_url: str, access_token: str, did: str, text: str, reply_to: Dict = None, embed: Dict = None) -> Tuple[str, str]:
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    
+    # Identifica hashtags no texto e cria facets
+    facets = find_hashtags(text)
+    
     post = {
         "$type": "app.bsky.feed.post",
         "text": text,
         "createdAt": now,
+        "facets": facets if facets else []  # Inclui facets se houverem hashtags
     }
 
     if reply_to:
@@ -285,7 +316,7 @@ def download_random_image():
 
 # Function to post AI-generated cat skeet
 def post_ai_generated_cat():
-    response_gemini = gemini_image("Write a funny tweet rating this ai-generated cat image without hashtags", "fakecat.jpg")
+    response_gemini = gemini_image("Write a funny skeet for the Bluesky social media (maximum 300 characters) rating this ai-generated cat image with hashtags", "fakecat.jpg")
     if response_gemini == None:
         response_gemini = "HBFC - Hourly Bluesky Fake Cat"
     else:
@@ -297,7 +328,7 @@ def post_ai_generated_cat():
     
 # Function to post random cat skeet
 def post_random_cat():
-    response_gemini = gemini_image("Write a funny and/or cute tweet about this cat image without hashtags",'cat_image.jpg')
+    response_gemini = gemini_image("Write a funny and/or cute skeet for the Bluesky social media (maximum 300 characters) about this cat image with hashtags",'cat_image.jpg')
     if response_gemini == None or response_gemini == '"':
         response_gemini = "HBC - Hourly Bluesky Cat"
     else:
@@ -309,7 +340,7 @@ def post_random_cat():
 
 # Function to post random dog skeet
 def post_random_dog():
-    response_gemini = gemini_image("Write a funny and/or cute tweet about this dog image without hashtags",'dog_image.jpg')
+    response_gemini = gemini_image("Write a funny and/or cute skeet for the Bluesky social media (maximum 300 characters) about this dog image with hashtags",'dog_image.jpg')
     if response_gemini == None:
         response_gemini = "HBD - Hourly Bluesky Dog"
     else:
