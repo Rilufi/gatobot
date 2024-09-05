@@ -68,10 +68,10 @@ def search_pet_posts(pds_url: str, access_token: str, limit: int = 10) -> List[D
             print(f"Analisando post: {post_text}")
             print(f"Mídia associada: {media}")
 
-            if (
-                any(keyword in post_text for keyword in ["cat", "dog", "kitty", "puppy", "kitten", "#cat", "#dog", "#puppy", "#kitten"])
-            ):
-                pet_posts.append(post)
+   #         if (
+    #            any(keyword in post_text for keyword in ["cat", "dog", "kitty", "puppy", "kitten", "#cat", "#dog", "#puppy", "#kitten"])
+     #       ):
+            pet_posts.append(post)
 
         # Verifica se há mais páginas para processar
         cursor = feed_data.get("cursor")
