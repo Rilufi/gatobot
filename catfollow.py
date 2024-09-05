@@ -1,6 +1,6 @@
 import os
 import requests
-#from atproto import Client
+from typing import Dict, List
 
 
 # Inicializando o cliente do Bluesky
