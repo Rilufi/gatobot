@@ -1,65 +1,41 @@
-import os
-from typing import Dict, List
+import requests
 
-from atproto import Client
+BLUESKY_HANDLE = "example.bsky.social"
+BLUESKY_APP_PASSWORD = "123-456-789"
+PET_KEYWORDS = ["cat", "dog", "gato", "cachorro", "kitty", "puppy", "kitten"]
 
-# Assuming your Bluesky credentials are stored in environment variables
-BSKY_HANDLE = os.environ.get("BSKY_HANDLE")
-BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")
-PDS_URL = "https://bsky.social"
+# Autenticação
+resp = requests.post(
+    "https://bsky.social/xrpc/com.atproto.server.createSession",
+    json={"identifier": BLUESKY_HANDLE, "password": BLUESKY_APP_PASSWORD},
+)
+resp.raise_for_status()
+session = resp.json()
+access_token = session["accessJwt"]
 
-def create_atproto_client():
-  """Cria um cliente atproto para interagir com a API do Bluesky."""
-  client = Client(base_url=PDS_URL)
-  client.login(BSKY_HANDLE, BSKY_PASSWORD)
-  return client
+# Buscar posts com imagens
+headers = {"Authorization": f"Bearer {access_token}"}
+params = {"filter": "posts_with_media"}
 
-def get_pet_posts(api_client: Client, author_did: str) -> List[Dict]:
-    """
-    Busca posts com imagens de gatos e/ou cachorros na rede social Bluesky.
-    """
-    pet_keywords = ["cat", "dog", "kitty", "puppy", "kitten", "#cat", "#dog", "#puppy", "#kitten"]
-    pet_posts = []
+resp = requests.get(
+    "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed",
+    headers=headers,
+    params=params
+)
+resp.raise_for_status()
+feed = resp.json()["data"]
 
-    try:
-        # Fetch posts with media using the get_author_feed method
-        response = api_client.app.bsky.feed.get_author_feed(
-            actor=author_did,
-            filter="posts_with_media"
-        )
-        data = response.data  # Assuming the response structure aligns with the documentation
-    except Exception as e:
-        print(f"Erro ao buscar posts: {e}")
-        return []
-
-    # Iterate over the posts and filter based on keywords
-    for post in data:
-        post_text = post.get('text', '').lower()
-
-        # Check if any keyword is in the post text
-        if any(keyword in post_text for keyword in pet_keywords):
+# Filtrar posts por palavras-chave relacionadas a pets
+pet_posts = []
+for post in feed:
+    text = post.get("text", "").lower()
+    if any(keyword in text for keyword in PET_KEYWORDS):
+        if "embed" in post and "images" in post["embed"]:
             pet_posts.append(post)
 
-    return pet_posts
-
-
-def main():
-    try:
-        # Cria um cliente atproto
-        client = create_atproto_client()
-
-        # Procura por posts de pets
-        pet_posts = get_pet_posts(client, client.session.access_jwt)
-
-        # Exibe os posts encontrados
-        for post in pet_posts:
-            print(f"Autor: {post.get('author', {}).get('displayName', 'Desconhecido')}")
-            print(f"Texto: {post.get('text')}")
-            print(f"Mídia: {post.get('embed', {}).get('images', [])}")
-            print("-----\n")
-    except Exception as e:
-        print(f"Erro durante a execução: {e}")
-
-
-if __name__ == "__main__":
-    main()
+# Imprimir os posts encontrados
+for post in pet_posts:
+    print(f"Autor: {post.get('author', {}).get('displayName', 'Desconhecido')}")
+    print(f"Texto: {post.get('text')}")
+    print(f"Imagens: {post.get('embed', {}).get('images', [])}")
+    print("-----\n")
