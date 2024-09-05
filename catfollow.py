@@ -81,6 +81,7 @@ if __name__ == "__main__":
             print("Nenhum resultado encontrado.")
         else:
             for post in search_results["posts"]:
+                print(post)
                 print(f"Post ID: {post.get('id')}")
                 print(f"Title: {post.get('title', 'No Title')}")
                 print(f"Author: {post.get('author', {}).get('displayName', 'Unknown')}")
