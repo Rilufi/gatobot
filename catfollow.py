@@ -9,13 +9,16 @@ BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 PDS_URL = "https://bsky.social"  # URL do Bluesky
 BOT_NAME = "Boturi"  # Nome do bot para evitar interagir com os próprios posts
 
-def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
-    """Logs in to Bluesky and returns the client instance."""
+def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
+    """Logs in to Bluesky and returns the session data."""
     print("Tentando autenticar no Bluesky...")
-    client = Client(base_url=pds_url)
-    client.login(handle, password)
+    resp = requests.post(
+        pds_url + "/xrpc/com.atproto.server.createSession",
+        json={"identifier": handle, "password": password},
+    )
+    resp.raise_for_status()
     print("Autenticação bem-sucedida.")
-    return client
+    return resp.json()
 
 def search_posts_by_hashtags(session: Dict, hashtags: List[str]) -> Dict:
     """Searches for posts containing the given hashtags."""
