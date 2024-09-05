@@ -17,7 +17,7 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
     print("Autenticação bem-sucedida.")
     return resp.json()
 
-def search_pet_posts(pds_url: str, access_token: str, limit: int = 30) -> List[Dict]:
+def search_pet_posts(pds_url: str, access_token: str, limit: int = 100) -> List[Dict]:
     """
     Procura por posts com mídia contendo fotos de gatos e cachorros no feed do usuário autenticado.
     """
@@ -27,34 +27,50 @@ def search_pet_posts(pds_url: str, access_token: str, limit: int = 30) -> List[D
         "Accept-Language": "en",  # Pode ajustar para múltiplos idiomas, se necessário
     }
 
-    try:
-        # Busca posts no timeline do usuário autenticado
-        resp = requests.get(
-            f"{pds_url}/xrpc/app.bsky.feed.getTimeline",
-            headers=headers,
-            params={"limit": limit}
-        )
-        resp.raise_for_status()
-        feed_data = resp.json()
-    except requests.exceptions.RequestException as e:
-        print(f"Erro ao buscar o feed: {e}")
-        return []
-
+    cursor = None
     pet_posts = []
 
-    # Verifica se a resposta contém o campo "feed"
-    if "feed" not in feed_data:
-        print("A resposta da API não contém o campo 'feed'.")
-        print("Resposta completa:", feed_data)
-        return []
+    while True:
+        params = {
+            "limit": limit,
+        }
+        if cursor:
+            params["cursor"] = cursor
 
-    # Filtra posts que mencionam gatos ou cachorros e possuem mídia
-    for post in feed_data.get("feed", []):
-        post_text = post.get("text", "").lower()
-        media = post.get("embed", {}).get("images", [])
+        try:
+            # Busca posts no timeline do usuário autenticado
+            resp = requests.get(
+                f"{pds_url}/xrpc/app.bsky.feed.getTimeline",
+                headers=headers,
+                params=params
+            )
+            resp.raise_for_status()
+            feed_data = resp.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Erro ao buscar o feed: {e}")
+            break
 
-        if ("cat" in post_text or "dog" in post_text or "#cat" in post_text or "#dog" in post_text) and media:
-            pet_posts.append(post)
+        # Verifica se a resposta contém o campo "feed"
+        if "feed" not in feed_data:
+            print("A resposta da API não contém o campo 'feed'.")
+            print("Resposta completa:", feed_data)
+            break
+
+        # Filtra posts que mencionam gatos ou cachorros e possuem mídia
+        for post in feed_data.get("feed", []):
+            post_text = post.get("text", "").lower()
+            media = post.get("embed", {}).get("images", [])
+
+            if (
+                any(keyword in post_text for keyword in ["cat", "dog", "kitty", "puppy", "kitten", "#cat", "#dog", "#puppy", "#kitten"])
+                and media
+            ):
+                pet_posts.append(post)
+
+        # Verifica se há mais páginas para processar
+        cursor = feed_data.get("cursor")
+        if not cursor or len(pet_posts) >= limit:
+            break
 
     if not pet_posts:
         print("Nenhum post com mídia de gatos ou cachorros foi encontrado.")
@@ -62,6 +78,7 @@ def search_pet_posts(pds_url: str, access_token: str, limit: int = 30) -> List[D
         print(f"Encontrados {len(pet_posts)} posts com mídia de gatos ou cachorros.")
 
     return pet_posts
+
 
 def main():
     try:
