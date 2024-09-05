@@ -1,7 +1,7 @@
 import os
 from typing import Dict, List
 
-from atproto.client import Client
+from atproto import Client
 
 # Assuming your Bluesky credentials are stored in environment variables
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")
