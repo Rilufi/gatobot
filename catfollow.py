@@ -17,17 +17,14 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
     print("Autenticação bem-sucedida.")
     return client
 
-def search_posts_by_hashtags(session: Client, hashtags: List[str]) -> Dict:
-    """Searches for posts containing the given hashtags using the session cookies."""
+def search_posts_by_hashtags(session: Dict, hashtags: List[str]) -> Dict:
+    """Searches for posts containing the given hashtags."""
     hashtag_query = " OR ".join(hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
-    
-    # Utiliza os cookies de sessão gerenciados pelo client para manter a autenticação
-    session_cookie = session._session.cookies.get_dict()
-    headers = {"Authorization": f"Bearer {session._access_jwt}"}  # ainda usando access_jwt com underscore
+    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
     params = {"q": hashtag_query, "limit": 5}  # Ajuste o limite conforme necessário
 
-    response = requests.get(url, headers=headers, params=params, cookies=session_cookie)
+    response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
     return response.json()
 
