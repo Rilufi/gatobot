@@ -17,12 +17,10 @@ access_token = session["accessJwt"]
 
 # Buscar posts com imagens
 headers = {"Authorization": f"Bearer {access_token}"}
-params = {"filter": "posts_with_media"}
 
 resp = requests.get(
     f"{PDS_URL}/xrpc/app.bsky.feed.getAuthorFeed",
-    headers=headers,
-    params=params
+    headers=headers
 )
 resp.raise_for_status()
 feed = resp.json()["data"]
