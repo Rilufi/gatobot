@@ -2,10 +2,10 @@ import os
 import requests
 from typing import Dict, List
 
-# Inicializando o cliente do Bluesky
-BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
-BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
-PDS_URL = "https://bsky.social"  # URL do Bluesky
+# Assuming your Bluesky credentials are stored in environment variables
+BSKY_HANDLE = os.environ.get("BSKY_HANDLE")
+BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")
+PDS_URL = "https://bsky.social"
 
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
     print("Tentando autenticar no Bluesky...")
@@ -17,19 +17,27 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
     print("Autenticação bem-sucedida.")
     return resp.json()
 
-def get_pet_posts(api_client, author_did):
+def get_pet_posts(api_client: str, author_did: str) -> List[Dict]:
+    """
+    Busca posts com imagens de gatos e/ou cachorros na rede social Bluesky.
+    """
     pet_keywords = ["cat", "dog", "kitty", "puppy", "kitten", "#cat", "#dog", "#puppy", "#kitten"]
     pet_posts = []
 
-    # Fetch posts with media using the filter parameter
-    response = api_client.get_author_feed(
-        actor=author_did,
-        filter="posts_with_media"  # Fetch only posts with media
-    )
+    try:
+        # Fetch posts with media using the filter parameter
+        response = api_client.get_author_feed(
+            actor=author_did,
+            filter="posts_with_media",
+        )
+        data = response.get('data', [])  # Handle potential missing data key
+    except Exception as e:
+        print(f"Erro ao buscar posts: {e}")
+        return []
 
     # Iterate over the posts and filter based on keywords
-    for post in response['data']:
-        post_text = post.get('text', '').lower()  # Assuming text is in a 'text' field
+    for post in data:
+        post_text = post.get('text', '').lower()
 
         # Check if any keyword is in the post text
         if any(keyword in post_text for keyword in pet_keywords):
@@ -38,15 +46,13 @@ def get_pet_posts(api_client, author_did):
     return pet_posts
 
 
-
-
 def main():
     try:
         session = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
         access_token = session.get("accessJwt")
 
         if not access_token:
-            print("Token de acesso não encontrado.")
+            print("Token de acesso não encontrado. Verifique suas credenciais ou permissões de conta.")
             return
 
         # Procura por posts de pets
@@ -60,6 +66,7 @@ def main():
             print("-----\n")
     except Exception as e:
         print(f"Erro durante a execução: {e}")
+
 
 if __name__ == "__main__":
     main()
