@@ -47,7 +47,7 @@ def search_posts_by_hashtags(session: Dict, hashtags: List[str]) -> Dict:
 
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
     headers = {"Authorization": f"Bearer {session['accessJwt']}"}  # Use accessJwt key
-    params = {"q": hashtag_query, "limit": 5}  # You can adjust the limit as needed
+    params = {"q": hashtag_query, "limit": 10}  # You can adjust the limit as needed
 
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
@@ -81,9 +81,13 @@ if __name__ == "__main__":
             print("Nenhum resultado encontrado.")
         else:
             for post in search_results["posts"]:
-                print(post)
-                print(f"Post uri: {post.get('uri')}")
-                print(f"Post uri: {post.get('cid')}")
-                print(f"Author: {post.get('author', {}).get('displayName', 'Unknown')}")
-                print(f"Alt: {post.get('images')}")#, {}).get('text', 'No Text')}")
-                print("-----\n")
+                if post.get('embed', {}).get('$type') == 'app.bsky.embed.images':
+                   images = post['embed']['images']
+                   for image in images:
+                     if "cat" in image.get('alt', '').lower() or "dog" in image.get('alt', '').lower():
+                       print(f"Found image with matching alt text: {image.get('alt')}")
+                       print(post)
+                       print(f"Post uri: {post.get('uri')}")
+                       print(f"Post uri: {post.get('cid')}")
+                       print(f"Author: {post.get('author', {}).get('displayName', 'Unknown')}")
+                       print("-----\n")
