@@ -91,3 +91,5 @@ if __name__ == "__main__":
                        print(f"Post uri: {post.get('cid')}")
                        print(f"Author: {post.get('author', {}).get('displayName', 'Unknown')}")
                        print("-----\n")
+                     else:
+                       print(f"Not found image with matching alt text: {image.get('alt')}")
