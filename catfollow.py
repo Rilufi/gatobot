@@ -85,5 +85,5 @@ if __name__ == "__main__":
                 print(f"Post uri: {post.get('uri')}")
                 print(f"Post uri: {post.get('cid')}")
                 print(f"Author: {post.get('author', {}).get('displayName', 'Unknown')}")
-                print(f"Alt: {post.get('images'['alt']}")#, {}).get('text', 'No Text')}")
+                print(f"Alt: {post.get('images')}")#, {}).get('text', 'No Text')}")
                 print("-----\n")
