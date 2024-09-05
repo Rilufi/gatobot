@@ -31,27 +31,20 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
     return resp.json()
 
 
-def search_posts_by_hashtags(session: Dict, hashtags: List[str]) -> Dict:
-    """Searches for posts containing the given hashtags
-
-    Args:
-        session (Dict): The Bluesky session data obtained from bsky_login_session
-        hashtags (List[str]): A list of hashtags to search for (without the # symbol)
-
-    Returns:
-        Dict: A dictionary containing the search results
-    """
-
-    # Combine hashtags with OR operator for searching multiple terms
-    hashtag_query = " OR ".join(hashtags)
-
-    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
-    headers = {"Authorization": f"Bearer {session['accessJwt']}"}  # Use accessJwt key
-    params = {"q": hashtag_query, "limit": 100}  # You can adjust the limit as needed
-
-    response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()
-    return response.json()
+def find_images_with_keywords(post: Dict, keywords: List[str]) -> List[Dict]:
+    """Finds images in the post that contain specified keywords in their 'alt' descriptions."""
+    images_with_keywords = []
+    embed = post.get('record', {}).get('embed')
+    
+    # Check if the embed type is images
+    if embed and embed.get('$type') == 'app.bsky.embed.images':
+        images = embed.get('images', [])
+        for image in images:
+            alt_text = image.get('alt', '').lower()
+            if any(keyword in alt_text for keyword in keywords):
+                images_with_keywords.append(image)
+                
+    return images_with_keywords
 
 
 if __name__ == "__main__":
@@ -73,23 +66,28 @@ if __name__ == "__main__":
 
     # Search for posts
     for hashtag in hashtags:    
-        search_results = search_posts_by_hashtags(session, hashtag)
+        search_results = search_posts_by_hashtags(session, [hashtag])
         
-        # Print more detailed information about the search results
-        print("Resultados da pesquisa:")
+        # Print detailed information about the search results
+        print(f"Resultados da pesquisa para {hashtag}:")
         if not search_results.get('posts'):
             print("Nenhum resultado encontrado.")
         else:
             for post in search_results["posts"]:
-                if post.get('embed', {}).get('$type') == 'app.bsky.embed.images':
-                   images = post['embed']['images']
-                   for image in images:
-                     if "cat" in image.get('alt', '').lower() or "dog" in image.get('alt', '').lower():
-                       print(f"Found image with matching alt text: {image.get('alt')}")
-                       print(post)
-                       print(f"Post uri: {post.get('uri')}")
-                       print(f"Post uri: {post.get('cid')}")
-                       print(f"Author: {post.get('author', {}).get('displayName', 'Unknown')}")
-                       print("-----\n")
-                     else:
-                       print(f"Not found image with matching alt text: {image.get('alt')}")
+                uri = post.get('uri')
+                cid = post.get('cid')
+                author_name = post.get('author', {}).get('displayName', 'Unknown')
+                
+                # Find images containing 'cat' or 'dog' in their alt descriptions
+                images = find_images_with_keywords(post, ['cat', 'dog'])
+                
+                if images:
+                    print(f"Post URI: {uri}")
+                    print(f"Post CID: {cid}")
+                    print(f"Author: {author_name}")
+                    for image in images:
+                        print(f"Image ALT: {image['alt']}")
+                        print(f"Image URL: {image.get('url', 'No URL')}")
+                    print("-----\n")
+                else:
+                    print("Nenhuma imagem relevante encontrada com 'cat' ou 'dog'.\n")
