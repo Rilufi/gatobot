@@ -47,7 +47,7 @@ def search_posts_by_hashtags(session: Dict, hashtags: List[str]) -> Dict:
 
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
     headers = {"Authorization": f"Bearer {session['accessJwt']}"}  # Use accessJwt key
-    params = {"q": hashtag_query, "limit": 10}  # You can adjust the limit as needed
+    params = {"q": hashtag_query, "limit": 100}  # You can adjust the limit as needed
 
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
@@ -60,15 +60,15 @@ if __name__ == "__main__":
 
     # Define the hashtags to search for (without #)
     hashtags = [
-    #    "#cat",
-     #   "#dog",
-      #  "#gato",
-      #  "#cachorro",
-      #  "#doglife",
-      #  "#catvibes",
+        "#cat",
+        "#dog",
+        "#gato",
+        "#cachorro",
+        "#doglife",
+        "#catvibes",
         "#catsofbluesky",
-        "#dogsofbluesky"#,
-      #  "#caturday"
+        "#dogsofbluesky",
+        "#caturday"
     ]
 
     # Search for posts
