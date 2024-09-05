@@ -17,7 +17,7 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
     print("Autenticação bem-sucedida.")
     return resp.json()
 
-def search_pet_posts(pds_url: str, access_token: str, limit: int = 100) -> List[Dict]:
+def search_pet_posts(pds_url: str, access_token: str, limit: int = 10) -> List[Dict]:
     """
     Procura por posts com mídia contendo fotos de gatos e cachorros no feed do usuário autenticado.
     """
@@ -32,8 +32,8 @@ def search_pet_posts(pds_url: str, access_token: str, limit: int = 100) -> List[
 
     while True:
         params = {
-            "limit": limit,
-            "filter": "posts_with_media"
+            "limit": limit#,
+          #  "filter": "posts_with_media"
         }
         if cursor:
             params["cursor"] = cursor
