@@ -1,29 +1,26 @@
 import os
-import requests
 from typing import Dict, List
+from atproto import Client
 
-# Initializing Bluesky client (using environment variables)
+# Configurações do Bluesky
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 PDS_URL = "https://bsky.social"  # URL do Bluesky
 BOT_NAME = "Boturi"  # Nome do bot para evitar interagir com os próprios posts
 
-def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
-    """Logs in to Bluesky and returns the session data."""
+def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
+    """Logs in to Bluesky and returns the client instance."""
     print("Tentando autenticar no Bluesky...")
-    resp = requests.post(
-        pds_url + "/xrpc/com.atproto.server.createSession",
-        json={"identifier": handle, "password": password},
-    )
-    resp.raise_for_status()
+    client = Client(base_url=pds_url)
+    client.login(handle, password)
     print("Autenticação bem-sucedida.")
-    return resp.json()
+    return client
 
-def search_posts_by_hashtags(session: Dict, hashtags: List[str]) -> Dict:
+def search_posts_by_hashtags(session: Client, hashtags: List[str]) -> Dict:
     """Searches for posts containing the given hashtags."""
     hashtag_query = " OR ".join(hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
-    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
+    headers = {"Authorization": f"Bearer {session.access_jwt}"}
     params = {"q": hashtag_query, "limit": 5}  # Ajuste o limite conforme necessário
 
     response = requests.get(url, headers=headers, params=params)
@@ -45,56 +42,41 @@ def find_images_with_keywords(post: Dict, keywords: List[str]) -> List[Dict]:
                 
     return images_with_keywords
 
-def like_post(session: Dict, uri: str, cid: str):
+def like_post(client: Client, uri: str, cid: str):
     """Likes a post given its URI and CID."""
-    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.like"
-    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
-    data = {"uri": uri, "cid": cid}
-    
-    response = requests.post(url, headers=headers, json=data)
-    response.raise_for_status()
+    client.like(uri=uri, cid=cid)
     print(f"Post curtido: {uri}")
 
-def repost_post(session: Dict, uri: str, cid: str):
+def repost_post(client: Client, uri: str, cid: str):
     """Reposts a post given its URI and CID."""
-    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.repost"
-    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
-    data = {"uri": uri, "cid": cid}
-    
-    response = requests.post(url, headers=headers, json=data)
-    response.raise_for_status()
+    client.repost(uri=uri, cid=cid)
     print(f"Post repostado: {uri}")
 
-def follow_user(session: Dict, did: str):
+def follow_user(client: Client, did: str):
     """Follows a user given their DID."""
-    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.follow"
-    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
-    data = {"did": did}
-    
-    response = requests.post(url, headers=headers, json=data)
-    response.raise_for_status()
+    client.follow(did)
     print(f"Seguindo usuário: {did}")
 
 if __name__ == "__main__":
     # Login to Bluesky
-    session = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
+    client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
 
     # Define the hashtags to search for (without #)
     hashtags = [
-            "#cat",
-            "#dog",
-            "#gato",
-            "#cachorro",
-            "#doglife",
-            "#catvibes",
-            "#catsofbluesky",
-            "#dogsofbluesky",
-            "#caturday"
-        ]
+        "#cat",
+        "#dog",
+        "#gato",
+        "#cachorro",
+        "#doglife",
+        "#catvibes",
+        "#catsofbluesky",
+        "#dogsofbluesky",
+        "#caturday"
+    ]
 
     # Search for posts
     for hashtag in hashtags:    
-        search_results = search_posts_by_hashtags(session, [hashtag])
+        search_results = search_posts_by_hashtags(client, [hashtag])
         
         # Print detailed information about the search results
         print(f"Resultados da pesquisa para {hashtag}:")
@@ -125,8 +107,8 @@ if __name__ == "__main__":
                     print("-----\n")
                     
                     # Curtir, repostar e seguir o autor do post
-                    like_post(session, uri, cid)
-                    repost_post(session, uri, cid)
-                    follow_user(session, author_did)
+                    like_post(client, uri, cid)
+                    repost_post(client, uri, cid)
+                    follow_user(client, author_did)
                 else:
                     print("Nenhuma imagem relevante encontrada com 'cat' ou 'dog'.\n")
