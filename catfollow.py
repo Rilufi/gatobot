@@ -1,4 +1,5 @@
 import os
+import requests
 from typing import Dict, List
 from atproto import Client
 
@@ -17,13 +18,16 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
     return client
 
 def search_posts_by_hashtags(session: Client, hashtags: List[str]) -> Dict:
-    """Searches for posts containing the given hashtags."""
+    """Searches for posts containing the given hashtags using the session cookies."""
     hashtag_query = " OR ".join(hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
-    headers = {"Authorization": f"Bearer {session.access_jwt}"}
+    
+    # Utiliza os cookies de sessão gerenciados pelo client para manter a autenticação
+    session_cookie = session._session.cookies.get_dict()
+    headers = {"Authorization": f"Bearer {session._access_jwt}"}  # ainda usando access_jwt com underscore
     params = {"q": hashtag_query, "limit": 5}  # Ajuste o limite conforme necessário
 
-    response = requests.get(url, headers=headers, params=params)
+    response = requests.get(url, headers=headers, params=params, cookies=session_cookie)
     response.raise_for_status()
     return response.json()
 
