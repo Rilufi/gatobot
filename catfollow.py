@@ -1,6 +1,6 @@
 import os
 import requests
-from atproto import Client
+#from atproto import Client
 
 
 # Inicializando o cliente do Bluesky
@@ -8,17 +8,52 @@ BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 PDS_URL = "https://bsky.social"  # URL do Bluesky
 
-client = Client(base_url='https://bsky.social')
-client.login(BSKY_HANDLE, BSKY_PASSWORD)
+def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
+    """Logs in to Bluesky and returns the session data"""
+    print("Tentando autenticar no Bluesky...")
+    resp = requests.post(
+        pds_url + "/xrpc/com.atproto.server.createSession",
+        json={"identifier": handle, "password": password},
+    )
+    resp.raise_for_status()
+    print("Autenticação bem-sucedida.")
+    return resp.json()
 
-data = client.app.bsky.feed.get_feed_generator({
-    'feed': 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/whats-hot'
-})
+def search_posts_by_hashtags(session: Dict, hashtags: List[str]) -> Dict:
+    """Searches for posts containing the given hashtags
 
-view = data.view
-creator = view.creator
-display_name = view.display_name
-avatar = view.avatar
-like_count = view.like_count
+    Args:
+        session: The Bluesky session data obtained from bsky_login_session
+        hashtags: A list of hashtags to search for (without the # symbol)
 
-print(view,creator,display_name,avatar,like_count)
+    Returns:
+        A dictionary containing the search results
+    """
+
+    # Combine hashtags with OR operator for searching multiple terms
+    hashtag_query = " OR ".join(hashtags)
+
+    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
+    headers = {"Authorization": f"Bearer {session['token']}"}
+    params = {"q": hashtag_query, "limit": 25}  # You can adjust the limit as needed
+
+    response = requests.get(url, headers=headers, params=params)
+    response.raise_for_status()
+    return response.json()
+
+
+if __name__ == "__main__":
+    # Login to Bluesky
+    session = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
+
+    # Define the hashtags to search for (without #)
+    hashtags = ["cat", "dog", "gato", "cachorro", "kitty", "puppy", "kitten", "doglife", "catvibes", "catsofbluesky", "dogsofbluesky"]
+
+    # Search for posts
+    search_results = search_posts_by_hashtags(session, hashtags)
+
+    # Process the search results (e.g., print titles, authors, etc.)
+    print("Resultados da pesquisa:")
+    for post in search_results["posts"]:
+        print(f"- {post['title']}")  # Modify this line to access specific post data
+
