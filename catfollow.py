@@ -1,6 +1,6 @@
 import os
-import requests
 from typing import Dict, List
+import requests
 from atproto import Client
 
 # Configurações do Bluesky
@@ -9,22 +9,19 @@ BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 PDS_URL = "https://bsky.social"  # URL do Bluesky
 BOT_NAME = "Boturi"  # Nome do bot para evitar interagir com os próprios posts
 
-def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
-    """Logs in to Bluesky and returns the session data."""
+def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
+    """Logs in to Bluesky and returns the client instance."""
     print("Tentando autenticar no Bluesky...")
-    resp = requests.post(
-        pds_url + "/xrpc/com.atproto.server.createSession",
-        json={"identifier": handle, "password": password},
-    )
-    resp.raise_for_status()
+    client = Client(base_url=pds_url)
+    client.login(handle, password)
     print("Autenticação bem-sucedida.")
-    return resp.json()
+    return client
 
-def search_posts_by_hashtags(session: Dict, hashtags: List[str]) -> Dict:
+def search_posts_by_hashtags(session: Client, hashtags: List[str]) -> Dict:
     """Searches for posts containing the given hashtags."""
     hashtag_query = " OR ".join(hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
-    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
+    headers = {"Authorization": f"Bearer {session._access_jwt}"}  # Usando _access_jwt obtido do client
     params = {"q": hashtag_query, "limit": 5}  # Ajuste o limite conforme necessário
 
     response = requests.get(url, headers=headers, params=params)
@@ -35,7 +32,7 @@ def find_images_with_keywords(post: Dict, keywords: List[str]) -> List[Dict]:
     """Finds images in the post that contain specified keywords in their 'alt' descriptions."""
     images_with_keywords = []
     embed = post.get('record', {}).get('embed')
-    
+
     # Check if the embed type is images
     if embed and embed.get('$type') == 'app.bsky.embed.images':
         images = embed.get('images', [])
@@ -43,7 +40,7 @@ def find_images_with_keywords(post: Dict, keywords: List[str]) -> List[Dict]:
             alt_text = image.get('alt', '').lower()
             if any(keyword in alt_text for keyword in keywords):
                 images_with_keywords.append(image)
-                
+
     return images_with_keywords
 
 def like_post(client: Client, uri: str, cid: str):
@@ -93,14 +90,14 @@ if __name__ == "__main__":
                 author = post.get('author', {})
                 author_name = author.get('displayName', 'Unknown')
                 author_did = author.get('did', '')
-                
+
                 # Evitar interagir com posts do próprio bot
                 if author_name == BOT_NAME:
                     continue
 
                 # Find images containing 'cat' or 'dog' in their alt descriptions
                 images = find_images_with_keywords(post, ['cat', 'dog'])
-                
+
                 if images:
                     print(f"Post URI: {uri}")
                     print(f"Post CID: {cid}")
@@ -109,7 +106,7 @@ if __name__ == "__main__":
                         print(f"Image ALT: {image['alt']}")
                         print(f"Image URL: {image.get('url', 'No URL')}")
                     print("-----\n")
-                    
+
                     # Curtir, repostar e seguir o autor do post
                     like_post(client, uri, cid)
                     repost_post(client, uri, cid)
