@@ -20,7 +20,7 @@ headers = {"Authorization": f"Bearer {access_token}"}
 params = {"filter": "posts_with_media"}
 
 resp = requests.get(
-    "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed",
+    f"{PDS_URL}/xrpc/app.bsky.feed.getAuthorFeed",
     headers=headers,
     params=params
 )
@@ -32,8 +32,7 @@ pet_posts = []
 for post in feed:
     text = post.get("text", "").lower()
     if any(keyword in text for keyword in PET_KEYWORDS):
-        if "embed" in post and "images" in post["embed"]:
-            pet_posts.append(post)
+        pet_posts.append(post)
 
 # Imprimir os posts encontrados
 for post in pet_posts:
