@@ -2,25 +2,14 @@ import os
 import requests
 from typing import Dict, List
 
-
 # Initializing Bluesky client (using environment variables)
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
 BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 PDS_URL = "https://bsky.social"  # URL do Bluesky
-
+BOT_NAME = "Boturi"  # Nome do bot para evitar interagir com os próprios posts
 
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
-    """Logs in to Bluesky and returns the session data
-
-    Args:
-        pds_url (str): The Bluesky PDS URL
-        handle (str): The Bluesky user handle
-        password (str): The Bluesky user password
-
-    Returns:
-        Dict: The Bluesky session data dictionary
-    """
-
+    """Logs in to Bluesky and returns the session data."""
     print("Tentando autenticar no Bluesky...")
     resp = requests.post(
         pds_url + "/xrpc/com.atproto.server.createSession",
@@ -56,6 +45,35 @@ def find_images_with_keywords(post: Dict, keywords: List[str]) -> List[Dict]:
                 
     return images_with_keywords
 
+def like_post(session: Dict, uri: str, cid: str):
+    """Likes a post given its URI and CID."""
+    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.like"
+    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
+    data = {"uri": uri, "cid": cid}
+    
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+    print(f"Post curtido: {uri}")
+
+def repost_post(session: Dict, uri: str, cid: str):
+    """Reposts a post given its URI and CID."""
+    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.repost"
+    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
+    data = {"uri": uri, "cid": cid}
+    
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+    print(f"Post repostado: {uri}")
+
+def follow_user(session: Dict, did: str):
+    """Follows a user given their DID."""
+    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.follow"
+    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
+    data = {"did": did}
+    
+    response = requests.post(url, headers=headers, json=data)
+    response.raise_for_status()
+    print(f"Seguindo usuário: {did}")
 
 if __name__ == "__main__":
     # Login to Bluesky
@@ -63,16 +81,16 @@ if __name__ == "__main__":
 
     # Define the hashtags to search for (without #)
     hashtags = [
-        "#cat",
-        "#dog",
-        "#gato",
-        "#cachorro",
-        "#doglife",
-        "#catvibes",
-        "#catsofbluesky",
-        "#dogsofbluesky",
-        "#caturday"
-    ]
+            "#cat",
+            "#dog",
+            "#gato",
+            "#cachorro",
+            "#doglife",
+            "#catvibes",
+            "#catsofbluesky",
+            "#dogsofbluesky",
+            "#caturday"
+        ]
 
     # Search for posts
     for hashtag in hashtags:    
@@ -86,8 +104,14 @@ if __name__ == "__main__":
             for post in search_results["posts"]:
                 uri = post.get('uri')
                 cid = post.get('cid')
-                author_name = post.get('author', {}).get('displayName', 'Unknown')
+                author = post.get('author', {})
+                author_name = author.get('displayName', 'Unknown')
+                author_did = author.get('did', '')
                 
+                # Evitar interagir com posts do próprio bot
+                if author_name == BOT_NAME:
+                    continue
+
                 # Find images containing 'cat' or 'dog' in their alt descriptions
                 images = find_images_with_keywords(post, ['cat', 'dog'])
                 
@@ -99,5 +123,10 @@ if __name__ == "__main__":
                         print(f"Image ALT: {image['alt']}")
                         print(f"Image URL: {image.get('url', 'No URL')}")
                     print("-----\n")
+                    
+                    # Curtir, repostar e seguir o autor do post
+                    like_post(session, uri, cid)
+                    repost_post(session, uri, cid)
+                    follow_user(session, author_did)
                 else:
                     print("Nenhuma imagem relevante encontrada com 'cat' ou 'dog'.\n")
