@@ -9,6 +9,10 @@ BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 PDS_URL = "https://bsky.social"  # URL do Bluesky
 BOT_NAME = "Boturi"  # Nome do bot para evitar interagir com os próprios posts
 
+# Limites diários e ações permitidas por hora
+DAILY_LIMIT = 11666  # Limite de ações diárias
+HOURLY_LIMIT = DAILY_LIMIT // 24  # Limite de ações por hora
+
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
     """Logs in to Bluesky and returns the client instance."""
     print("Tentando autenticar no Bluesky...")
@@ -75,8 +79,12 @@ if __name__ == "__main__":
         "#caturday"
     ]
 
+    # Define the number of actions to perform per hour
+    actions_per_hour = HOURLY_LIMIT
+    action_counter = 0
+
     # Search for posts
-    for hashtag in hashtags:    
+    for hashtag in hashtags:
         search_results = search_posts_by_hashtags(client, [hashtag])
         
         # Print detailed information about the search results
@@ -98,7 +106,7 @@ if __name__ == "__main__":
                 # Find images containing 'cat' or 'dog' in their alt descriptions
                 images = find_images_with_keywords(post, ['cat', 'dog'])
 
-                if images:
+                if images and action_counter < actions_per_hour:
                     print(f"Post URI: {uri}")
                     print(f"Post CID: {cid}")
                     print(f"Author: {author_name}")
@@ -108,8 +116,23 @@ if __name__ == "__main__":
                     print("-----\n")
 
                     # Curtir, repostar e seguir o autor do post
-                    like_post(client, uri, cid)
-                    repost_post(client, uri, cid)
-                    follow_user(client, author_did)
-                else:
-                    print("Nenhuma imagem relevante encontrada com 'cat' ou 'dog'.\n")
+                    if action_counter < actions_per_hour:
+                        like_post(client, uri, cid)
+                        action_counter += 1
+                    if action_counter < actions_per_hour:
+                        repost_post(client, uri, cid)
+                        action_counter += 1
+                    if action_counter < actions_per_hour:
+                        follow_user(client, author_did)
+                        action_counter += 1
+
+                # Verifica se o limite de ações foi atingido
+                if action_counter >= actions_per_hour:
+                    print("Limite de ações por hora atingido.")
+                    break
+
+            # Verifica se o limite de ações foi atingido
+            if action_counter >= actions_per_hour:
+                break
+
+    print("Concluído.")
