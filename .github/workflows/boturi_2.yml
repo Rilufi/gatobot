@@ -46,3 +46,12 @@ jobs:
           BSKY_HANDLE:  ${{ secrets.BSKY_HANDLE }}
           BSKY_PASSWORD:  ${{ secrets.BSKY_PASSWORD }}
         run: python catfollow.py
+
+      - name: Atualizar arquivo de interações
+        run: |
+          git config --global user.email "github-actions@example.com"
+          git config --global user.name "GitHub Actions"
+          git status  # Verificar se há mudanças detectadas
+          git add -f interactions.json  # Forçar adição do arquivo
+          git commit -m "Atualizar arquivo de interações [skip ci]" || echo "Nenhuma alteração para fazer commit."
+          git push || echo "Nenhuma alteração para fazer push."
