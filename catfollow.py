@@ -2,6 +2,7 @@ import os
 from typing import Dict, List
 import requests
 from atproto import Client
+import json
 
 # Configurações do Bluesky
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
@@ -12,6 +13,27 @@ BOT_NAME = "Boturi"  # Nome do bot para evitar interagir com os próprios posts
 # Limites diários e ações permitidas por hora
 DAILY_LIMIT = 11666  # Limite de ações diárias
 HOURLY_LIMIT = DAILY_LIMIT // 24  # Limite de ações por hora
+
+# Arquivo para armazenar interações
+INTERACTIONS_FILE = 'interactions.json'
+
+def load_interactions():
+    """Loads interactions from a JSON file."""
+    if os.path.exists(INTERACTIONS_FILE):
+        with open(INTERACTIONS_FILE, 'r') as file:
+            try:
+                return json.load(file)
+            except json.JSONDecodeError:
+                # O arquivo está vazio ou corrompido; inicializar com valores padrão
+                print(f"O arquivo {INTERACTIONS_FILE} está vazio ou corrompido. Inicializando com valores padrão.")
+                return {"likes": [], "reposts": [], "follows": []}
+    # Se o arquivo não existir, retorna interações padrão
+    return {"likes": [], "reposts": [], "follows": []}
+
+def save_interactions(interactions):
+    """Saves interactions to a JSON file."""
+    with open(INTERACTIONS_FILE, 'w') as file:
+        json.dump(interactions, file)
 
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
     """Logs in to Bluesky and returns the client instance."""
@@ -47,26 +69,35 @@ def find_images_with_keywords(post: Dict, keywords: List[str]) -> List[Dict]:
 
     return images_with_keywords
 
-def like_post(client: Client, uri: str, cid: str):
-    """Likes a post given its URI and CID."""
-    client.like(uri=uri, cid=cid)
-    print(f"Post curtido: {uri}")
+def like_post(client: Client, uri: str, cid: str, interactions):
+    """Likes a post given its URI and CID, if not already liked."""
+    if uri not in interactions["likes"]:
+        client.like(uri=uri, cid=cid)
+        interactions["likes"].append(uri)
+        print(f"Post curtido: {uri}")
 
-def repost_post(client: Client, uri: str, cid: str):
-    """Reposts a post given its URI and CID."""
-    client.repost(uri=uri, cid=cid)
-    print(f"Post repostado: {uri}")
+def repost_post(client: Client, uri: str, cid: str, interactions):
+    """Reposts a post given its URI and CID, if not already reposted."""
+    if uri not in interactions["reposts"]:
+        client.repost(uri=uri, cid=cid)
+        interactions["reposts"].append(uri)
+        print(f"Post repostado: {uri}")
 
-def follow_user(client: Client, did: str):
-    """Follows a user given their DID."""
-    client.follow(did)
-    print(f"Seguindo usuário: {did}")
+def follow_user(client: Client, did: str, interactions):
+    """Follows a user given their DID, if not already followed."""
+    if did not in interactions["follows"]:
+        client.follow(did)
+        interactions["follows"].append(did)
+        print(f"Seguindo usuário: {did}")
 
 if __name__ == "__main__":
+    # Carrega interações passadas para evitar duplicatas
+    interactions = load_interactions()
+
     # Login to Bluesky
     client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
 
-    # Define the hashtags to search for (without #)
+    # Define the hashtags to search for
     hashtags = [
         "#cat",
         "#dog",
@@ -115,15 +146,15 @@ if __name__ == "__main__":
                         print(f"Image URL: {image.get('url', 'No URL')}")
                     print("-----\n")
 
-                    # Curtir, repostar e seguir o autor do post
+                    # Curtir, repostar e seguir o autor do post se ainda não interagido
                     if action_counter < actions_per_hour:
-                        like_post(client, uri, cid)
+                        like_post(client, uri, cid, interactions)
                         action_counter += 1
                     if action_counter < actions_per_hour:
-                        repost_post(client, uri, cid)
+                        repost_post(client, uri, cid, interactions)
                         action_counter += 1
                     if action_counter < actions_per_hour:
-                        follow_user(client, author_did)
+                        follow_user(client, author_did, interactions)
                         action_counter += 1
 
                 # Verifica se o limite de ações foi atingido
@@ -134,5 +165,8 @@ if __name__ == "__main__":
             # Verifica se o limite de ações foi atingido
             if action_counter >= actions_per_hour:
                 break
+
+    # Salva as interações para a próxima execução
+    save_interactions(interactions)
 
     print("Concluído.")
