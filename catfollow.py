@@ -144,7 +144,7 @@ if __name__ == "__main__":
                         continue
 
                     # Encontra imagens com 'cat' ou 'dog' nas descrições alt
-                    images = find_images_with_keywords(post, ['cat', 'dog'])
+                    images = find_images_with_keywords(post, ['cat', 'dog', 'gato', 'cachorro'])
 
                     if images and action_counter < actions_per_hour:
                         print(f"Post URI: {uri}")
