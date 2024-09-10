@@ -44,7 +44,7 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
 
 def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, until: str) -> Dict:
     """Searches for posts containing the given hashtags within a specific time range."""
-    # Remova o símbolo '#' das hashtags para evitar erros na query
+    # Limpeza das hashtags para evitar problemas com '#'
     cleaned_hashtags = [hashtag.replace('#', '') for hashtag in hashtags]
     hashtag_query = " OR ".join(cleaned_hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
@@ -54,12 +54,11 @@ def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, u
         "limit": 50,
         "since": since,
         "until": until,
-        "sort": "latest"  # Ordena os resultados pelos mais recentes
+        "sort": "latest"
     }
 
     response = requests.get(url, headers=headers, params=params)
     
-    # Captura o status de erro específico para identificar o problema
     try:
         response.raise_for_status()
         return response.json()
@@ -114,11 +113,11 @@ if __name__ == "__main__":
         "#dogsofbluesky", "#caturday"
     ]
 
-    # Calcula as datas de ontem e hoje no formato ISO com timezone-aware
-    today = datetime.now(timezone.utc).date()
+    # Calcula as datas de ontem e hoje no formato ISO com timezone-aware completo
+    today = datetime.now(timezone.utc)
     yesterday = today - timedelta(days=1)
-    since = yesterday.isoformat()  # YYYY-MM-DD
-    until = today.isoformat()  # YYYY-MM-DD
+    since = yesterday.isoformat()  # YYYY-MM-DDTHH:MM:SS+00:00
+    until = today.isoformat()      # YYYY-MM-DDTHH:MM:SS+00:00
 
     actions_per_hour = HOURLY_LIMIT
     action_counter = 0
