@@ -3,6 +3,7 @@ from typing import Dict, List
 import requests
 from atproto import Client
 import json
+from datetime import datetime, timedelta
 
 # Configurações do Bluesky
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
@@ -24,10 +25,8 @@ def load_interactions():
             try:
                 return json.load(file)
             except json.JSONDecodeError:
-                # O arquivo está vazio ou corrompido; inicializar com valores padrão
                 print(f"O arquivo {INTERACTIONS_FILE} está vazio ou corrompido. Inicializando com valores padrão.")
                 return {"likes": [], "reposts": [], "follows": []}
-    # Se o arquivo não existir, retorna interações padrão
     return {"likes": [], "reposts": [], "follows": []}
 
 def save_interactions(interactions):
@@ -43,12 +42,17 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
     print("Autenticação bem-sucedida.")
     return client
 
-def search_posts_by_hashtags(session: Client, hashtags: List[str]) -> Dict:
-    """Searches for posts containing the given hashtags."""
+def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, until: str) -> Dict:
+    """Searches for posts containing the given hashtags within a specific time range."""
     hashtag_query = " OR ".join(hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
     headers = {"Authorization": f"Bearer {session._access_jwt}"}  # Usando _access_jwt obtido do client
-    params = {"q": hashtag_query, "limit": 50}  # Ajuste o limite conforme necessário
+    params = {
+        "q": hashtag_query,
+        "limit": 50,  # Ajuste o limite conforme necessário
+        "since": since,
+        "until": until
+    }
 
     response = requests.get(url, headers=headers, params=params)
     response.raise_for_status()
@@ -59,7 +63,6 @@ def find_images_with_keywords(post: Dict, keywords: List[str]) -> List[Dict]:
     images_with_keywords = []
     embed = post.get('record', {}).get('embed')
 
-    # Check if the embed type is images
     if embed and embed.get('$type') == 'app.bsky.embed.images':
         images = embed.get('images', [])
         for image in images:
@@ -91,34 +94,30 @@ def follow_user(client: Client, did: str, interactions):
         print(f"Seguindo usuário: {did}")
 
 if __name__ == "__main__":
-    # Carrega interações passadas para evitar duplicatas
     interactions = load_interactions()
-
-    # Login to Bluesky
     client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
 
-    # Define the hashtags to search for
+    # Define hashtags para busca
     hashtags = [
-        "#cat",
-        "#dog",
-        "#gato",
-        "#cachorro",
-        "#doglife",
-        "#catvibes",
-        "#catsofbluesky",
-        "#dogsofbluesky",
-        "#caturday"
+        "#cat", "#dog", "#gato", "#cachorro", 
+        "#doglife", "#catvibes", "#catsofbluesky",
+        "#dogsofbluesky", "#caturday"
     ]
 
-    # Define the number of actions to perform per hour
+    # Calcula as datas de ontem e hoje no formato ISO
+    today = datetime.utcnow().date()
+    yesterday = today - timedelta(days=1)
+    since = yesterday.isoformat()  # YYYY-MM-DD
+    until = today.isoformat()  # YYYY-MM-DD
+
     actions_per_hour = HOURLY_LIMIT
     action_counter = 0
 
-    # Search for posts
+    # Busca posts dentro do intervalo de tempo especificado
     for hashtag in hashtags:
-        search_results = search_posts_by_hashtags(client, [hashtag])
+        search_results = search_posts_by_hashtags(client, [hashtag], since, until)
         
-        # Print detailed information about the search results
+        # Print detalhado sobre os resultados da pesquisa
         print(f"Resultados da pesquisa para {hashtag}:")
         if not search_results.get('posts'):
             print("Nenhum resultado encontrado.")
@@ -130,11 +129,11 @@ if __name__ == "__main__":
                 author_name = author.get('displayName', 'Unknown')
                 author_did = author.get('did', '')
 
-                # Evitar interagir com posts do próprio bot
+                # Evita interagir com posts do próprio bot
                 if author_name == BOT_NAME:
                     continue
 
-                # Find images containing 'cat' or 'dog' in their alt descriptions
+                # Encontra imagens com 'cat' ou 'dog' nas descrições alt
                 images = find_images_with_keywords(post, ['cat', 'dog'])
 
                 if images and action_counter < actions_per_hour:
@@ -157,16 +156,12 @@ if __name__ == "__main__":
                         follow_user(client, author_did, interactions)
                         action_counter += 1
 
-                # Verifica se o limite de ações foi atingido
                 if action_counter >= actions_per_hour:
                     print("Limite de ações por hora atingido.")
                     break
 
-            # Verifica se o limite de ações foi atingido
             if action_counter >= actions_per_hour:
                 break
 
-    # Salva as interações para a próxima execução
     save_interactions(interactions)
-
     print("Concluído.")
