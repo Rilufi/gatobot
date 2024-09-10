@@ -1,10 +1,10 @@
 name: Boturi_2
 
-on: push
-#  workflow_run:
-#    workflows: ["Boturi"]
-#    types:
-#      - completed
+on:
+  workflow_run:
+    workflows: ["Boturi"]
+    types:
+      - completed
 
 jobs:
   tweet:
