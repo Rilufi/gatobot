@@ -3,7 +3,7 @@ from typing import Dict, List
 import requests
 from atproto import Client
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # Configurações do Bluesky
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
@@ -104,8 +104,8 @@ if __name__ == "__main__":
         "#dogsofbluesky", "#caturday"
     ]
 
-    # Calcula as datas de ontem e hoje no formato ISO
-    today = datetime.utcnow().date()
+    # Calcula as datas de ontem e hoje no formato ISO com timezone-aware
+    today = datetime.now(timezone.utc).date()
     yesterday = today - timedelta(days=1)
     since = yesterday.isoformat()  # YYYY-MM-DD
     until = today.isoformat()  # YYYY-MM-DD
@@ -115,53 +115,56 @@ if __name__ == "__main__":
 
     # Busca posts dentro do intervalo de tempo especificado
     for hashtag in hashtags:
-        search_results = search_posts_by_hashtags(client, [hashtag], since, until)
-        
-        # Print detalhado sobre os resultados da pesquisa
-        print(f"Resultados da pesquisa para {hashtag}:")
-        if not search_results.get('posts'):
-            print("Nenhum resultado encontrado.")
-        else:
-            for post in search_results["posts"]:
-                uri = post.get('uri')
-                cid = post.get('cid')
-                author = post.get('author', {})
-                author_name = author.get('displayName', 'Unknown')
-                author_did = author.get('did', '')
+        try:
+            search_results = search_posts_by_hashtags(client, [hashtag], since, until)
+            
+            # Print detalhado sobre os resultados da pesquisa
+            print(f"Resultados da pesquisa para {hashtag}:")
+            if not search_results.get('posts'):
+                print("Nenhum resultado encontrado.")
+            else:
+                for post in search_results["posts"]:
+                    uri = post.get('uri')
+                    cid = post.get('cid')
+                    author = post.get('author', {})
+                    author_name = author.get('displayName', 'Unknown')
+                    author_did = author.get('did', '')
 
-                # Evita interagir com posts do próprio bot
-                if author_name == BOT_NAME:
-                    continue
+                    # Evita interagir com posts do próprio bot
+                    if author_name == BOT_NAME:
+                        continue
 
-                # Encontra imagens com 'cat' ou 'dog' nas descrições alt
-                images = find_images_with_keywords(post, ['cat', 'dog'])
+                    # Encontra imagens com 'cat' ou 'dog' nas descrições alt
+                    images = find_images_with_keywords(post, ['cat', 'dog'])
 
-                if images and action_counter < actions_per_hour:
-                    print(f"Post URI: {uri}")
-                    print(f"Post CID: {cid}")
-                    print(f"Author: {author_name}")
-                    for image in images:
-                        print(f"Image ALT: {image['alt']}")
-                        print(f"Image URL: {image.get('url', 'No URL')}")
-                    print("-----\n")
+                    if images and action_counter < actions_per_hour:
+                        print(f"Post URI: {uri}")
+                        print(f"Post CID: {cid}")
+                        print(f"Author: {author_name}")
+                        for image in images:
+                            print(f"Image ALT: {image['alt']}")
+                            print(f"Image URL: {image.get('url', 'No URL')}")
+                        print("-----\n")
 
-                    # Curtir, repostar e seguir o autor do post se ainda não interagido
-                    if action_counter < actions_per_hour:
-                        like_post(client, uri, cid, interactions)
-                        action_counter += 1
-                    if action_counter < actions_per_hour:
-                        repost_post(client, uri, cid, interactions)
-                        action_counter += 1
-                    if action_counter < actions_per_hour:
-                        follow_user(client, author_did, interactions)
-                        action_counter += 1
+                        # Curtir, repostar e seguir o autor do post se ainda não interagido
+                        if action_counter < actions_per_hour:
+                            like_post(client, uri, cid, interactions)
+                            action_counter += 1
+                        if action_counter < actions_per_hour:
+                            repost_post(client, uri, cid, interactions)
+                            action_counter += 1
+                        if action_counter < actions_per_hour:
+                            follow_user(client, author_did, interactions)
+                            action_counter += 1
+
+                    if action_counter >= actions_per_hour:
+                        print("Limite de ações por hora atingido.")
+                        break
 
                 if action_counter >= actions_per_hour:
-                    print("Limite de ações por hora atingido.")
                     break
-
-            if action_counter >= actions_per_hour:
-                break
+        except requests.exceptions.HTTPError as e:
+            print(f"Erro ao buscar posts para {hashtag}: {e}")
 
     save_interactions(interactions)
     print("Concluído.")
