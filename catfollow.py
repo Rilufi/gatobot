@@ -44,19 +44,29 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
 
 def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, until: str) -> Dict:
     """Searches for posts containing the given hashtags within a specific time range."""
-    hashtag_query = " OR ".join(hashtags)
+    # Remova o símbolo '#' das hashtags para evitar erros na query
+    cleaned_hashtags = [hashtag.replace('#', '') for hashtag in hashtags]
+    hashtag_query = " OR ".join(cleaned_hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
-    headers = {"Authorization": f"Bearer {session._access_jwt}"}  # Usando _access_jwt obtido do client
+    headers = {"Authorization": f"Bearer {session._access_jwt}"}
     params = {
         "q": hashtag_query,
-        "limit": 50,  # Ajuste o limite conforme necessário
+        "limit": 50,
         "since": since,
-        "until": until
+        "until": until,
+        "sort": "latest"  # Ordena os resultados pelos mais recentes
     }
 
     response = requests.get(url, headers=headers, params=params)
-    response.raise_for_status()
-    return response.json()
+    
+    # Captura o status de erro específico para identificar o problema
+    try:
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.HTTPError as e:
+        print(f"Erro ao buscar posts para {hashtag_query}: {e}")
+        print(f"Detalhes do erro: {response.text}")
+        return {}
 
 def find_images_with_keywords(post: Dict, keywords: List[str]) -> List[Dict]:
     """Finds images in the post that contain specified keywords in their 'alt' descriptions."""
