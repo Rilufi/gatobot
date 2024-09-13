@@ -394,7 +394,7 @@ def main():
             skeet()
         except Exception as e:
             print(f"An error occurred: {e}")
-#        sleep(300)
+        sleep(300)
 
 if __name__ == "__main__":
     main()
