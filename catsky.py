@@ -7,6 +7,7 @@ from PIL import Image
 import google.generativeai as genai
 from time import sleep
 from typing import Dict, List, Tuple
+from datetime import datetime, timezone, timedelta
 
 
 # Tudo do Bluesky daqui pra frente, sem precisar do pacote atpro (ou algo assim)
@@ -157,9 +158,6 @@ def post_chunk(pds_url: str, access_token: str, did: str, text: str, reply_to: D
     return response_data["uri"], response_data["cid"]
 
 def post_bk_with_replies(text: str):
-    pds_url = "https://bsky.social"
-    handle = BSKY_HANDLE
-    password = BSKY_PASSWORD
     session = bsky_login_session(pds_url, handle, password)
     access_token = session["accessJwt"]
     did = session["did"]
