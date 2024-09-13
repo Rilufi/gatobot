@@ -5,19 +5,32 @@ import random
 import urllib.request
 from PIL import Image
 import google.generativeai as genai
-from time import sleep
 from typing import Dict, List, Tuple
 from datetime import datetime, timezone, timedelta
+import time
 
 
 # Tudo do Bluesky daqui pra frente, sem precisar do pacote atpro (ou algo assim)
+
+# Função para tentar novamente com backoff exponencial em caso de erro 429
+def retry_request(func, *args, **kwargs):
+    max_retries = 5
+    delay = 5
+    for attempt in range(max_retries):
+        try:
+            return func(*args, **kwargs)
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 429:
+                print(f"Too many requests. Retrying in {delay} seconds...")
+                time.sleep(delay)
+                delay *= 2  # Exponential backoff
+            else:
+                raise
+    raise Exception("Exceeded maximum retry attempts")
+
+# Adiciona a chamada com retry na função de login do Bluesky
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
-    resp = requests.post(
-        pds_url + "/xrpc/com.atproto.server.createSession",
-        json={"identifier": handle, "password": password},
-    )
-    resp.raise_for_status()
-    return resp.json()
+    return retry_request(requests.post, pds_url + "/xrpc/com.atproto.server.createSession", json={"identifier": handle, "password": password}).json()
 
 def parse_uri(uri: str) -> Dict:
     # Função para analisar a URI, separando em partes relevantes
@@ -125,17 +138,15 @@ def find_hashtags(text: str) -> List[Dict]:
 
     return facets
 
+# Atualiza funções de postagem para usar o backoff exponencial
 def post_chunk(pds_url: str, access_token: str, did: str, text: str, reply_to: Dict = None, embed: Dict = None) -> Tuple[str, str]:
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    
-    # Identifica hashtags no texto e cria facets
     facets = find_hashtags(text)
-    
     post = {
         "$type": "app.bsky.feed.post",
         "text": text,
         "createdAt": now,
-        "facets": facets if facets else []  # Inclui facets se houverem hashtags
+        "facets": facets if facets else []  # Inclui facets se houver hashtags
     }
 
     if reply_to:
@@ -144,18 +155,12 @@ def post_chunk(pds_url: str, access_token: str, did: str, text: str, reply_to: D
     if embed:
         post["embed"] = embed
 
-    resp = requests.post(
-        pds_url + "/xrpc/com.atproto.repo.createRecord",
-        headers={"Authorization": "Bearer " + access_token},
-        json={
-            "repo": did,
-            "collection": "app.bsky.feed.post",
-            "record": post,
-        },
-    )
-    resp.raise_for_status()
-    response_data = resp.json()
-    return response_data["uri"], response_data["cid"]
+    # Usar retry com backoff exponencial para a postagem
+    response = retry_request(requests.post, pds_url + "/xrpc/com.atproto.repo.createRecord",
+                             headers={"Authorization": "Bearer " + access_token},
+                             json={"repo": did, "collection": "app.bsky.feed.post", "record": post})
+    
+    return response.json()["uri"], response.json()["cid"]
 
 def post_bk_with_replies(text: str):
     session = bsky_login_session(pds_url, handle, password)
@@ -190,46 +195,6 @@ def post_thread_with_image(pds_url: str, handle: str, password: str, long_text: 
 
     print("Thread com imagem postada com sucesso!")
 
-# Inicializando api do Gemini
-GOOGLE_API_KEY=os.environ["GOOGLE_API_KEY"]
-genai.configure(api_key=GOOGLE_API_KEY)
-
-model = genai.GenerativeModel('gemini-1.5-flash')
-
-def gemini_image(prompt, image_path):
-    # Carregando a imagem
-    imagem = Image.open(image_path)
-
-    # Convertendo a imagem para o modo 'RGB' caso esteja em modo 'P'
-    if imagem.mode == 'P':
-        imagem = imagem.convert('RGB')
-
-    # Gerando conteúdo com base na imagem e no prompt
-    response = model.generate_content([prompt, imagem], stream=True)
-
-    # Aguarda a conclusão da iteração antes de acessar os candidatos
-    response.resolve()
-
-    # Verificando a resposta
-    if response.candidates and len(response.candidates) > 0:
-        if response.candidates[0].content.parts and len(response.candidates[0].content.parts) > 0:
-            text = response.candidates[0].content.parts[0].text
-
-            # Supondo que o alt-text esteja separado por "ALT-TEXT:" na resposta
-            if "ALT-TEXT:" in text:
-                parts = text.split("ALT-TEXT:")
-                legenda = parts[0].strip()
-                alt_text = parts[1].strip()
-            else:
-                pass
-
-            return legenda, alt_text
-        else:
-            print("Nenhuma parte de conteúdo encontrada na resposta.")
-    else:
-        print("Nenhum candidato válido encontrado.")
-
-
 # Function to resize image for Bluesky
 def resize_bluesky(image_path, max_file_size=1 * 1024 * 1024):
     """
@@ -259,6 +224,45 @@ def resize_bluesky(image_path, max_file_size=1 * 1024 * 1024):
         img.save(image_path)
         print("Imagem já está dentro do limite de tamanho do Bluesky.")
 
+# Inicializando api do Gemini
+GOOGLE_API_KEY=os.environ["GOOGLE_API_KEY"]
+genai.configure(api_key=GOOGLE_API_KEY)
+
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+def gemini_image(prompt, image_path):
+    # Carregando a imagem
+    imagem = Image.open(image_path)
+
+    # Convertendo a imagem para o modo 'RGB' caso esteja em modo 'P'
+    if imagem.mode == 'P':
+        imagem = imagem.convert('RGB')
+
+    # Gerando conteúdo com base na imagem e no prompt
+    response = model.generate_content([prompt, imagem], stream=True)
+
+    # Aguarda a conclusão da iteração antes de acessar os candidatos
+    response.resolve()
+
+    # Verificando a resposta
+    if response.candidates and len(response.candidates) > 0:
+        if response.candidates[0].content.parts and len(response.candidates[0].content.parts) > 0:
+            text = response.candidates[0].content.parts[0].text
+
+            # Supondo que o alt-text esteja separado por "ALT-TEXT:" na resposta
+            if "ALT-TEXT:" in text:
+                parts = text.split("ALT-TEXT:")
+                legenda = parts[0].strip() if len(parts) > 0 else None
+                alt_text = parts[1].strip() if len(parts) > 1 else None
+                return legenda, alt_text
+            else:
+                print("Texto alternativo não encontrado.")
+                return None
+    print("Nenhum candidato válido encontrado.")
+    return None
+
+
+# Funções para pegar as imagens e postar
 # Function to get random cat image and resize it if needed
 def get_random_cat():
     CAT_KEY = os.environ.get("CAT_KEY")
@@ -374,14 +378,13 @@ password = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 pds_url = "https://bsky.social"
 
 # Main function
+# Inclua um sleep adicional entre os posts, se necessário
 def main():
-    # Call necessary functions
     download_random_image()
     get_random_dog()
     get_random_cat()
     cat_fact = get_cat_fact()
-    
-    # Posta skeets com pausas de 5 minutos
+
     skeets = [
         lambda: post_bk_with_replies(cat_fact),
         post_ai_generated_cat,
@@ -392,9 +395,11 @@ def main():
     for skeet in skeets:
         try:
             skeet()
+            time.sleep(10 * 60)  # Aguarda 10 minutos entre as postagens para evitar rate limit
         except Exception as e:
             print(f"An error occurred: {e}")
-        sleep(300)
+            time.sleep(10 * 60)  # Aguarda 10 minutos antes de tentar o próximo para reduzir a chance de rate limit
 
 if __name__ == "__main__":
     main()
+
