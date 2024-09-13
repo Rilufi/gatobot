@@ -4,6 +4,7 @@ import requests
 from atproto import Client
 import json
 from datetime import datetime, timedelta, timezone
+import time
 
 # Configurações do Bluesky
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
@@ -42,9 +43,20 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
     print("Autenticação bem-sucedida.")
     return client
 
+def check_rate_limit(response):
+    """Checks the rate limit status from the response headers and pauses if necessary."""
+    rate_limit_remaining = int(response.headers.get('RateLimit-Remaining', 1))
+    rate_limit_reset = int(response.headers.get('RateLimit-Reset', 0))
+
+    if rate_limit_remaining <= 1:
+        reset_time = datetime.fromtimestamp(rate_limit_reset, timezone.utc)
+        current_time = datetime.now(timezone.utc)
+        wait_seconds = (reset_time - current_time).total_seconds()
+        print(f"Limite de requisições atingido. Aguardando {wait_seconds:.0f} segundos para o reset.")
+        time.sleep(max(wait_seconds, 0))
+
 def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, until: str) -> Dict:
     """Searches for posts containing the given hashtags within a specific time range."""
-    # Limpeza das hashtags para evitar problemas com '#'
     cleaned_hashtags = [hashtag.replace('#', '') for hashtag in hashtags]
     hashtag_query = " OR ".join(cleaned_hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
@@ -58,6 +70,8 @@ def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, u
     }
 
     response = requests.get(url, headers=headers, params=params)
+    
+    check_rate_limit(response)  # Checa e gerencia o limite de requisições
     
     try:
         response.raise_for_status()
