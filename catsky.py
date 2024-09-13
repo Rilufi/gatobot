@@ -28,9 +28,12 @@ def retry_request(func, *args, **kwargs):
                 raise
     raise Exception("Exceeded maximum retry attempts")
 
-# Adiciona a chamada com retry na função de login do Bluesky
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
-    return retry_request(requests.post, pds_url + "/xrpc/com.atproto.server.createSession", json={"identifier": handle, "password": password}).json()
+    response = retry_request(requests.post, pds_url + "/xrpc/com.atproto.server.createSession", json={"identifier": handle, "password": password})
+    data = response.json()
+    if "accessJwt" not in data:
+        raise ValueError("Falha no login: accessJwt não encontrado na resposta")
+    return data
 
 def parse_uri(uri: str) -> Dict:
     # Função para analisar a URI, separando em partes relevantes
