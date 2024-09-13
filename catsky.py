@@ -3,16 +3,11 @@ import requests
 import json
 import random
 import urllib.request
-from datetime import datetime, timezone, timedelta
 from PIL import Image
 import google.generativeai as genai
 from time import sleep
 from typing import Dict, List, Tuple
 
-
-# Inicializando o cliente do Bluesky
-BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
-BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 
 # Tudo do Bluesky daqui pra frente, sem precisar do pacote atpro (ou algo assim)
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
@@ -220,7 +215,17 @@ def gemini_image(prompt, image_path):
     # Verificando a resposta
     if response.candidates and len(response.candidates) > 0:
         if response.candidates[0].content.parts and len(response.candidates[0].content.parts) > 0:
-            return response.candidates[0].content.parts[0].text
+            text = response.candidates[0].content.parts[0].text
+
+            # Supondo que o alt-text esteja separado por "ALT-TEXT:" na resposta
+            if "ALT-TEXT:" in text:
+                parts = text.split("ALT-TEXT:")
+                legenda = parts[0].strip()
+                alt_text = parts[1].strip()
+            else:
+                pass
+
+            return legenda, alt_text
         else:
             print("Nenhuma parte de conteúdo encontrada na resposta.")
     else:
@@ -316,39 +321,43 @@ def download_random_image():
 
 # Function to post AI-generated cat skeet
 def post_ai_generated_cat():
-    response_gemini = gemini_image("Write a funny skeet for the Bluesky social media (maximum 300 characters) rating this ai-generated cat image with hashtags", "fakecat.jpg")
-    if response_gemini == None:
-        response_gemini = "HBFC - Hourly Bluesky Fake Cat"
-    else:
+    response_gemini, alt_text = gemini_image(
+        "Write a funny skeet for the Bluesky social media (maximum 300 characters) rating this AI-generated cat image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
+        "fakecat.jpg"
+    )
+    if response_gemini is None:
         pass
-    mystring = f"{response_gemini}"
-    print(mystring)
-    resize_bluesky("fakecat.jpg")
-    post_thread_with_image(pds_url, handle, password, mystring, "fakecat.jpg", "AI-generated image of a cat.")
+    else:
+        print(response_gemini, alt_text)
+        resize_bluesky("fakecat.jpg")
+        post_thread_with_image(pds_url, handle, password, response_gemini, "fakecat.jpg", alt_text)
+
     
 # Function to post random cat skeet
 def post_random_cat():
-    response_gemini = gemini_image("Write a funny and/or cute skeet for the Bluesky social media (maximum 300 characters) about this cat image with hashtags",'cat_image.jpg')
-    if response_gemini == None or response_gemini == '"':
-        response_gemini = "HBC - Hourly Bluesky Cat"
-    else:
+    response_gemini, alt_text = gemini_image(
+        "Write a funny and/or cute skeet for the Bluesky social media (maximum 300 characters) about this cat image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
+        'cat_image.jpg'
+    )
+    if response_gemini is None:
         pass
-    mystring = f"{response_gemini}"
-    print(mystring)
-    resize_bluesky("cat_image.jpg")
-    post_thread_with_image(pds_url, handle, password, mystring, "cat_image.jpg", "Cat Picture.")
+    else:
+        print(response_gemini, alt_text)
+        resize_bluesky("cat_image.jpg")
+        post_thread_with_image(pds_url, handle, password, response_gemini, "cat_image.jpg", alt_text)
 
 # Function to post random dog skeet
 def post_random_dog():
-    response_gemini = gemini_image("Write a funny and/or cute skeet for the Bluesky social media (maximum 300 characters) about this dog image with hashtags",'dog_image.jpg')
-    if response_gemini == None:
-        response_gemini = "HBD - Hourly Bluesky Dog"
-    else:
+    response_gemini, alt_text = gemini_image(
+        "Write a funny and/or cute skeet for the Bluesky social media (maximum 300 characters) about this dog image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
+        'dog_image.jpg'
+    )
+    if response_gemini is None:
         pass
-    mystring = f"{response_gemini}"
-    print(mystring)
-    resize_bluesky("dog_image.jpg")
-    post_thread_with_image(pds_url, handle, password, mystring, "dog_image.jpg", "Dog Picture.")
+    else:
+        print(response_gemini, alt_text)
+        resize_bluesky("dog_image.jpg")
+        post_thread_with_image(pds_url, handle, password, response_gemini, "dog_image.jpg", alt_text)
 
 # Function to get a cat fact from catfact.ninja
 def get_cat_fact():
@@ -361,27 +370,10 @@ def get_cat_fact():
         if "skins" not in fact:
             return fact
 
-# Function to post random dog skeet if the hour is 12
-def cattp():
-    # Get current hour
-    hora = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%H')
-
-    if hora == '12':
-        #list of errors and cat or dog
-        pet = ["cat", "dog"]
-        error = [100,101,102,200,201,202,203,204,206,207,300,301,302,303,304,305,307,308,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,420,421,422,423,424,425,426,429,431,444,450,451,497,498,499,500,501,502,503,504,506,507,508,509,510,511,521,523,525,599]
-
-        # Get random image from one of these sites and post
-        site ="https://http."+random.choice(pet)+"/"+str(random.choice(error))+".jpg"
-        urllib.request.urlretrieve(site, 'http_pet.jpg')
-        mystring = f""" HTTP status of the day {datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime('%d/%m')}"""
-        post_thread_with_image(pds_url, handle, password, mystring, "http_pet.jpg", "Cat/Dog Picture joke about HTTP requests.")
-    else:
-        pass
-
+# Inicializando o cliente do Bluesky
+handle = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
+password = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 pds_url = "https://bsky.social"
-handle = BSKY_HANDLE
-password = BSKY_PASSWORD
 
 # Main function
 def main():
@@ -396,8 +388,7 @@ def main():
         lambda: post_bk_with_replies(cat_fact),
         post_ai_generated_cat,
         post_random_cat,
-        post_random_dog,
-        cattp
+        post_random_dog
     ]
 
     for skeet in skeets:
