@@ -55,9 +55,14 @@ def check_rate_limit(response):
         print(f"Limite de requisições atingido. Aguardando {wait_seconds:.0f} segundos para o reset.")
         time.sleep(max(wait_seconds, 0))
 
+def post_contains_hashtags(post: Dict, hashtags: List[str]) -> bool:
+    """Verifica se o conteúdo do post contém alguma das hashtags especificadas."""
+    content = post.get('record', {}).get('text', '').lower()
+    return any(hashtag.lower() in content for hashtag in hashtags)
+
 def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, until: str) -> Dict:
     """Searches for posts containing the given hashtags within a specific time range."""
-    cleaned_hashtags = [hashtag.replace('#', '') for hashtag in hashtags]
+    cleaned_hashtags = [hashtag.replace('#', '').lower() for hashtag in hashtags]
     hashtag_query = " OR ".join(cleaned_hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
     headers = {"Authorization": f"Bearer {session._access_jwt}"}
@@ -136,58 +141,49 @@ if __name__ == "__main__":
     actions_per_hour = HOURLY_LIMIT
     action_counter = 0
 
-    # Busca posts dentro do intervalo de tempo especificado
+    # Busca posts dentro do intervalo de tempo especificado e valida hashtags
     for hashtag in hashtags:
-        try:
-            search_results = search_posts_by_hashtags(client, [hashtag], since, until)
-            
-            # Print detalhado sobre os resultados da pesquisa
-            print(f"Resultados da pesquisa para {hashtag}:")
-            if not search_results.get('posts'):
-                print("Nenhum resultado encontrado.")
-            else:
-                for post in search_results["posts"]:
-                    uri = post.get('uri')
-                    cid = post.get('cid')
-                    author = post.get('author', {})
-                    author_name = author.get('displayName', 'Unknown')
-                    author_did = author.get('did', '')
+    try:
+        search_results = search_posts_by_hashtags(client, [hashtag], since, until)
 
-                    # Evita interagir com posts do próprio bot
-                    if author_name == BOT_NAME:
-                        continue
+        print(f"Resultados da pesquisa para {hashtag}:")
+        if not search_results.get('posts'):
+            print("Nenhum resultado encontrado.")
+        else:
+            for post in search_results["posts"]:
+                uri = post.get('uri')
+                cid = post.get('cid')
+                author = post.get('author', {})
+                author_name = author.get('displayName', 'Unknown')
+                author_did = author.get('did', '')
 
-                    # Encontra imagens com 'cat' ou 'dog' nas descrições alt
-                    images = find_images_with_keywords(post, ['cat', 'dog', 'gato', 'cachorro'])
+                # Evita interagir com posts do próprio bot
+                if author_name == BOT_NAME:
+                    continue
 
-                    if images and action_counter < actions_per_hour:
-                        print(f"Post URI: {uri}")
-                        print(f"Post CID: {cid}")
-                        print(f"Author: {author_name}")
-                        for image in images:
-                            print(f"Image ALT: {image['alt']}")
-                            print(f"Image URL: {image.get('url', 'No URL')}")
-                        print("-----\n")
+                # Verifica se a hashtag está presente no texto do post
+                if post_contains_hashtags(post, [hashtag]):
+                    print(f"Post contém a hashtag no texto: {uri}")
 
+                    if action_counter < actions_per_hour:
                         # Curtir, repostar e seguir o autor do post se ainda não interagido
-                        if action_counter < actions_per_hour:
-                            like_post(client, uri, cid, interactions)
-                            action_counter += 1
-                        if action_counter < actions_per_hour:
-                            repost_post(client, uri, cid, interactions)
-                            action_counter += 1
-                        if action_counter < actions_per_hour:
-                            follow_user(client, author_did, interactions)
-                            action_counter += 1
-
-                    if action_counter >= actions_per_hour:
-                        print("Limite de ações por hora atingido.")
-                        break
+                        like_post(client, uri, cid, interactions)
+                        action_counter += 1
+                    if action_counter < actions_per_hour:
+                        repost_post(client, uri, cid, interactions)
+                        action_counter += 1
+                    if action_counter < actions_per_hour:
+                        follow_user(client, author_did, interactions)
+                        action_counter += 1
 
                 if action_counter >= actions_per_hour:
+                    print("Limite de ações por hora atingido.")
                     break
-        except requests.exceptions.HTTPError as e:
-            print(f"Erro ao buscar posts para {hashtag}: {e}")
 
-    save_interactions(interactions)
-    print("Concluído.")
+        if action_counter >= actions_per_hour:
+            break
+    except requests.exceptions.HTTPError as e:
+        print(f"Erro ao buscar posts para {hashtag}: {e}")
+
+save_interactions(interactions)
+print("Concluído.")
