@@ -143,47 +143,47 @@ if __name__ == "__main__":
 
     # Busca posts dentro do intervalo de tempo especificado e valida hashtags
     for hashtag in hashtags:
-    try:
-        search_results = search_posts_by_hashtags(client, [hashtag], since, until)
-
-        print(f"Resultados da pesquisa para {hashtag}:")
-        if not search_results.get('posts'):
-            print("Nenhum resultado encontrado.")
-        else:
-            for post in search_results["posts"]:
-                uri = post.get('uri')
-                cid = post.get('cid')
-                author = post.get('author', {})
-                author_name = author.get('displayName', 'Unknown')
-                author_did = author.get('did', '')
-
-                # Evita interagir com posts do próprio bot
-                if author_name == BOT_NAME:
-                    continue
-
-                # Verifica se a hashtag está presente no texto do post
-                if post_contains_hashtags(post, [hashtag]):
-                    print(f"Post contém a hashtag no texto: {uri}")
-
-                    if action_counter < actions_per_hour:
-                        # Curtir, repostar e seguir o autor do post se ainda não interagido
-                        like_post(client, uri, cid, interactions)
-                        action_counter += 1
-                    if action_counter < actions_per_hour:
-                        repost_post(client, uri, cid, interactions)
-                        action_counter += 1
-                    if action_counter < actions_per_hour:
-                        follow_user(client, author_did, interactions)
-                        action_counter += 1
-
-                if action_counter >= actions_per_hour:
-                    print("Limite de ações por hora atingido.")
-                    break
-
-        if action_counter >= actions_per_hour:
-            break
-    except requests.exceptions.HTTPError as e:
-        print(f"Erro ao buscar posts para {hashtag}: {e}")
-
-save_interactions(interactions)
-print("Concluído.")
+        try:
+            search_results = search_posts_by_hashtags(client, [hashtag], since, until)
+    
+            print(f"Resultados da pesquisa para {hashtag}:")
+            if not search_results.get('posts'):
+                print("Nenhum resultado encontrado.")
+            else:
+                for post in search_results["posts"]:
+                    uri = post.get('uri')
+                    cid = post.get('cid')
+                    author = post.get('author', {})
+                    author_name = author.get('displayName', 'Unknown')
+                    author_did = author.get('did', '')
+    
+                    # Evita interagir com posts do próprio bot
+                    if author_name == BOT_NAME:
+                        continue
+    
+                    # Verifica se a hashtag está presente no texto do post
+                    if post_contains_hashtags(post, [hashtag]):
+                        print(f"Post contém a hashtag no texto: {uri}")
+    
+                        if action_counter < actions_per_hour:
+                            # Curtir, repostar e seguir o autor do post se ainda não interagido
+                            like_post(client, uri, cid, interactions)
+                            action_counter += 1
+                        if action_counter < actions_per_hour:
+                            repost_post(client, uri, cid, interactions)
+                            action_counter += 1
+                        if action_counter < actions_per_hour:
+                            follow_user(client, author_did, interactions)
+                            action_counter += 1
+    
+                    if action_counter >= actions_per_hour:
+                        print("Limite de ações por hora atingido.")
+                        break
+    
+            if action_counter >= actions_per_hour:
+                break
+        except requests.exceptions.HTTPError as e:
+            print(f"Erro ao buscar posts para {hashtag}: {e}")
+    
+    save_interactions(interactions)
+    print("Concluído.")
