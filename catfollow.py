@@ -125,12 +125,13 @@ if __name__ == "__main__":
     interactions = load_interactions()
     client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
 
-    # Define hashtags para busca
+    # Define hashtags e palavras-chave para busca
     hashtags = [
         "#cat", "#dog", "#gato", "#cachorro", 
         "#doglife", "#catvibes", "#catsofbluesky",
         "#dogsofbluesky", "#caturday"
     ]
+    keywords = ['cat', 'dog', 'gato', 'cachorro']
 
     # Calcula as datas de ontem e hoje no formato ISO com timezone-aware completo
     today = datetime.now(timezone.utc)
@@ -141,7 +142,7 @@ if __name__ == "__main__":
     actions_per_hour = HOURLY_LIMIT
     action_counter = 0
 
-    # Busca posts dentro do intervalo de tempo especificado e valida hashtags
+    # Busca posts dentro do intervalo de tempo especificado e valida hashtags e palavras-chave no alt text
     for hashtag in hashtags:
         try:
             search_results = search_posts_by_hashtags(client, [hashtag], since, until)
@@ -163,19 +164,21 @@ if __name__ == "__main__":
     
                     # Verifica se a hashtag está presente no texto do post
                     if post_contains_hashtags(post, [hashtag]):
-                        print(f"Post contém a hashtag no texto: {uri}")
-    
-                        if action_counter < actions_per_hour:
-                            # Curtir, repostar e seguir o autor do post se ainda não interagido
-                            like_post(client, uri, cid, interactions)
-                            action_counter += 1
-                        if action_counter < actions_per_hour:
-                            repost_post(client, uri, cid, interactions)
-                            action_counter += 1
-                        if action_counter < actions_per_hour:
-                            follow_user(client, author_did, interactions)
-                            action_counter += 1
-    
+                        # Verifica se o alt text das imagens contém as palavras-chave especificadas
+                        images = find_images_with_keywords(post, keywords)
+                        if images:
+                            print(f"Post contém hashtag e palavras-chave no alt text: {uri}")
+                            if action_counter < actions_per_hour:
+                                # Curtir, repostar e seguir o autor do post se ainda não interagido
+                                like_post(client, uri, cid, interactions)
+                                action_counter += 1
+                            if action_counter < actions_per_hour:
+                                repost_post(client, uri, cid, interactions)
+                                action_counter += 1
+                            if action_counter < actions_per_hour:
+                                follow_user(client, author_did, interactions)
+                                action_counter += 1
+
                     if action_counter >= actions_per_hour:
                         print("Limite de ações por hora atingido.")
                         break
