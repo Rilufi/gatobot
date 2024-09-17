@@ -56,8 +56,18 @@ def check_rate_limit(response):
         time.sleep(max(wait_seconds, 0))
 
 def post_contains_hashtags(post: Dict, hashtags: List[str]) -> bool:
-    """Verifica se o conteúdo do post contém alguma das hashtags especificadas."""
+    """Verifica se o conteúdo do post contém alguma das hashtags especificadas e não contém hashtags a serem ignoradas."""
     content = post.get('record', {}).get('text', '').lower()
+    
+    # Hashtags a serem ignoradas
+    ignored_hashtags = ['#furry', '#furryart']
+
+    # Verifica se o post contém hashtags a serem ignoradas
+    if any(ignored_hashtag in content for ignored_hashtag in ignored_hashtags):
+        print(f"Post ignorado devido a hashtags bloqueadas: {ignored_hashtags}")
+        return False
+
+    # Verifica se contém as hashtags desejadas
     return any(hashtag.lower() in content for hashtag in hashtags)
 
 def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, until: str) -> Dict:
@@ -162,7 +172,7 @@ if __name__ == "__main__":
                     if author_name == BOT_NAME:
                         continue
     
-                    # Verifica se a hashtag está presente no texto do post
+                    # Verifica se a hashtag está presente no texto do post e ignora posts bloqueados
                     if post_contains_hashtags(post, [hashtag]):
                         # Verifica se o alt text das imagens contém as palavras-chave especificadas
                         images = find_images_with_keywords(post, keywords)
