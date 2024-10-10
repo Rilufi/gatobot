@@ -8,7 +8,66 @@ import google.generativeai as genai
 from typing import Dict, List, Tuple
 from datetime import datetime, timezone, timedelta
 import time
+import tweepy
 
+
+# Autenticação via Tweepy API v2 (Client)
+client = tweepy.Client(
+    consumer_key=os.environ.get("CONSUMER_KEY"),
+    consumer_secret=os.environ.get("CONSUMER_SECRET"),
+    access_token=os.environ.get("ACCESS_TOKEN"),
+    access_token_secret=os.environ.get("ACCESS_TOKEN_SECRET"),
+    wait_on_rate_limit=False
+)
+
+# Autenticação via Tweepy API v1.1 (API)
+CONSUMER_KEY = os.environ["CONSUMER_KEY"]
+CONSUMER_SECRET = os.environ["CONSUMER_SECRET"]
+ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
+ACCESS_TOKEN_SECRET = os.environ["ACCESS_TOKEN_SECRET"]
+
+auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+api = tweepy.API(auth, wait_on_rate_limit=False)
+
+# Função para dividir o texto em partes menores sem cortar palavras
+def get_chunks(text, max_length):
+    words = text.split(' ')
+    chunk = ''
+    for word in words:
+        if len(chunk) + len(word) + 1 <= max_length:
+            chunk += ' ' + word if chunk else word
+        else:
+            yield chunk
+            chunk = word
+    if chunk:
+        yield chunk
+
+# Função para postar tweets com ou sem respostas
+def post_tweet_with_replies(text, max_length=280):
+    if len(text) <= max_length:
+        # Postar o tweet diretamente se estiver dentro do limite de caracteres
+        client.create_tweet(text=text)
+    else:
+        # Dividir o texto em partes menores
+        chunks = get_chunks(text, max_length)
+        # Postar o primeiro pedaço
+        response = client.create_tweet(text=next(chunks))
+        # Salvar o ID do primeiro tweet para responder a ele
+        reply_to_id = response.data['id']
+        # Postar os pedaços subsequentes como respostas
+        for chunk in chunks:
+            response = client.create_tweet(text=chunk, in_reply_to_tweet_id=reply_to_id)
+            # Atualizar o ID para a próxima resposta
+            reply_to_id = response.data['id']
+
+# Exemplo de postagem com mídia usando API v1.1 para upload de imagem e API v2 para criar o tweet
+def post_tweet_with_media(text, media_path):
+    # Fazer upload da imagem via API v1.1
+    media = api.media_upload(media_path)
+    
+    # Postar o tweet com a imagem via API v2
+    client.create_tweet(text=text, media_ids=[media.media_id])
 
 # Tudo do Bluesky daqui pra frente, sem precisar do pacote atpro (ou algo assim)
 
@@ -227,6 +286,34 @@ def resize_bluesky(image_path, max_file_size=1 * 1024 * 1024):
         img.save(image_path)
         print("Imagem já está dentro do limite de tamanho do Bluesky.")
 
+def resize_twitter(image_path, max_file_size=5 * 1024 * 1024):
+    """
+    Redimensiona e comprime uma imagem para ficar dentro do limite de tamanho aceito pela rede social Bluesky.
+    Substitui a imagem original se necessário.
+
+    :param image_path: Caminho da imagem original.
+    :param max_file_size: Tamanho máximo permitido da imagem em bytes (default: 1 MB).
+    """
+    # Abre a imagem usando o Pillow
+    img = Image.open(image_path)
+
+    # Redimensiona a imagem mantendo a proporção se necessário
+    if os.path.getsize(image_path) > max_file_size:
+        # Define o tamanho máximo para redimensionar
+        img.thumbnail((1600, 1600))  # Redimensiona para caber dentro de 1600x1600 pixels
+
+        # Reduz a qualidade gradualmente para atingir o tamanho desejado
+        quality = 95
+        while os.path.getsize(image_path) > max_file_size and quality > 10:
+            img.save(image_path, quality=quality)
+            quality -= 5
+            img = Image.open(image_path)  # Recarrega a imagem para verificar o tamanho
+
+        print(f"Imagem redimensionada e comprimida para o limite do Bluesky de {max_file_size} bytes.")
+    else:
+        img.save(image_path)
+        print("Imagem já está dentro do limite de tamanho do Bluesky.")
+
 # Inicializando api do Gemini
 GOOGLE_API_KEY=os.environ["GOOGLE_API_KEY"]
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -336,7 +423,8 @@ def post_ai_generated_cat():
         print(response_gemini, alt_text)
         resize_bluesky("fakecat.jpg")
         post_thread_with_image(pds_url, handle, password, response_gemini, "fakecat.jpg", alt_text)
-
+        resize_twitter("fakecat.jpg")
+        post_tweet_with_media(response_gemini, "fakecat.jpg")
     
 # Function to post random cat skeet
 def post_random_cat():
@@ -350,6 +438,8 @@ def post_random_cat():
         print(response_gemini, alt_text)
         resize_bluesky("cat_image.jpg")
         post_thread_with_image(pds_url, handle, password, response_gemini, "cat_image.jpg", alt_text)
+        resize_twitter("cat_image.jpg")
+        post_tweet_with_media(response_gemini, "cat_image.jpg")
 
 # Function to post random dog skeet
 def post_random_dog():
@@ -363,6 +453,8 @@ def post_random_dog():
         print(response_gemini, alt_text)
         resize_bluesky("dog_image.jpg")
         post_thread_with_image(pds_url, handle, password, response_gemini, "dog_image.jpg", alt_text)
+        resize_twitter("dog_image.jpg")
+        post_tweet_with_media(response_gemini, "dog_image.jpg")
 
 # Function to get a cat fact from catfact.ninja
 def get_cat_fact():
@@ -390,6 +482,7 @@ def main():
 
     skeets = [
         lambda: post_bk_with_replies(cat_fact),
+        post_tweet_with_replies(cat_fact),
         post_ai_generated_cat,
         post_random_cat,
         post_random_dog
