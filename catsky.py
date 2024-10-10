@@ -414,7 +414,7 @@ def download_random_image():
 # Function to post AI-generated cat skeet
 def post_ai_generated_cat():
     response_gemini, alt_text = gemini_image(
-        "Write a funny and/or cute skeet for the Bluesky social media (maximum 300 characters) about this AI-generated cat image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
+        "Write a funny and/or cute subtitle for a social media post (maximum 280 characters) about this AI-generated cat image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
         "fakecat.jpg"
     )
     if response_gemini is None:
@@ -429,7 +429,7 @@ def post_ai_generated_cat():
 # Function to post random cat skeet
 def post_random_cat():
     response_gemini, alt_text = gemini_image(
-        "Write a funny and/or cute skeet for the Bluesky social media (maximum 300 characters) about this cat image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
+        "Write a funny and/or cute subtitle for a social media post (maximum 280 characters) about this cat image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
         'cat_image.jpg'
     )
     if response_gemini is None:
@@ -444,7 +444,7 @@ def post_random_cat():
 # Function to post random dog skeet
 def post_random_dog():
     response_gemini, alt_text = gemini_image(
-        "Write a funny and/or cute skeet for the Bluesky social media (maximum 300 characters) about this dog image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
+        "Write a funny and/or cute subtitle for a social media post (maximum 280 characters) about this dog image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
         'dog_image.jpg'
     )
     if response_gemini is None:
