@@ -478,8 +478,7 @@ def main():
     downloads = [
         lambda: download_random_image,
         get_random_dog,
-        get_random_cat,
-        get_cat_fact
+        get_random_cat
     ]
 
     for download in downloads:
