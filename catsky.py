@@ -475,11 +475,20 @@ pds_url = "https://bsky.social"
 # Main function
 # Inclua um sleep adicional entre os posts, se necessário
 def main():
-    download_random_image()
-    get_random_dog()
-    get_random_cat()
-    cat_fact = get_cat_fact()
+    downloads = [
+        lambda: download_random_image,
+        get_random_dog,
+        get_random_cat,
+        cat_fact = get_cat_fact
+    ]
 
+    for download in downloads:
+        try:
+            download()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            pass
+    
     skeets = [
         lambda: post_bk_with_replies(cat_fact),
         post_tweet_with_replies(cat_fact),
