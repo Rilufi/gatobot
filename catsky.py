@@ -479,7 +479,7 @@ def main():
         lambda: download_random_image,
         get_random_dog,
         get_random_cat,
-        cat_fact = get_cat_fact
+        get_cat_fact
     ]
 
     for download in downloads:
@@ -490,8 +490,8 @@ def main():
             pass
     
     skeets = [
-        lambda: post_bk_with_replies(cat_fact),
-        post_tweet_with_replies(cat_fact),
+        lambda: post_bk_with_replies(get_cat_fact),
+        post_tweet_with_replies(get_cat_fact),
         post_ai_generated_cat,
         post_random_cat,
         post_random_dog
