@@ -501,10 +501,10 @@ def main():
     for skeet in skeets:
         try:
             skeet()
-            time.sleep(10 * 60)  # Aguarda 10 minutos entre as postagens para evitar rate limit
+            time.sleep(5 * 60)  # Aguarda 5 minutos entre as postagens para evitar rate limit
         except Exception as e:
             print(f"An error occurred: {e}")
-            time.sleep(10 * 60)  # Aguarda 10 minutos antes de tentar o próximo para reduzir a chance de rate limit
+            time.sleep(5 * 60)  # Aguarda 5 minutos antes de tentar o próximo para reduzir a chance de rate limit
 
 if __name__ == "__main__":
     main()
