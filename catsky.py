@@ -475,6 +475,8 @@ pds_url = "https://bsky.social"
 # Main function
 # Inclua um sleep adicional entre os posts, se necessário
 def main():
+    cat_fact = get_cat_fact()
+    
     downloads = [
         lambda: download_random_image,
         get_random_dog,
@@ -489,8 +491,8 @@ def main():
             pass
     
     skeets = [
-        lambda: post_bk_with_replies(get_cat_fact),
-        post_tweet_with_replies(get_cat_fact),
+        lambda: post_bk_with_replies(cat_fact),
+        post_tweet_with_replies(cat_fact),
         post_ai_generated_cat,
         post_random_cat,
         post_random_dog
