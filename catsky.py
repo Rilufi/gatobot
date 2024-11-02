@@ -17,7 +17,7 @@ client = tweepy.Client(
     consumer_secret=os.environ.get("CONSUMER_SECRET"),
     access_token=os.environ.get("ACCESS_TOKEN"),
     access_token_secret=os.environ.get("ACCESS_TOKEN_SECRET"),
-    wait_on_rate_limit=False
+    wait_on_rate_limit=True
 )
 
 # Autenticação via Tweepy API v1.1 (API)
@@ -28,7 +28,7 @@ ACCESS_TOKEN_SECRET = os.environ["ACCESS_TOKEN_SECRET"]
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-api = tweepy.API(auth, wait_on_rate_limit=False)
+api = tweepy.API(auth, wait_on_rate_limit=True)
 
 # Função para dividir o texto em partes menores sem cortar palavras
 def get_chunks(text, max_length):
