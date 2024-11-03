@@ -12,14 +12,18 @@ import tweepy
 
 
 # Autenticação via Tweepy API v2 (Client)
-client = tweepy.Client(
+try:
+    client = tweepy.Client(
     consumer_key=os.environ.get("CONSUMER_KEY"),
     consumer_secret=os.environ.get("CONSUMER_SECRET"),
     access_token=os.environ.get("ACCESS_TOKEN"),
     access_token_secret=os.environ.get("ACCESS_TOKEN_SECRET"),
     wait_on_rate_limit=True
-)
-
+    )
+except RateLimitError:
+    print("Rate limit atingido ao inicializar o client. Encerrando o script.")
+    sys.exit(0)
+    
 # Autenticação via Tweepy API v1.1 (API)
 CONSUMER_KEY = os.environ["CONSUMER_KEY"]
 CONSUMER_SECRET = os.environ["CONSUMER_SECRET"]
@@ -28,7 +32,11 @@ ACCESS_TOKEN_SECRET = os.environ["ACCESS_TOKEN_SECRET"]
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-api = tweepy.API(auth, wait_on_rate_limit=True)
+try:
+    api = tweepy.API(auth, wait_on_rate_limit=True)
+except RateLimitError:
+    print("Rate limit atingido ao inicializar o client. Encerrando o script.")
+    sys.exit(0)
 
 # Função para dividir o texto em partes menores sem cortar palavras
 def get_chunks(text, max_length):
