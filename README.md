@@ -1,5 +1,5 @@
 # gatobot
-Bot para postar fotos de gato e cachorro no Bluesky (antigamente Twitter/X, mas o script ainda tá aí na pasta old_scripts)
+Bot para postar fotos de gato e cachorro no Bluesky e Twitter/X
 
 ## Atualizações com endpoint v2
 Devido à última atualização, algumas funcionalidades do endpoint v1.1 do API do Twitter não funcionam mais, sendo necessário utilizar o v2. Infelizmente, a versão free do v2 não têm algumas funcionalidades disponíveis, como o "tweet_lookup" para procurar outros posts de gato para curtir e compartilhar. Mesmo assim, é possivel utilizar uma mistura das funcionalidades do v1, como upar imagens com "media_upload" e do v2 para postar com "create_tweet". Por fim, as funcionalidades de postar imagens e texto ainda funcionam, só não é possível procurar outros tweets.
