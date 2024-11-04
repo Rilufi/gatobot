@@ -10,7 +10,6 @@ from datetime import datetime, timezone, timedelta
 import time
 import tweepy
 import sys
-from tweepy.errors import RateLimitError
 
 # Autenticação via Tweepy API v2 (Client)
 try:
@@ -21,14 +20,14 @@ try:
         access_token_secret=os.environ.get("ACCESS_TOKEN_SECRET"),
         wait_on_rate_limit=True
     )
-except RateLimitError:
+except:
     print("Rate limit atingido ao inicializar o client. Encerrando o script.")
     sys.exit(0)
 
 # Autenticação via Tweepy API v1.1 (API)
 try:
     api = tweepy.API(auth, wait_on_rate_limit=True)
-except RateLimitError:
+except:
     print("Rate limit atingido ao inicializar o client. Encerrando o script.")
     sys.exit(0)
 
