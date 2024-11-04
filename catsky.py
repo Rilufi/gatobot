@@ -104,49 +104,6 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Dict:
         raise ValueError("Falha no login: accessJwt não encontrado na resposta")
     return data
 
-def parse_uri(uri: str) -> Dict:
-    # Função para analisar a URI, separando em partes relevantes
-    repo, collection, rkey = uri.split("/")[2:5]
-    return {"repo": repo, "collection": collection, "rkey": rkey}
-
-def get_reply_refs(pds_url: str, parent_uri: str) -> Dict:
-    uri_parts = parse_uri(parent_uri)
-    resp = requests.get(
-        pds_url + "/xrpc/com.atproto.repo.getRecord",
-        params=uri_parts,
-    )
-    resp.raise_for_status()
-    parent = resp.json()
-    parent_reply = parent["value"].get("reply")
-
-    # Retorna as referências corretas para o root e parent
-    if parent_reply:
-        return {
-            "root": parent_reply["root"],
-            "parent": {"uri": parent["uri"], "cid": parent["cid"]},
-        }
-    else:
-        return {
-            "root": {"uri": parent["uri"], "cid": parent["cid"]},
-            "parent": {"uri": parent["uri"], "cid": parent["cid"]},
-        }
-
-def split_text(text: str, max_length: int = 300) -> List[str]:
-    words = text.split()
-    chunks = []
-    current_chunk = ""
-
-    for word in words:
-        if len(current_chunk) + len(word) + 1 <= max_length:
-            current_chunk += (word if current_chunk == "" else " " + word)
-        else:
-            chunks.append(current_chunk)
-            current_chunk = word
-
-    if current_chunk:
-        chunks.append(current_chunk)
-
-    return chunks
 
 def upload_file(pds_url: str, access_token: str, filename: str, img_bytes: bytes) -> Dict:
     suffix = filename.split(".")[-1].lower()
@@ -234,17 +191,15 @@ def post_chunk(pds_url: str, access_token: str, did: str, text: str, reply_to: D
     
     return response.json()["uri"], response.json()["cid"]
 
-def post_bk_with_replies(text: str):
+# Function to post the cat fact on Bluesky
+def post_bk(text: str):
     session = bsky_login_session(pds_url, handle, password)
     access_token = session["accessJwt"]
     did = session["did"]
 
-    chunks = split_text(text)
-    reply_to = None
-
-    for chunk in chunks:
-        uri, cid = post_chunk(pds_url, access_token, did, chunk, reply_to)
-        reply_to = get_reply_refs(pds_url, uri)  # Atualiza a referência para a próxima parte do thread
+    # Directly post the text without splitting into chunks or using replies
+    post_chunk(pds_url, access_token, did, text)
+    
 
 def post_thread_with_image(pds_url: str, handle: str, password: str, long_text: str, image_path: str, alt_text: str):
     session = bsky_login_session(pds_url, handle, password)
@@ -468,13 +423,12 @@ def post_random_dog():
 
 # Function to get a cat fact from catfact.ninja
 def get_cat_fact():
-    # Loop until a fact without the word "skins" is obtained
+    # Loop until a fact without the word "skins" is obtained and with <= 300 characters
     while True:
         r = requests.get('https://catfact.ninja/fact')
         data = r.json()
         fact = data["fact"]
-        length = data["length"]
-        if "skins" not in fact:
+        if "skins" not in fact and len(fact) <= 300:
             return fact
 
 # Inicializando o cliente do Bluesky
@@ -501,7 +455,7 @@ def main():
             pass
     
     skeets = [
-        lambda: post_bk_with_replies(cat_fact),
+        lambda: post_bk(cat_fact),
         post_tweet_with_replies(cat_fact),
         post_ai_generated_cat,
         post_random_cat,
