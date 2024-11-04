@@ -20,15 +20,15 @@ try:
         access_token_secret=os.environ.get("ACCESS_TOKEN_SECRET"),
         wait_on_rate_limit=True
     )
-except:
-    print("Rate limit atingido ao inicializar o client. Encerrando o script.")
+except Exception as e:
+    print(f"Deu erro: {e}. Encerrando o script.")
     sys.exit(0)
 
 # Autenticação via Tweepy API v1.1 (API)
 try:
     api = tweepy.API(auth, wait_on_rate_limit=True)
-except:
-    print("Rate limit atingido ao inicializar o client. Encerrando o script.")
+except Exception as e:
+    print(f"Deu erro: {e}. Encerrando o script.")
     sys.exit(0)
 
 # Função para dividir o texto em partes menores sem cortar palavras
