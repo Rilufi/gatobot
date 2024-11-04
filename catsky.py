@@ -10,6 +10,7 @@ from datetime import datetime, timezone, timedelta
 import time
 import tweepy
 import sys
+import requests.exceptions
 
 
 #Autenticações twitter
@@ -436,40 +437,65 @@ handle = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
 password = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 pds_url = "https://bsky.social"
 
-# Main function
-# Inclua um sleep adicional entre os posts, se necessário
+
+# Variável de controle para rate limit
+has_hit_rate_limit = False
+
+# Função principal
 def main():
+    global has_hit_rate_limit
+    
+    # Verificação de rate limit
+    if has_hit_rate_limit:
+        print("Limitado pelo rate limit. Script pausado.")
+        sys.exit(0)
+    
     cat_fact = get_cat_fact()
     
+    # Lista de funções de download
     downloads = [
-        lambda: download_random_image,
+        lambda: download_random_image(),
         get_random_dog,
         get_random_cat
     ]
 
+    # Executa downloads e trata exceções
     for download in downloads:
         try:
             download()
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"An error occurred during download: {e}")
             pass
     
+    # Lista de funções de postagem
     skeets = [
         lambda: post_bk(cat_fact),
-        post_tweet_with_replies(cat_fact),
+        lambda: post_tweet_with_replies(cat_fact),
         post_ai_generated_cat,
         post_random_cat,
         post_random_dog
     ]
 
+    # Executa postagens com verificação de rate limit
     for skeet in skeets:
         try:
+            # Tenta executar a postagem
             skeet()
-            time.sleep(5 * 60)  # Aguarda 5 minutos entre as postagens para evitar rate limit
+            time.sleep(5 * 60)  # Aguarda 5 minutos entre as postagens
+
+        except requests.exceptions.HTTPError as e:
+            # Verifica se o erro é um rate limit (status 429)
+            if e.response.status_code == 429:
+                has_hit_rate_limit = True
+                print("Erro 429 detectado. Script encerrado devido ao rate limit.")
+                sys.exit(0)
+            else:
+                # Para outros erros HTTP, re-levanta a exceção
+                raise
+
         except Exception as e:
-            print(f"An error occurred: {e}")
-            time.sleep(5 * 60)  # Aguarda 5 minutos antes de tentar o próximo para reduzir a chance de rate limit
+            print(f"An error occurred during posting: {e}")
+            time.sleep(5 * 60)  # Aguarda 5 minutos antes de tentar o próximo post
 
 if __name__ == "__main__":
     main()
-
