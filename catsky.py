@@ -81,6 +81,23 @@ def post_tweet_with_media(text, media_path):
     client.create_tweet(text=text, media_ids=[media.media_id])
 
 # Tudo do Bluesky daqui pra frente, sem precisar do pacote atpro (ou algo assim)
+# Função para dividir texto em chunks
+def split_text(text: str, max_length: int = 300) -> List[str]:
+    words = text.split()
+    chunks = []
+    current_chunk = ""
+
+    for word in words:
+        if len(current_chunk) + len(word) + 1 <= max_length:
+            current_chunk += (word if current_chunk == "" else " " + word)
+        else:
+            chunks.append(current_chunk)
+            current_chunk = word
+
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    return chunks
 
 # Função para tentar novamente com backoff exponencial em caso de erro 429
 def retry_request(func, *args, **kwargs):
