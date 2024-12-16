@@ -158,6 +158,32 @@ def upload_image(pds_url: str, access_token: str, image_path: str, alt_text: str
         "images": [{"alt": alt_text or "", "image": blob}],
     }
 
+# Função para criar facets de reply (respostas)
+def get_reply_refs(pds_url: str, parent_uri: str) -> Dict:
+    try:
+        repo, collection, rkey = parent_uri.split("/")[2:5]
+        resp = retry_request(
+            requests.get,
+            pds_url + "/xrpc/com.atproto.repo.getRecord",
+            params={"repo": repo, "collection": collection, "rkey": rkey},
+        )
+        parent = resp.json()
+        parent_reply = parent["value"].get("reply")
+
+        if parent_reply:
+            return {
+                "root": parent_reply["root"],
+                "parent": {"uri": parent["uri"], "cid": parent["cid"]},
+            }
+        else:
+            return {
+                "root": {"uri": parent["uri"], "cid": parent["cid"]},
+                "parent": {"uri": parent["uri"], "cid": parent["cid"]},
+            }
+    except Exception as e:
+        print(f"Erro ao obter referências de reply: {e}")
+        sys.exit(1)
+
 
 def find_hashtags(text: str) -> List[Dict]:
     """
@@ -397,7 +423,7 @@ def download_random_image():
 # Function to post AI-generated cat skeet
 def post_ai_generated_cat():
     response_gemini, alt_text = gemini_image(
-        "Write a funny and/or cute subtitle for a social media post (maximum 280 characters) about this AI-generated cat image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
+        "Write a single funny and/or cute subtitle for a social media post (maximum 280 characters) about this AI-generated cat image with hashtags without explanations or introductions and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
         "fakecat.jpg"
     )
     if response_gemini is None:
@@ -412,7 +438,7 @@ def post_ai_generated_cat():
 # Function to post random cat skeet
 def post_random_cat():
     response_gemini, alt_text = gemini_image(
-        "Write a funny and/or cute subtitle for a social media post (maximum 280 characters) about this cat image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
+        "Write a single funny and/or cute subtitle for a social media post (maximum 280 characters) about this cat image with hashtags without explanations or introductions and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
         'cat_image.jpg'
     )
     if response_gemini is None:
@@ -427,7 +453,7 @@ def post_random_cat():
 # Function to post random dog skeet
 def post_random_dog():
     response_gemini, alt_text = gemini_image(
-        "Write a funny and/or cute subtitle for a social media post (maximum 280 characters) about this dog image with hashtags and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
+        "Write a single funny and/or cute subtitle for a social media post (maximum 280 characters) about this dog image with hashtags without explanations or introductions and create a descriptive alt text. Separate the subtitle from the alt text with 'ALT-TEXT:'",
         'dog_image.jpg'
     )
     if response_gemini is None:
