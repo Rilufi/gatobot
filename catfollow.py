@@ -94,7 +94,7 @@ def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, u
     cleaned_hashtags = [hashtag.replace('#', '').lower() for hashtag in hashtags]
     hashtag_query = " OR ".join(cleaned_hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
-    headers = {"Authorization": f"Bearer {session._access_jwt}"}
+    headers = {"Authorization": f"Bearer {session.session.access_jwt}"}  # Corrigido aqui
     params = {
         "q": hashtag_query,
         "limit": 50,
