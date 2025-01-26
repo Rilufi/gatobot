@@ -1,6 +1,7 @@
 name: Boturi_2
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["Boturi"]
     types:
