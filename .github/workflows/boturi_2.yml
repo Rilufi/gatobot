@@ -41,10 +41,12 @@ jobs:
           pip install bs4 atproto requests
 
       # Use HEREDOC for `run` to escape possible single and double quotes in the message.
-      - name: Run all cat scripts 🐦
+      - name: Follow all the pets 🐱
         env:
           BSKY_HANDLE:  ${{ secrets.BSKY_HANDLE }}
           BSKY_PASSWORD:  ${{ secrets.BSKY_PASSWORD }}
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
         run: python catfollow.py
 
       - name: Atualizar arquivo de interações
