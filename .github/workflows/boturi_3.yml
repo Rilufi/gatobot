@@ -1,0 +1,56 @@
+name: Boturi_2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  tweet:
+    name: Skeet
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v3
+
+      - name: Keep this repo alive
+        uses: gautamkrishnar/keepalive-workflow@master
+
+      - name: Set up Python 🐍
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.x
+
+      - name: Cache Python packages 💾
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-
+
+      - name: Install packages ⚙
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Use HEREDOC for `run` to escape possible single and double quotes in the message.
+      - name: Follow all the pets 🐱
+        env:
+          CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+          CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+        run: python twitter_follow.py
+
+      - name: Atualizar arquivo de interações
+        run: |
+          git config --global user.email "github-actions@example.com"
+          git config --global user.name "GitHub Actions"
+          git status  # Verificar se há mudanças detectadas
+          git add -f interactions.json  # Forçar adição do arquivo
+          git commit -m "Atualizar arquivo de interações [skip ci]" || echo "Nenhuma alteração para fazer commit."
+          git push || echo "Nenhuma alteração para fazer push."
