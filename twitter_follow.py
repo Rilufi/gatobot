@@ -1,9 +1,9 @@
 import os
-from typing import Dict, List
 import json
-from datetime import datetime, timedelta, timezone
-import tweepy
+import time
 import sys
+from typing import Dict, List
+import tweepy
 
 # Autenticações Twitter
 consumer_key = os.environ.get("CONSUMER_KEY")
@@ -78,21 +78,28 @@ def like_post_twitter(tweet_id: str, interactions):
         except tweepy.errors.TweepyException as e:
             print(f"Erro ao curtir o tweet {tweet_id}: {e}")
 
-def follow_user_twitter(username: str, interactions):
+def follow_user_twitter(user_id: str, interactions):
     """Seguir um usuário no Twitter."""
-    if username not in interactions["follows"]:
+    if user_id not in interactions["follows"]:
         try:
-            twitter_api.create_friendship(screen_name=username)
-            interactions["follows"].append(username)
-            print(f"Seguindo usuário no Twitter: @{username}")
+            # Obtém o screen_name do usuário usando o user_id
+            user_info = twitter_client.get_user(id=user_id)
+            screen_name = user_info.data.username
+            twitter_api.create_friendship(screen_name=screen_name)
+            interactions["follows"].append(user_id)
+            print(f"Seguindo usuário no Twitter: @{screen_name}")
         except tweepy.errors.TweepyException as e:
-            print(f"Erro ao seguir o usuário @{username}: {e}")
+            print(f"Erro ao seguir o usuário com ID {user_id}: {e}")
 
 def search_tweets_by_hashtags(hashtags: List[str]):
     """Busca tweets contendo as hashtags fornecidas."""
     query = " OR ".join(hashtags)
     try:
-        tweets = twitter_client.search_recent_tweets(query=query, max_results=50)
+        tweets = twitter_client.search_recent_tweets(
+            query=query,
+            max_results=50,
+            expansions=["author_id"]
+        )
         return tweets.data if tweets.data else []
     except tweepy.errors.TweepyException as e:
         print(f"Erro ao buscar tweets: {e}")
@@ -115,14 +122,17 @@ if __name__ == "__main__":
     tweets = search_tweets_by_hashtags(hashtags)
     for tweet in tweets:
         tweet_id = tweet.id
-        username = tweet.author_id
+        user_id = tweet.author_id
 
         if action_counter < actions_per_hour:
             like_post_twitter(tweet_id, interactions)
             action_counter += 1
+            time.sleep(2)  # Pausa para evitar exceder os limites de taxa
+
         if action_counter < actions_per_hour:
-            follow_user_twitter(username, interactions)
+            follow_user_twitter(user_id, interactions)
             action_counter += 1
+            time.sleep(2)  # Pausa para evitar exceder os limites de taxa
 
         if action_counter >= actions_per_hour:
             print("Limite de ações por hora atingido no Twitter.")
