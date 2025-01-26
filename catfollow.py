@@ -14,6 +14,11 @@ consumer_secret = os.environ.get("CONSUMER_SECRET")
 access_token = os.environ.get("ACCESS_TOKEN")
 access_token_secret = os.environ.get("ACCESS_TOKEN_SECRET")
 
+# Verifica se as credenciais do Twitter estão definidas
+if not all([consumer_key, consumer_secret, access_token, access_token_secret]):
+    print("Credenciais do Twitter não encontradas. Verifique as variáveis de ambiente.")
+    sys.exit(1)
+
 # Autenticação via Tweepy API v2 (Client)
 try:
     twitter_client = tweepy.Client(
@@ -23,17 +28,29 @@ try:
         access_token_secret=access_token_secret,
         wait_on_rate_limit=True
     )
+    # Verifica se a autenticação foi bem-sucedida
+    twitter_client.get_me()  # Testa a autenticação
+    print("Autenticação no Twitter bem-sucedida.")
+except tweepy.errors.Unauthorized as e:
+    print(f"Erro de autenticação no Twitter: {e}. Verifique suas credenciais.")
+    sys.exit(1)
 except Exception as e:
-    print(f"Erro na autenticação do Twitter: {e}. Encerrando o script.")
-    sys.exit(0)
+    print(f"Erro inesperado na autenticação do Twitter: {e}")
+    sys.exit(1)
 
 # Autenticação via Tweepy API v1.1 (API)
 try:
     auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, access_token_secret)
     twitter_api = tweepy.API(auth, wait_on_rate_limit=True)
+    # Verifica se a autenticação foi bem-sucedida
+    twitter_api.verify_credentials()
+    print("Autenticação no Twitter (API v1.1) bem-sucedida.")
+except tweepy.errors.Unauthorized as e:
+    print(f"Erro de autenticação no Twitter (API v1.1): {e}. Verifique suas credenciais.")
+    sys.exit(1)
 except Exception as e:
-    print(f"Erro na autenticação do Twitter (API v1.1): {e}. Encerrando o script.")
-    sys.exit(0)
+    print(f"Erro inesperado na autenticação do Twitter (API v1.1): {e}")
+    sys.exit(1)
 
 # Configurações do Bluesky
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
@@ -135,22 +152,32 @@ def follow_user_bluesky(client: Client, did: str, interactions):
 def like_post_twitter(tweet_id: str, interactions):
     """Curtir um post no Twitter."""
     if tweet_id not in interactions["likes"]:
-        twitter_client.like(tweet_id)
-        interactions["likes"].append(tweet_id)
-        print(f"Post curtido no Twitter: {tweet_id}")
+        try:
+            twitter_client.like(tweet_id)
+            interactions["likes"].append(tweet_id)
+            print(f"Post curtido no Twitter: {tweet_id}")
+        except tweepy.errors.TweepyException as e:
+            print(f"Erro ao curtir o tweet {tweet_id}: {e}")
 
 def follow_user_twitter(username: str, interactions):
     """Seguir um usuário no Twitter."""
     if username not in interactions["follows"]:
-        twitter_api.create_friendship(screen_name=username)
-        interactions["follows"].append(username)
-        print(f"Seguindo usuário no Twitter: @{username}")
+        try:
+            twitter_api.create_friendship(screen_name=username)
+            interactions["follows"].append(username)
+            print(f"Seguindo usuário no Twitter: @{username}")
+        except tweepy.errors.TweepyException as e:
+            print(f"Erro ao seguir o usuário @{username}: {e}")
 
 def search_tweets_by_hashtags(hashtags: List[str]):
     """Busca tweets contendo as hashtags fornecidas."""
     query = " OR ".join(hashtags)
-    tweets = twitter_client.search_recent_tweets(query=query, max_results=50)
-    return tweets.data if tweets.data else []
+    try:
+        tweets = twitter_client.search_recent_tweets(query=query, max_results=50)
+        return tweets.data if tweets.data else []
+    except tweepy.errors.TweepyException as e:
+        print(f"Erro ao buscar tweets: {e}")
+        return []
 
 if __name__ == "__main__":
     interactions = load_interactions()
