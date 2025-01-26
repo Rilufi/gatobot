@@ -1,4 +1,4 @@
-name: Boturi_2
+name: Boturi_3
 
 on:
   workflow_dispatch:
