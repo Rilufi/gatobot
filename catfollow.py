@@ -5,7 +5,35 @@ from atproto import Client
 import json
 from datetime import datetime, timedelta, timezone
 import time
+import tweepy
+import sys
 
+# Autenticações Twitter
+consumer_key = os.environ.get("CONSUMER_KEY")
+consumer_secret = os.environ.get("CONSUMER_SECRET")
+access_token = os.environ.get("ACCESS_TOKEN")
+access_token_secret = os.environ.get("ACCESS_TOKEN_SECRET")
+
+# Autenticação via Tweepy API v2 (Client)
+try:
+    twitter_client = tweepy.Client(
+        consumer_key=consumer_key,
+        consumer_secret=consumer_secret,
+        access_token=access_token,
+        access_token_secret=access_token_secret,
+        wait_on_rate_limit=True
+    )
+except Exception as e:
+    print(f"Erro na autenticação do Twitter: {e}. Encerrando o script.")
+    sys.exit(0)
+
+# Autenticação via Tweepy API v1.1 (API)
+try:
+    auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, access_token_secret)
+    twitter_api = tweepy.API(auth, wait_on_rate_limit=True)
+except Exception as e:
+    print(f"Erro na autenticação do Twitter (API v1.1): {e}. Encerrando o script.")
+    sys.exit(0)
 
 # Configurações do Bluesky
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
@@ -21,7 +49,7 @@ HOURLY_LIMIT = DAILY_LIMIT // 24  # Limite de ações por hora
 INTERACTIONS_FILE = 'interactions.json'
 
 def load_interactions():
-    """Loads interactions from a JSON file."""
+    """Carrega interações de um arquivo JSON."""
     if os.path.exists(INTERACTIONS_FILE):
         with open(INTERACTIONS_FILE, 'r') as file:
             try:
@@ -32,12 +60,12 @@ def load_interactions():
     return {"likes": [], "reposts": [], "follows": []}
 
 def save_interactions(interactions):
-    """Saves interactions to a JSON file."""
+    """Salva interações em um arquivo JSON."""
     with open(INTERACTIONS_FILE, 'w') as file:
         json.dump(interactions, file)
 
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
-    """Logs in to Bluesky and returns the client instance."""
+    """Autentica no Bluesky e retorna a instância do cliente."""
     print("Tentando autenticar no Bluesky...")
     client = Client(base_url=pds_url)
     client.login(handle, password)
@@ -45,7 +73,7 @@ def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
     return client
 
 def check_rate_limit(response):
-    """Checks the rate limit status from the response headers and pauses if necessary."""
+    """Verifica o status do limite de requisições e pausa, se necessário."""
     rate_limit_remaining = int(response.headers.get('RateLimit-Remaining', 1))
     rate_limit_reset = int(response.headers.get('RateLimit-Reset', 0))
 
@@ -57,22 +85,12 @@ def check_rate_limit(response):
         time.sleep(max(wait_seconds, 0))
 
 def post_contains_hashtags(post: Dict, hashtags: List[str]) -> bool:
-    """Verifica se o conteúdo do post contém alguma das hashtags especificadas e não contém hashtags a serem ignoradas."""
+    """Verifica se o conteúdo do post contém alguma das hashtags especificadas."""
     content = post.get('record', {}).get('text', '').lower()
-    
-    # Hashtags a serem ignoradas
-    ignored_hashtags = ['#furry', '#furryart']
-
-    # Verifica se o post contém hashtags a serem ignoradas
-    if any(ignored_hashtag in content for ignored_hashtag in ignored_hashtags):
-        print(f"Post ignorado devido a hashtags bloqueadas: {ignored_hashtags}")
-        return False
-
-    # Verifica se contém as hashtags desejadas
     return any(hashtag.lower() in content for hashtag in hashtags)
 
 def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, until: str) -> Dict:
-    """Searches for posts containing the given hashtags within a specific time range."""
+    """Busca posts contendo as hashtags fornecidas dentro de um intervalo de tempo."""
     cleaned_hashtags = [hashtag.replace('#', '').lower() for hashtag in hashtags]
     hashtag_query = " OR ".join(cleaned_hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
@@ -86,9 +104,8 @@ def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, u
     }
 
     response = requests.get(url, headers=headers, params=params)
-    
-    check_rate_limit(response)  # Checa e gerencia o limite de requisições
-    
+    check_rate_limit(response)  # Verifica e gerencia o limite de requisições
+
     try:
         response.raise_for_status()
         return response.json()
@@ -97,44 +114,43 @@ def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, u
         print(f"Detalhes do erro: {response.text}")
         return {}
 
-def find_images_with_keywords(post: Dict, keywords: List[str]) -> List[Dict]:
-    """Finds images in the post that contain specified keywords in their 'alt' descriptions."""
-    images_with_keywords = []
-    embed = post.get('record', {}).get('embed')
-
-    if embed and embed.get('$type') == 'app.bsky.embed.images':
-        images = embed.get('images', [])
-        for image in images:
-            alt_text = image.get('alt', '').lower()
-            if any(keyword in alt_text for keyword in keywords):
-                images_with_keywords.append(image)
-
-    return images_with_keywords
-
-def like_post(client: Client, uri: str, cid: str, interactions):
-    """Likes a post given its URI and CID, if not already liked."""
+def like_post_bluesky(client: Client, uri: str, cid: str, interactions):
+    """Curtir um post no Bluesky."""
     if uri not in interactions["likes"]:
         client.like(uri=uri, cid=cid)
         interactions["likes"].append(uri)
-        print(f"Post curtido: {uri}")
+        print(f"Post curtido no Bluesky: {uri}")
 
-def repost_post(client: Client, uri: str, cid: str, interactions):
-    """Reposts a post given its URI and CID, if not already reposted."""
-    if uri not in interactions["reposts"]:
-        client.repost(uri=uri, cid=cid)
-        interactions["reposts"].append(uri)
-        print(f"Post repostado: {uri}")
-
-def follow_user(client: Client, did: str, interactions):
-    """Follows a user given their DID, if not already followed."""
+def follow_user_bluesky(client: Client, did: str, interactions):
+    """Seguir um usuário no Bluesky."""
     if did not in interactions["follows"]:
         client.follow(did)
         interactions["follows"].append(did)
-        print(f"Seguindo usuário: {did}")
+        print(f"Seguindo usuário no Bluesky: {did}")
+
+def like_post_twitter(tweet_id: str, interactions):
+    """Curtir um post no Twitter."""
+    if tweet_id not in interactions["likes"]:
+        twitter_client.like(tweet_id)
+        interactions["likes"].append(tweet_id)
+        print(f"Post curtido no Twitter: {tweet_id}")
+
+def follow_user_twitter(username: str, interactions):
+    """Seguir um usuário no Twitter."""
+    if username not in interactions["follows"]:
+        twitter_api.create_friendship(screen_name=username)
+        interactions["follows"].append(username)
+        print(f"Seguindo usuário no Twitter: @{username}")
+
+def search_tweets_by_hashtags(hashtags: List[str]):
+    """Busca tweets contendo as hashtags fornecidas."""
+    query = " OR ".join(hashtags)
+    tweets = twitter_client.search_recent_tweets(query=query, max_results=50)
+    return tweets.data if tweets.data else []
 
 if __name__ == "__main__":
     interactions = load_interactions()
-    client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
+    bsky_client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
 
     # Define hashtags e palavras-chave para busca
     hashtags = [
@@ -142,7 +158,6 @@ if __name__ == "__main__":
         "#doglife", "#catvibes", "#catsofbluesky",
         "#dogsofbluesky", "#caturday"
     ]
-    keywords = ['cat', 'dog', 'gato', 'cachorro']
 
     # Calcula as datas de ontem e hoje no formato ISO com timezone-aware completo
     today = datetime.now(timezone.utc)
@@ -153,51 +168,53 @@ if __name__ == "__main__":
     actions_per_hour = HOURLY_LIMIT
     action_counter = 0
 
-    # Busca posts dentro do intervalo de tempo especificado e valida hashtags e palavras-chave no alt text
+    # Interação no Bluesky
     for hashtag in hashtags:
         try:
-            search_results = search_posts_by_hashtags(client, [hashtag], since, until)
-    
-            print(f"Resultados da pesquisa para {hashtag}:")
+            search_results = search_posts_by_hashtags(bsky_client, [hashtag], since, until)
             if not search_results.get('posts'):
-                print("Nenhum resultado encontrado.")
+                print(f"Nenhum resultado encontrado para {hashtag} no Bluesky.")
             else:
                 for post in search_results["posts"]:
                     uri = post.get('uri')
                     cid = post.get('cid')
                     author = post.get('author', {})
-                    author_name = author.get('displayName', 'Unknown')
                     author_did = author.get('did', '')
-    
+
                     # Evita interagir com posts do próprio bot
-                    if author_name == BOT_NAME:
+                    if author.get('displayName', '') == BOT_NAME:
                         continue
-    
-                    # Verifica se a hashtag está presente no texto do post e ignora posts bloqueados
+
                     if post_contains_hashtags(post, [hashtag]):
-                        # Verifica se o alt text das imagens contém as palavras-chave especificadas
-                        images = find_images_with_keywords(post, keywords)
-                        if images:
-                            print(f"Post contém hashtag e palavras-chave no alt text: {uri}")
-                            if action_counter < actions_per_hour:
-                                # Curtir, repostar e seguir o autor do post se ainda não interagido
-                                like_post(client, uri, cid, interactions)
-                                action_counter += 1
-                            if action_counter < actions_per_hour:
-                                repost_post(client, uri, cid, interactions)
-                                action_counter += 1
-                            if action_counter < actions_per_hour:
-                                follow_user(client, author_did, interactions)
-                                action_counter += 1
+                        if action_counter < actions_per_hour:
+                            like_post_bluesky(bsky_client, uri, cid, interactions)
+                            action_counter += 1
+                        if action_counter < actions_per_hour:
+                            follow_user_bluesky(bsky_client, author_did, interactions)
+                            action_counter += 1
 
                     if action_counter >= actions_per_hour:
-                        print("Limite de ações por hora atingido.")
+                        print("Limite de ações por hora atingido no Bluesky.")
                         break
-    
-            if action_counter >= actions_per_hour:
-                break
         except requests.exceptions.HTTPError as e:
-            print(f"Erro ao buscar posts para {hashtag}: {e}")
-    
+            print(f"Erro ao buscar posts para {hashtag} no Bluesky: {e}")
+
+    # Interação no Twitter
+    tweets = search_tweets_by_hashtags(hashtags)
+    for tweet in tweets:
+        tweet_id = tweet.id
+        username = tweet.author_id
+
+        if action_counter < actions_per_hour:
+            like_post_twitter(tweet_id, interactions)
+            action_counter += 1
+        if action_counter < actions_per_hour:
+            follow_user_twitter(username, interactions)
+            action_counter += 1
+
+        if action_counter >= actions_per_hour:
+            print("Limite de ações por hora atingido no Twitter.")
+            break
+
     save_interactions(interactions)
     print("Concluído.")
