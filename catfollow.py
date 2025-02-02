@@ -145,7 +145,7 @@ if __name__ == "__main__":
                         if action_counter < actions_per_hour:
                             like_post_bluesky(bsky_client, uri, cid, interactions)
                             action_counter += 1
-                        if action_counter < actions_per_hour:
+                        if action_counter < actions_per_hour and author_did not in interactions["follows"]:
                             follow_user_bluesky(bsky_client, author_did, interactions)
                             action_counter += 1
 
