@@ -28,8 +28,8 @@ def load_interactions() -> Dict:
                 return json.load(file)
             except json.JSONDecodeError:
                 print(f"O arquivo {INTERACTIONS_FILE} está vazio ou corrompido. Inicializando com valores padrão.")
-                return {"likes": [], "follows": []}
-    return {"likes": [], "follows": []}
+                return {"likes": [], "follows": [], "unfollows": []}
+    return {"likes": [], "follows": [], "unfollows": []}
 
 def save_interactions(interactions: Dict):
     """Salva interações em um arquivo JSON."""
@@ -99,10 +99,18 @@ def like_post_bluesky(client: Client, uri: str, cid: str, interactions):
 
 def follow_user_bluesky(client: Client, did: str, interactions):
     """Seguir um usuário no Bluesky."""
-    if did not in interactions["follows"]:
+    if did not in interactions["follows"] and did not in interactions["unfollows"]:
         client.follow(did)
         interactions["follows"].append(did)
         print(f"Seguindo usuário no Bluesky: {did}")
+
+def unfollow_user_bluesky(client: Client, did: str, interactions):
+    """Deixar de seguir um usuário no Bluesky."""
+    if did in interactions["follows"]:
+        client.unfollow(did)
+        interactions["follows"].remove(did)
+        interactions["unfollows"].append(did)
+        print(f"Deixando de seguir usuário no Bluesky: {did}")
 
 if __name__ == "__main__":
     interactions = load_interactions()
@@ -145,7 +153,7 @@ if __name__ == "__main__":
                         if action_counter < actions_per_hour:
                             like_post_bluesky(bsky_client, uri, cid, interactions)
                             action_counter += 1
-                        if action_counter < actions_per_hour and author_did not in interactions["follows"]:
+                        if action_counter < actions_per_hour and author_did not in interactions["follows"] and author_did not in interactions["unfollows"]:
                             follow_user_bluesky(bsky_client, author_did, interactions)
                             action_counter += 1
 
