@@ -2,10 +2,8 @@ import os
 from typing import Dict, List
 import requests
 from atproto import Client
-import json
 from datetime import datetime, timedelta, timezone
 import time
-import sys
 
 # Configurações do Bluesky
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
@@ -13,28 +11,69 @@ BSKY_PASSWORD = os.environ.get("BSKY_PASSWORD")  # Senha do Bluesky
 PDS_URL = "https://bsky.social"  # URL do Bluesky
 BOT_NAME = "Boturi"  # Nome do bot para evitar interagir com os próprios posts
 
+# Configurações do GitHub
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")  # Token de acesso do GitHub
+GITHUB_REPO = "Rilufi/gatobot"  # Substitua pelo seu usuário/repositório
+GITHUB_FILE_PATH = "interactions.txt"  # Caminho do arquivo no repositório
+
 # Limites diários e ações permitidas por hora
 DAILY_LIMIT = 11666  # Limite de ações diárias
 HOURLY_LIMIT = DAILY_LIMIT // 24  # Limite de ações por hora
 
-# Arquivo para armazenar interações
-INTERACTIONS_FILE = 'bluesky_interactions.json'
+def load_interactions():
+    """Carrega interações do arquivo interactions.txt no GitHub."""
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
+    headers = {
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        content = response.json().get("content", "")
+        if content:
+            # Decodifica o conteúdo (base64) e divide em linhas
+            import base64
+            decoded_content = base64.b64decode(content).decode("utf-8")
+            return decoded_content.splitlines()
+    elif response.status_code == 404:
+        print(f"Arquivo {GITHUB_FILE_PATH} não encontrado no repositório. Inicializando com lista vazia.")
+    else:
+        print(f"Erro ao carregar interações: {response.status_code} - {response.text}")
+    
+    return []
 
-def load_interactions() -> Dict:
-    """Carrega interações de um arquivo JSON."""
-    if os.path.exists(INTERACTIONS_FILE):
-        with open(INTERACTIONS_FILE, 'r') as file:
-            try:
-                return json.load(file)
-            except json.JSONDecodeError:
-                print(f"O arquivo {INTERACTIONS_FILE} está vazio ou corrompido. Inicializando com valores padrão.")
-                return {"likes": [], "follows": [], "unfollows": []}
-    return {"likes": [], "follows": [], "unfollows": []}
-
-def save_interactions(interactions: Dict):
-    """Salva interações em um arquivo JSON."""
-    with open(INTERACTIONS_FILE, 'w') as file:
-        json.dump(interactions, file)
+def save_interactions(interactions):
+    """Salva interações no arquivo interactions.txt no GitHub."""
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
+    headers = {
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    
+    # Obtém o SHA do arquivo atual (necessário para atualização)
+    response = requests.get(url, headers=headers)
+    sha = response.json().get("sha") if response.status_code == 200 else None
+    
+    # Converte a lista de interações em uma string
+    content = "\n".join(interactions)
+    
+    # Codifica o conteúdo em base64
+    import base64
+    encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+    
+    # Envia a requisição para atualizar o arquivo
+    data = {
+        "message": "Atualizando interações",
+        "content": encoded_content,
+        "sha": sha
+    }
+    response = requests.put(url, headers=headers, json=data)
+    
+    if response.status_code == 200:
+        print(f"Interações salvas no GitHub: {GITHUB_FILE_PATH}")
+    else:
+        print(f"Erro ao salvar interações: {response.status_code} - {response.text}")
 
 def bsky_login_session(pds_url: str, handle: str, password: str) -> Client:
     """Autentica no Bluesky e retorna a instância do cliente."""
@@ -53,8 +92,11 @@ def check_rate_limit(response):
         reset_time = datetime.fromtimestamp(rate_limit_reset, timezone.utc)
         current_time = datetime.now(timezone.utc)
         wait_seconds = (reset_time - current_time).total_seconds()
-        print(f"Limite de requisições atingido. Aguardando {wait_seconds:.0f} segundos para o reset.")
-        time.sleep(max(wait_seconds, 0))
+        if wait_seconds > 0:
+            print(f"Limite de requisições atingido. Aguardando {wait_seconds:.0f} segundos para o reset.")
+            time.sleep(wait_seconds)
+        else:
+            print("Limite de requisições atingido, mas o tempo de reset já passou.")
 
 def post_contains_hashtags(post: Dict, hashtags: List[str]) -> bool:
     """Verifica se o conteúdo do post contém alguma das hashtags especificadas."""
@@ -68,7 +110,7 @@ def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, u
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
     
     # Obtém o token de acesso da sessão
-    access_jwt = session._session.access_jwt
+    access_jwt = session._session.access_jwt  # Corrigido aqui
     headers = {"Authorization": f"Bearer {access_jwt}"}
     
     params = {
@@ -92,36 +134,30 @@ def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, u
 
 def like_post_bluesky(client: Client, uri: str, cid: str, interactions):
     """Curtir um post no Bluesky."""
-    if uri not in interactions["likes"]:
+    if f"like:{uri}" not in interactions:
         client.like(uri=uri, cid=cid)
-        interactions["likes"].append(uri)
+        interactions.append(f"like:{uri}")
+        save_interactions(interactions)  # Salva as interações após cada like
         print(f"Post curtido no Bluesky: {uri}")
+    else:
+        print(f"Post já curtido anteriormente: {uri}")
 
-def follow_user_bluesky(client: Client, did: str, interactions):
-    """Seguir um usuário no Bluesky."""
-    if did not in interactions["follows"] and did not in interactions["unfollows"]:
-        client.follow(did)
-        interactions["follows"].append(did)
-        print(f"Seguindo usuário no Bluesky: {did}")
-
-def unfollow_user_bluesky(client: Client, did: str, interactions):
-    """Deixar de seguir um usuário no Bluesky."""
-    if did in interactions["follows"]:
-        client.unfollow(did)
-        interactions["follows"].remove(did)
-        interactions["unfollows"].append(did)
-        print(f"Deixando de seguir usuário no Bluesky: {did}")
+def repost_post_bluesky(client: Client, uri: str, cid: str, interactions):
+    """Repostar um post no Bluesky."""
+    if f"repost:{uri}" not in interactions:
+        client.repost(uri=uri, cid=cid)
+        interactions.append(f"repost:{uri}")
+        save_interactions(interactions)  # Salva as interações após cada repost
+        print(f"Post repostado no Bluesky: {uri}")
+    else:
+        print(f"Post já repostado anteriormente: {uri}")
 
 if __name__ == "__main__":
     interactions = load_interactions()
     bsky_client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
 
     # Define hashtags e palavras-chave para busca
-    hashtags = [
-        "#cat", "#dog", "#gato", "#cachorro", 
-        "#doglife", "#catvibes", "#catsofbluesky",
-        "#dogsofbluesky", "#caturday"
-    ]
+    hashtags = ["#temperatura"]
 
     # Calcula as datas de ontem e hoje no formato ISO com timezone-aware completo
     today = datetime.now(timezone.utc)
@@ -143,7 +179,6 @@ if __name__ == "__main__":
                     uri = post.get('uri')
                     cid = post.get('cid')
                     author = post.get('author', {})
-                    author_did = author.get('did', '')
 
                     # Evita interagir com posts do próprio bot
                     if author.get('displayName', '') == BOT_NAME:
@@ -152,10 +187,8 @@ if __name__ == "__main__":
                     if post_contains_hashtags(post, [hashtag]):
                         if action_counter < actions_per_hour:
                             like_post_bluesky(bsky_client, uri, cid, interactions)
-                            action_counter += 1
-                        if action_counter < actions_per_hour and author_did not in interactions["follows"] and author_did not in interactions["unfollows"]:
-                            follow_user_bluesky(bsky_client, author_did, interactions)
-                            action_counter += 1
+                            repost_post_bluesky(bsky_client, uri, cid, interactions)
+                            action_counter += 2  # Conta como duas ações (like e repost)
 
                     if action_counter >= actions_per_hour:
                         print("Limite de ações por hora atingido no Bluesky.")
@@ -163,5 +196,4 @@ if __name__ == "__main__":
         except requests.exceptions.HTTPError as e:
             print(f"Erro ao buscar posts para {hashtag} no Bluesky: {e}")
 
-    save_interactions(interactions)
     print("Concluído.")
