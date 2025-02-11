@@ -74,3 +74,4 @@ repost:at://did:plc:fv3iz4gz52fwicek6zb4dvrc/app.bsky.feed.post/3lhwpek4uuc2n
 like:at://did:plc:blcz2bnrgsijyjazbzn35qoe/app.bsky.feed.post/3lhwpchvdo22a
 repost:at://did:plc:blcz2bnrgsijyjazbzn35qoe/app.bsky.feed.post/3lhwpchvdo22a
 like:at://did:plc:dq4ozdpivzq2q2uo5ymowlma/app.bsky.feed.post/3lhwpby3m322s
+repost:at://did:plc:dq4ozdpivzq2q2uo5ymowlma/app.bsky.feed.post/3lhwpby3m322s
