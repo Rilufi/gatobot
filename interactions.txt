@@ -1625,3 +1625,4 @@ like:at://did:plc:g22knylajvwhnkodm2ssw37c/app.bsky.feed.post/3lhy7wsqksk2u
 repost:at://did:plc:g22knylajvwhnkodm2ssw37c/app.bsky.feed.post/3lhy7wsqksk2u
 like:at://did:plc:gwznn2mn2eud3broh3ze4agr/app.bsky.feed.post/3lhy7wpc3nk2c
 repost:at://did:plc:gwznn2mn2eud3broh3ze4agr/app.bsky.feed.post/3lhy7wpc3nk2c
+like:at://did:plc:k477v5t2anprejshoqkisrmb/app.bsky.feed.post/3lhy7vlrwa22e
