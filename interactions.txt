@@ -1603,3 +1603,4 @@ like:at://did:plc:yd5dsa6xqw5aim77xek56zyp/app.bsky.feed.post/3lhy4h2gzvk2p
 repost:at://did:plc:yd5dsa6xqw5aim77xek56zyp/app.bsky.feed.post/3lhy4h2gzvk2p
 like:at://did:plc:2t626xbnlkgxvdfo77l4ebwm/app.bsky.feed.post/3lhy4gsxdy22e
 repost:at://did:plc:2t626xbnlkgxvdfo77l4ebwm/app.bsky.feed.post/3lhy4gsxdy22e
+like:at://did:plc:oy5jt2jgmjt3qx3oxmjxx2ld/app.bsky.feed.post/3lhy4gnbho22a
