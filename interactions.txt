@@ -1769,3 +1769,4 @@ like:at://did:plc:sycfc3ddokde5vgh7kvun3es/app.bsky.feed.post/3lhyb66btec26
 repost:at://did:plc:sycfc3ddokde5vgh7kvun3es/app.bsky.feed.post/3lhyb66btec26
 like:at://did:plc:o3bqgq4xxwvsuba3pgbowfdw/app.bsky.feed.post/3lhyb5f36uc2p
 repost:at://did:plc:o3bqgq4xxwvsuba3pgbowfdw/app.bsky.feed.post/3lhyb5f36uc2p
+like:at://did:plc:dmsrx3gpo77rqhck3xjxh7s2/app.bsky.feed.post/3lhyaz2ki6k2n
