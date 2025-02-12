@@ -3245,3 +3245,4 @@ like:at://did:plc:vckl5usr7jtzmdxnqis5d5e2/app.bsky.feed.post/3lhzaccuz2k26
 repost:at://did:plc:vckl5usr7jtzmdxnqis5d5e2/app.bsky.feed.post/3lhzaccuz2k26
 like:at://did:plc:qovrm4vmwslauo5ui7hfnizq/app.bsky.feed.post/3lhza7bg2g22u
 repost:at://did:plc:qovrm4vmwslauo5ui7hfnizq/app.bsky.feed.post/3lhza7bg2g22u
+like:at://did:plc:c4ofujjymcitcnaa57nt4wzm/app.bsky.feed.post/3lhza77ncyc2s
