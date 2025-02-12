@@ -1943,3 +1943,4 @@ like:at://did:plc:otfc2ywlu6qtargjwz5f4vsu/app.bsky.feed.post/3lhydapnlzc2r
 repost:at://did:plc:otfc2ywlu6qtargjwz5f4vsu/app.bsky.feed.post/3lhydapnlzc2r
 like:at://did:plc:jvwv2n24dvq6furrug73j5tv/app.bsky.feed.post/3lhydaf7ses2w
 repost:at://did:plc:jvwv2n24dvq6furrug73j5tv/app.bsky.feed.post/3lhydaf7ses2w
+like:at://did:plc:5o6yiawkrgihwisoqid3xtfx/app.bsky.feed.post/3lhyf34angc2x
