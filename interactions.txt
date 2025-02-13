@@ -6355,3 +6355,4 @@ like:at://did:plc:ztqi3fhfpxqivgqpybnyxhqd/app.bsky.feed.post/3li3ra4pcys2o
 repost:at://did:plc:ztqi3fhfpxqivgqpybnyxhqd/app.bsky.feed.post/3li3ra4pcys2o
 like:at://did:plc:vcpqgt4bfahgxralkpjzpwqx/app.bsky.feed.post/3li3r5c5fca2x
 repost:at://did:plc:vcpqgt4bfahgxralkpjzpwqx/app.bsky.feed.post/3li3r5c5fca2x
+like:at://did:plc:aoo5o7pgvzgratygurccmb3u/app.bsky.feed.post/3li3rco242s2a
