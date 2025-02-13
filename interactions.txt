@@ -6493,3 +6493,4 @@ like:at://did:plc:3h3jactozqamwo2vgnjq2zqi/app.bsky.feed.post/3li3ozgndgs27
 repost:at://did:plc:3h3jactozqamwo2vgnjq2zqi/app.bsky.feed.post/3li3ozgndgs27
 like:at://did:plc:prfwfbh62xnctcc7cmunxe3e/app.bsky.feed.post/3li3ovgehxs2a
 repost:at://did:plc:prfwfbh62xnctcc7cmunxe3e/app.bsky.feed.post/3li3ovgehxs2a
+like:at://did:plc:lz7ksodagnqlzsjazqna7wao/app.bsky.feed.post/3li3ot6nx622a
