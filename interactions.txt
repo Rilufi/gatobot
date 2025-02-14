@@ -6839,3 +6839,4 @@ like:at://did:plc:3ogwgs7q4vktno5pkpjpdpvq/app.bsky.feed.post/3li3zc5ynsc2r
 repost:at://did:plc:3ogwgs7q4vktno5pkpjpdpvq/app.bsky.feed.post/3li3zc5ynsc2r
 like:at://did:plc:3ogwgs7q4vktno5pkpjpdpvq/app.bsky.feed.post/3li3z6ht7ws2r
 repost:at://did:plc:3ogwgs7q4vktno5pkpjpdpvq/app.bsky.feed.post/3li3z6ht7ws2r
+like:at://did:plc:kig3223lodhvwi3l6mna4o6n/app.bsky.feed.post/3li3z5zru2k2h
