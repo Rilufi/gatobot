@@ -3388,3 +3388,4 @@ like:at://did:plc:okvx6c3hpicov7ykzjen42jk/app.bsky.feed.post/3licvha6sic2i
 repost:at://did:plc:okvx6c3hpicov7ykzjen42jk/app.bsky.feed.post/3licvha6sic2i
 like:at://did:plc:j6diznl4aypc3xmfiha56uh2/app.bsky.feed.post/3licveifov22t
 repost:at://did:plc:j6diznl4aypc3xmfiha56uh2/app.bsky.feed.post/3licveifov22t
+like:at://did:plc:nbwaefskxoqvvb3ozkyjx7kh/app.bsky.feed.post/3licvbgxqhs2d
