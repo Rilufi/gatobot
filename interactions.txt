@@ -3980,3 +3980,4 @@ like:at://did:plc:6rlgmzcm5lowq4vqotlecdem/app.bsky.feed.post/3lid6velylk2x
 repost:at://did:plc:6rlgmzcm5lowq4vqotlecdem/app.bsky.feed.post/3lid6velylk2x
 like:at://did:plc:2fajqv7yugl5secta4cfdjhi/app.bsky.feed.post/3lid6u6f7ok2k
 repost:at://did:plc:2fajqv7yugl5secta4cfdjhi/app.bsky.feed.post/3lid6u6f7ok2k
+like:at://did:plc:2gyk3drcfjnkqjeqe34z7vex/app.bsky.feed.post/3lid6psg5m22j
