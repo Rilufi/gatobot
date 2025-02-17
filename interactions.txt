@@ -6842,3 +6842,4 @@ like:at://did:plc:6so2r33hjmtjootm6o47oeap/app.bsky.feed.post/3lifled5s2c2l
 repost:at://did:plc:6so2r33hjmtjootm6o47oeap/app.bsky.feed.post/3lifled5s2c2l
 like:at://did:plc:smdxiuzb5ka7c7anfantcw24/app.bsky.feed.post/3liflc4uu5k2e
 repost:at://did:plc:smdxiuzb5ka7c7anfantcw24/app.bsky.feed.post/3liflc4uu5k2e
+like:at://did:plc:kettnf52fl5g36dsv3xugltm/app.bsky.feed.post/3lifl4jr26k2e
