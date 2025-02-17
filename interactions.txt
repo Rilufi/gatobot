@@ -6060,3 +6060,4 @@ like:at://did:plc:4ffemxn2wwzzbvuf3aqzvbfd/app.bsky.feed.post/3lif6dyyjic27
 repost:at://did:plc:4ffemxn2wwzzbvuf3aqzvbfd/app.bsky.feed.post/3lif6dyyjic27
 like:at://did:plc:zuhd53uu2d6vdob3qewkeksw/app.bsky.feed.post/3lif674rfsk25
 repost:at://did:plc:zuhd53uu2d6vdob3qewkeksw/app.bsky.feed.post/3lif674rfsk25
+like:at://did:plc:zptocyqu3pvo6i5yhbf6jdzu/app.bsky.feed.post/3lif64jmpa22u
