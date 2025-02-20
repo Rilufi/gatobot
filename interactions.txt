@@ -428,3 +428,4 @@ like:at://did:plc:zptocyqu3pvo6i5yhbf6jdzu/app.bsky.feed.post/3limd5oi2rs2d
 repost:at://did:plc:zptocyqu3pvo6i5yhbf6jdzu/app.bsky.feed.post/3limd5oi2rs2d
 like:at://did:plc:z3mtsyr5jdjafu6yczwc2lp4/app.bsky.feed.post/3limczk6ccs2e
 repost:at://did:plc:z3mtsyr5jdjafu6yczwc2lp4/app.bsky.feed.post/3limczk6ccs2e
+like:at://did:plc:lq2cnnbwb3xusest7ou6tk7x/app.bsky.feed.post/3limcygua7c2o
