@@ -205,8 +205,7 @@ hashtags = [
     "#himalayan", "#somali", "#turkishvan", "#turkishangora", 
     "#egyptianmau", "#korat", "#singapura", "#balinese", "#javanese", 
     "#colorpointshorthair", "#pixiebob", "#americanwirehair", 
-    "#americanbobtail", "#cymric", "#highlander", "#khaomanee"
-]
+    "#americanbobtail", "#cymric", "#highlander", "#khaomanee"]
 
     # Calcula as datas de ontem e hoje no formato ISO com timezone-aware completo
     today = datetime.now(timezone.utc)
