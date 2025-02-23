@@ -157,7 +157,7 @@ if __name__ == "__main__":
     bsky_client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
 
 # Define hashtags e palavras-chave para busca
-hashtags = [
+    hashtags = [
     "#cat", "#dog", "#gato", "#cachorro", 
     "#doglife", "#catvibes", "#catsofbluesky",
     "#dogsofbluesky", "#caturday", "#cats", "#kitty", 
