@@ -4,6 +4,7 @@ import requests
 from atproto import Client
 from datetime import datetime, timedelta, timezone
 import time
+import base64
 
 # Configurações do Bluesky
 BSKY_HANDLE = os.environ.get("BSKY_HANDLE")  # Handle do Bluesky
@@ -33,7 +34,6 @@ def load_interactions():
         content = response.json().get("content", "")
         if content:
             # Decodifica o conteúdo (base64) e divide em linhas
-            import base64
             decoded_content = base64.b64decode(content).decode("utf-8")
             return decoded_content.splitlines()
     elif response.status_code == 404:
@@ -59,7 +59,6 @@ def save_interactions(interactions):
     content = "\n".join(interactions)
     
     # Codifica o conteúdo em base64
-    import base64
     encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
     
     # Envia a requisição para atualizar o arquivo
@@ -103,16 +102,13 @@ def post_contains_hashtags(post: Dict, hashtags: List[str]) -> bool:
     content = post.get('record', {}).get('text', '').lower()
     return any(hashtag.lower() in content for hashtag in hashtags)
 
-def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, until: str) -> Dict:
+def search_posts_by_hashtags(hashtags: List[str], since: str, until: str) -> Dict:
     """Busca posts contendo as hashtags fornecidas dentro de um intervalo de tempo."""
     cleaned_hashtags = [hashtag.replace('#', '').lower() for hashtag in hashtags]
     hashtag_query = " OR ".join(cleaned_hashtags)
     url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
     
-    # Obtém o token de acesso da sessão
-    access_jwt = session._session.access_jwt  # Corrigido aqui
-    headers = {"Authorization": f"Bearer {access_jwt}"}
-    
+    # Parâmetros da requisição
     params = {
         "q": hashtag_query,
         "limit": 50,
@@ -121,14 +117,14 @@ def search_posts_by_hashtags(session: Client, hashtags: List[str], since: str, u
         "sort": "latest"
     }
 
-    response = requests.get(url, headers=headers, params=params)
-    check_rate_limit(response)  # Verifica e gerencia o limite de requisições
-
-    try:
-        response.raise_for_status()
+    # Faz a requisição SEM autenticação
+    response = requests.get(url, params=params)
+    
+    # Verifica o status da resposta
+    if response.status_code == 200:
         return response.json()
-    except requests.exceptions.HTTPError as e:
-        print(f"Erro ao buscar posts para {hashtag_query}: {e}")
+    else:
+        print(f"Erro ao buscar posts para {hashtag_query}: {response.status_code}")
         print(f"Detalhes do erro: {response.text}")
         return {}
 
@@ -156,56 +152,57 @@ if __name__ == "__main__":
     interactions = load_interactions()
     bsky_client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
 
-# Define hashtags e palavras-chave para busca
+    # Define hashtags e palavras-chave para busca
     hashtags = [
-    "#cat", "#dog", "#gato", "#cachorro", 
-    "#doglife", "#catvibes", "#catsofbluesky",
-    "#dogsofbluesky", "#caturday", "#cats", "#kitty", 
-    "#kitten", "#catlover", "#catlife", "#catsofinstagram", 
-    "#meow", "#purr", "#catstagram", "#catphotography", 
-    "#catlovers", "#catsoftheworld", "#catmom", "#catdad", 
-    "#feline", "#instacat", "#catlove", "#catsofig", 
-    "#catloversclub", "#catloversofinstagram", "#catloversworld", 
-    "#catloversunite", "#catloversociety", "#catloversforever", 
-    "#catloversparadise", "#catloverscommunity", "#catloversdaily", 
-    "#catloverslife", "#catloversonly", "#catloversworldwide", 
-    "#catloversuniverse", "#catloversclubhouse", "#catloverscorner", 
-    "#catlovershub", "#catloversnetwork", "#catloversplanet", 
-    "#catloverszone", "#dogs", "#puppy", "#puppylove", "#doglover", 
-    "#dogsofinstagram", "#woof", "#bark", "#dogstagram", 
-    "#dogphotography", "#doglovers", "#dogsoftheworld", "#dogmom", 
-    "#dogdad", "#canine", "#instadog", "#doglove", "#dogsofig", 
-    "#dogloversclub", "#dogloversofinstagram", "#dogloversworld", 
-    "#dogloversunite", "#dogloversociety", "#dogloversforever", 
-    "#dogloversparadise", "#dogloverscommunity", "#dogloversdaily", 
-    "#dogloverslife", "#dogloversonly", "#dogloversworldwide", 
-    "#dogloversuniverse", "#dogloversclubhouse", "#dogloverscorner", 
-    "#doglovershub", "#dogloversnetwork", "#dogloversplanet", 
-    "#dogloverszone", "#pets", "#petlover", "#petlife", 
-    "#petsofinstagram", "#petstagram", "#petphotography", 
-    "#petlovers", "#petsoftheworld", "#petmom", "#petdad", 
-    "#instapet", "#petlove", "#petsofig", "#petloversclub", 
-    "#petloversofinstagram", "#petloversworld", "#petloversunite", 
-    "#petloversociety", "#petloversforever", "#petloversparadise", 
-    "#petloverscommunity", "#petloversdaily", "#petloverslife", 
-    "#petloversonly", "#petloversworldwide", "#petloversuniverse", 
-    "#petloversclubhouse", "#petloverscorner", "#petlovershub", 
-    "#petloversnetwork", "#petloversplanet", "#petloverszone", 
-    "#labrador", "#goldenretriever", "#bulldog", "#poodle", 
-    "#siamese", "#persiancat", "#mainecon", "#sphynx", "#bengalcat", 
-    "#ragdoll", "#chihuahua", "#husky", "#pug", "#beagle", 
-    "#dachshund", "#boxer", "#shibainu", "#corgi", "#frenchbulldog", 
-    "#rottweiler", "#germanshepherd", "#siberianhusky", 
-    "#britishshorthair", "#scottishfold", "#russianblue", 
-    "#abyssinian", "#birman", "#savannahcat", "#norwegianforestcat", 
-    "#devonrex", "#bombaycat", "#orientalshorthair", "#toyger", 
-    "#snowshoe", "#tonkinese", "#burmese", "#ocicat", "#peterbald", 
-    "#selkirkrex", "#laperm", "#munchkin", "#americancurl", 
-    "#cornishrex", "#japanesebobtail", "#manx", "#chartreux", 
-    "#himalayan", "#somali", "#turkishvan", "#turkishangora", 
-    "#egyptianmau", "#korat", "#singapura", "#balinese", "#javanese", 
-    "#colorpointshorthair", "#pixiebob", "#americanwirehair", 
-    "#americanbobtail", "#cymric", "#highlander", "#khaomanee"]
+        "#cat", "#dog", "#gato", "#cachorro", 
+        "#doglife", "#catvibes", "#catsofbluesky",
+        "#dogsofbluesky", "#caturday", "#cats", "#kitty", 
+        "#kitten", "#catlover", "#catlife", "#catsofinstagram", 
+        "#meow", "#purr", "#catstagram", "#catphotography", 
+        "#catlovers", "#catsoftheworld", "#catmom", "#catdad", 
+        "#feline", "#instacat", "#catlove", "#catsofig", 
+        "#catloversclub", "#catloversofinstagram", "#catloversworld", 
+        "#catloversunite", "#catloversociety", "#catloversforever", 
+        "#catloversparadise", "#catloverscommunity", "#catloversdaily", 
+        "#catloverslife", "#catloversonly", "#catloversworldwide", 
+        "#catloversuniverse", "#catloversclubhouse", "#catloverscorner", 
+        "#catlovershub", "#catloversnetwork", "#catloversplanet", 
+        "#catloverszone", "#dogs", "#puppy", "#puppylove", "#doglover", 
+        "#dogsofinstagram", "#woof", "#bark", "#dogstagram", 
+        "#dogphotography", "#doglovers", "#dogsoftheworld", "#dogmom", 
+        "#dogdad", "#canine", "#instadog", "#doglove", "#dogsofig", 
+        "#dogloversclub", "#dogloversofinstagram", "#dogloversworld", 
+        "#dogloversunite", "#dogloversociety", "#dogloversforever", 
+        "#dogloversparadise", "#dogloverscommunity", "#dogloversdaily", 
+        "#dogloverslife", "#dogloversonly", "#dogloversworldwide", 
+        "#dogloversuniverse", "#dogloversclubhouse", "#dogloverscorner", 
+        "#doglovershub", "#dogloversnetwork", "#dogloversplanet", 
+        "#dogloverszone", "#pets", "#petlover", "#petlife", 
+        "#petsofinstagram", "#petstagram", "#petphotography", 
+        "#petlovers", "#petsoftheworld", "#petmom", "#petdad", 
+        "#instapet", "#petlove", "#petsofig", "#petloversclub", 
+        "#petloversofinstagram", "#petloversworld", "#petloversunite", 
+        "#petloversociety", "#petloversforever", "#petloversparadise", 
+        "#petloverscommunity", "#petloversdaily", "#petloverslife", 
+        "#petloversonly", "#petloversworldwide", "#petloversuniverse", 
+        "#petloversclubhouse", "#petloverscorner", "#petlovershub", 
+        "#petloversnetwork", "#petloversplanet", "#petloverszone", 
+        "#labrador", "#goldenretriever", "#bulldog", "#poodle", 
+        "#siamese", "#persiancat", "#mainecon", "#sphynx", "#bengalcat", 
+        "#ragdoll", "#chihuahua", "#husky", "#pug", "#beagle", 
+        "#dachshund", "#boxer", "#shibainu", "#corgi", "#frenchbulldog", 
+        "#rottweiler", "#germanshepherd", "#siberianhusky", 
+        "#britishshorthair", "#scottishfold", "#russianblue", 
+        "#abyssinian", "#birman", "#savannahcat", "#norwegianforestcat", 
+        "#devonrex", "#bombaycat", "#orientalshorthair", "#toyger", 
+        "#snowshoe", "#tonkinese", "#burmese", "#ocicat", "#peterbald", 
+        "#selkirkrex", "#laperm", "#munchkin", "#americancurl", 
+        "#cornishrex", "#japanesebobtail", "#manx", "#chartreux", 
+        "#himalayan", "#somali", "#turkishvan", "#turkishangora", 
+        "#egyptianmau", "#korat", "#singapura", "#balinese", "#javanese", 
+        "#colorpointshorthair", "#pixiebob", "#americanwirehair", 
+        "#americanbobtail", "#cymric", "#highlander", "#khaomanee"
+    ]
 
     # Calcula as datas de ontem e hoje no formato ISO com timezone-aware completo
     today = datetime.now(timezone.utc)
@@ -219,7 +216,7 @@ if __name__ == "__main__":
     # Interação no Bluesky
     for hashtag in hashtags:
         try:
-            search_results = search_posts_by_hashtags(bsky_client, [hashtag], since, until)
+            search_results = search_posts_by_hashtags([hashtag], since, until)
             if not search_results.get('posts'):
                 print(f"Nenhum resultado encontrado para {hashtag} no Bluesky.")
             else:
