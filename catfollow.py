@@ -156,12 +156,57 @@ if __name__ == "__main__":
     interactions = load_interactions()
     bsky_client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
 
-    # Define hashtags e palavras-chave para busca
-    hashtags = [
-        "#cat", "#dog", "#gato", "#cachorro", 
-        "#doglife", "#catvibes", "#catsofbluesky",
-        "#dogsofbluesky", "#caturday"
-    ]
+# Define hashtags e palavras-chave para busca
+hashtags = [
+    "#cat", "#dog", "#gato", "#cachorro", 
+    "#doglife", "#catvibes", "#catsofbluesky",
+    "#dogsofbluesky", "#caturday", "#cats", "#kitty", 
+    "#kitten", "#catlover", "#catlife", "#catsofinstagram", 
+    "#meow", "#purr", "#catstagram", "#catphotography", 
+    "#catlovers", "#catsoftheworld", "#catmom", "#catdad", 
+    "#feline", "#instacat", "#catlove", "#catsofig", 
+    "#catloversclub", "#catloversofinstagram", "#catloversworld", 
+    "#catloversunite", "#catloversociety", "#catloversforever", 
+    "#catloversparadise", "#catloverscommunity", "#catloversdaily", 
+    "#catloverslife", "#catloversonly", "#catloversworldwide", 
+    "#catloversuniverse", "#catloversclubhouse", "#catloverscorner", 
+    "#catlovershub", "#catloversnetwork", "#catloversplanet", 
+    "#catloverszone", "#dogs", "#puppy", "#puppylove", "#doglover", 
+    "#dogsofinstagram", "#woof", "#bark", "#dogstagram", 
+    "#dogphotography", "#doglovers", "#dogsoftheworld", "#dogmom", 
+    "#dogdad", "#canine", "#instadog", "#doglove", "#dogsofig", 
+    "#dogloversclub", "#dogloversofinstagram", "#dogloversworld", 
+    "#dogloversunite", "#dogloversociety", "#dogloversforever", 
+    "#dogloversparadise", "#dogloverscommunity", "#dogloversdaily", 
+    "#dogloverslife", "#dogloversonly", "#dogloversworldwide", 
+    "#dogloversuniverse", "#dogloversclubhouse", "#dogloverscorner", 
+    "#doglovershub", "#dogloversnetwork", "#dogloversplanet", 
+    "#dogloverszone", "#pets", "#petlover", "#petlife", 
+    "#petsofinstagram", "#petstagram", "#petphotography", 
+    "#petlovers", "#petsoftheworld", "#petmom", "#petdad", 
+    "#instapet", "#petlove", "#petsofig", "#petloversclub", 
+    "#petloversofinstagram", "#petloversworld", "#petloversunite", 
+    "#petloversociety", "#petloversforever", "#petloversparadise", 
+    "#petloverscommunity", "#petloversdaily", "#petloverslife", 
+    "#petloversonly", "#petloversworldwide", "#petloversuniverse", 
+    "#petloversclubhouse", "#petloverscorner", "#petlovershub", 
+    "#petloversnetwork", "#petloversplanet", "#petloverszone", 
+    "#labrador", "#goldenretriever", "#bulldog", "#poodle", 
+    "#siamese", "#persiancat", "#mainecon", "#sphynx", "#bengalcat", 
+    "#ragdoll", "#chihuahua", "#husky", "#pug", "#beagle", 
+    "#dachshund", "#boxer", "#shibainu", "#corgi", "#frenchbulldog", 
+    "#rottweiler", "#germanshepherd", "#siberianhusky", 
+    "#britishshorthair", "#scottishfold", "#russianblue", 
+    "#abyssinian", "#birman", "#savannahcat", "#norwegianforestcat", 
+    "#devonrex", "#bombaycat", "#orientalshorthair", "#toyger", 
+    "#snowshoe", "#tonkinese", "#burmese", "#ocicat", "#peterbald", 
+    "#selkirkrex", "#laperm", "#munchkin", "#americancurl", 
+    "#cornishrex", "#japanesebobtail", "#manx", "#chartreux", 
+    "#himalayan", "#somali", "#turkishvan", "#turkishangora", 
+    "#egyptianmau", "#korat", "#singapura", "#balinese", "#javanese", 
+    "#colorpointshorthair", "#pixiebob", "#americanwirehair", 
+    "#americanbobtail", "#cymric", "#highlander", "#khaomanee"
+]
 
     # Calcula as datas de ontem e hoje no formato ISO com timezone-aware completo
     today = datetime.now(timezone.utc)
