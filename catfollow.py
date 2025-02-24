@@ -121,15 +121,20 @@ def search_posts_by_hashtags(client: Client, hashtags: List[str], since: str, un
         "sort": "latest"
     }
 
-    # Faz a requisição COM autenticação
-    response = requests.get(url, headers=headers, params=params)
-    
-    # Verifica o status da resposta
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Erro ao buscar posts para {hashtag_query}: {response.status_code}")
-        print(f"Detalhes do erro: {response.text}")
+    try:
+        # Faz a requisição COM autenticação
+        response = requests.get(url, headers=headers, params=params)
+        
+        # Verifica o status da resposta
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Erro ao buscar posts para {hashtag_query}: {response.status_code}")
+            print(f"Detalhes do erro: {response.text}")
+            print(f"Headers da resposta: {response.headers}")
+            return {}
+    except requests.exceptions.RequestException as e:
+        print(f"Erro na requisição: {e}")
         return {}
 
 def like_post_bluesky(client: Client, uri: str, cid: str, interactions):
