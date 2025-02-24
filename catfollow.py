@@ -106,7 +106,7 @@ def search_posts_by_hashtags(client: Client, hashtags: List[str], since: str, un
     """Busca posts contendo as hashtags fornecidas dentro de um intervalo de tempo."""
     cleaned_hashtags = [hashtag.replace('#', '').lower() for hashtag in hashtags]
     hashtag_query = " OR ".join(cleaned_hashtags)
-    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
+    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchposts"  # Note o "searchposts" em minúsculas
     
     # Obtém o token de acesso da sessão
     access_jwt = client._session.access_jwt
@@ -136,7 +136,7 @@ def search_posts_by_hashtags(client: Client, hashtags: List[str], since: str, un
     except requests.exceptions.RequestException as e:
         print(f"Erro na requisição: {e}")
         return {}
-
+        
 def like_post_bluesky(client: Client, uri: str, cid: str, interactions):
     """Curtir um post no Bluesky."""
     if f"like:{uri}" not in interactions:
