@@ -9968,3 +9968,4 @@ like:at://did:plc:k6lbrnqba6wm7rfoa2tkyrhi/app.bsky.feed.post/3lk44tgwqpk24
 repost:at://did:plc:k6lbrnqba6wm7rfoa2tkyrhi/app.bsky.feed.post/3lk44tgwqpk24
 like:at://did:plc:ycfynyzxvuxh3z2m6pcdwlwt/app.bsky.feed.post/3lk42u3sz5227
 repost:at://did:plc:ycfynyzxvuxh3z2m6pcdwlwt/app.bsky.feed.post/3lk42u3sz5227
+like:at://did:plc:u4af5z3xi4ibbiqzm5r7kzcc/app.bsky.feed.post/3lk47wbhlhs25
