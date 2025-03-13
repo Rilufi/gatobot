@@ -10640,3 +10640,4 @@ like:at://did:plc:2ikeqaytwsggii2vzjlcf6lj/app.bsky.feed.post/3lka77f2erk2s
 repost:at://did:plc:2ikeqaytwsggii2vzjlcf6lj/app.bsky.feed.post/3lka77f2erk2s
 like:at://did:plc:eylvb36r4kowjh2xuvzxi4ki/app.bsky.feed.post/3lkacep3hkc2k
 repost:at://did:plc:eylvb36r4kowjh2xuvzxi4ki/app.bsky.feed.post/3lkacep3hkc2k
+like:at://did:plc:afgbrj65joxt3gireoq3jukk/app.bsky.feed.post/3lkac7yzt7c2i
