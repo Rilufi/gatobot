@@ -252,3 +252,4 @@ like:at://did:plc:ie3lacniz75rioikchummtee/app.bsky.feed.post/3lkuhmprdsk2e
 repost:at://did:plc:ie3lacniz75rioikchummtee/app.bsky.feed.post/3lkuhmprdsk2e
 like:at://did:plc:y5c7ymhujqw67y3mkijeb4u5/app.bsky.feed.post/3lku5cb75fs2r
 repost:at://did:plc:y5c7ymhujqw67y3mkijeb4u5/app.bsky.feed.post/3lku5cb75fs2r
+like:at://did:plc:y5c7ymhujqw67y3mkijeb4u5/app.bsky.feed.post/3lku5a6yva22r
