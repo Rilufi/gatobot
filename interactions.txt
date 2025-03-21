@@ -278,3 +278,4 @@ like:at://did:plc:l4atgv2p3ko2pmoe7jhqhhxe/app.bsky.feed.post/3lkuaweglts2c
 repost:at://did:plc:l4atgv2p3ko2pmoe7jhqhhxe/app.bsky.feed.post/3lkuaweglts2c
 like:at://did:plc:s2zqaaayyfre3ek7qgpmbhov/app.bsky.feed.post/3lkug4q53jk2v
 repost:at://did:plc:s2zqaaayyfre3ek7qgpmbhov/app.bsky.feed.post/3lkug4q53jk2v
+like:at://did:plc:ab6j4u3qbhkqyagbyt6uypok/app.bsky.feed.post/3lkug2cuu722w
