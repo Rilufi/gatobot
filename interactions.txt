@@ -1134,3 +1134,4 @@ like:at://did:plc:bhnp7tnocw74jj43jkdidi2n/app.bsky.feed.post/3lkyp5m6s7226
 repost:at://did:plc:bhnp7tnocw74jj43jkdidi2n/app.bsky.feed.post/3lkyp5m6s7226
 like:at://did:plc:3il7hf4ymr4fw67vwn4epf55/app.bsky.feed.post/3lkyp5k5mb22j
 repost:at://did:plc:3il7hf4ymr4fw67vwn4epf55/app.bsky.feed.post/3lkyp5k5mb22j
+like:at://did:plc:6auerlxjyso7hvagw74kryvi/app.bsky.feed.post/3lkyoy3qlic22
