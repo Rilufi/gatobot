@@ -1260,3 +1260,4 @@ like:at://did:plc:5n6v6febhlkz6s42imy4rsa5/app.bsky.feed.post/3lkznjszegm2x
 repost:at://did:plc:5n6v6febhlkz6s42imy4rsa5/app.bsky.feed.post/3lkznjszegm2x
 like:at://did:plc:dpykpvbosmnor6vyx4jnvo6e/app.bsky.feed.post/3lkznguv3u22f
 repost:at://did:plc:dpykpvbosmnor6vyx4jnvo6e/app.bsky.feed.post/3lkznguv3u22f
+like:at://did:plc:47t2pfwtrjsiuluswbohpo4s/app.bsky.feed.post/3lkzngjz7zc2j
