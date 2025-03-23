@@ -1288,3 +1288,4 @@ like:at://did:plc:oqqc6j4grjzwd76dksa4ohkk/app.bsky.feed.post/3lkzu46dfo226
 repost:at://did:plc:oqqc6j4grjzwd76dksa4ohkk/app.bsky.feed.post/3lkzu46dfo226
 like:at://did:plc:tkh4zxqphmui3z6v2pmwfutt/app.bsky.feed.post/3lkzu2mzbo22n
 repost:at://did:plc:tkh4zxqphmui3z6v2pmwfutt/app.bsky.feed.post/3lkzu2mzbo22n
+like:at://did:plc:emknjqsvigr352bbn6xsvbur/app.bsky.feed.post/3lkztqwnmok2a
