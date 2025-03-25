@@ -1966,3 +1966,4 @@ like:at://did:plc:7hdlozn6a52dcjigp4gkzy2d/app.bsky.feed.post/3ll6odalq7222
 repost:at://did:plc:7hdlozn6a52dcjigp4gkzy2d/app.bsky.feed.post/3ll6odalq7222
 like:at://did:plc:tzyt6cv6ksacs7p457xfl56f/app.bsky.feed.post/3ll6ocyrjec2e
 repost:at://did:plc:tzyt6cv6ksacs7p457xfl56f/app.bsky.feed.post/3ll6ocyrjec2e
+like:at://did:plc:yqr7gd22wy2xuvq2ur4ce2n5/app.bsky.feed.post/3ll6obcpg3c2x
