@@ -21,6 +21,16 @@ GITHUB_FILE_PATH = "interactions.txt"  # Caminho do arquivo no repositório
 DAILY_LIMIT = 11666  # Limite de ações diárias
 HOURLY_LIMIT = DAILY_LIMIT // 24  # Limite de ações por hora
 
+# Lista de palavras-chave inapropriadas
+ADULT_KEYWORDS = [
+    "nsfw", "porn", "sex", "nude", "onlyfans", "adult", "explicit",
+    "xxx", "nsfw18+", "hentai", "fuck", "dick", "pussy", "ass",
+    "bdsm", "fetish", "cum", "cock", "blowjob", "sexy", "naughty"
+]
+
+# Lista de contas banidas (opcional)
+BANNED_ACCOUNTS = []  # Adicione handles de contas problemáticas se necessário
+
 def load_interactions():
     """Carrega interações do arquivo interactions.txt no GitHub."""
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{GITHUB_FILE_PATH}"
@@ -33,7 +43,6 @@ def load_interactions():
     if response.status_code == 200:
         content = response.json().get("content", "")
         if content:
-            # Decodifica o conteúdo (base64) e divide em linhas
             decoded_content = base64.b64decode(content).decode("utf-8")
             return decoded_content.splitlines()
     elif response.status_code == 404:
@@ -51,17 +60,12 @@ def save_interactions(interactions):
         "Accept": "application/vnd.github.v3+json"
     }
     
-    # Obtém o SHA do arquivo atual (necessário para atualização)
     response = requests.get(url, headers=headers)
     sha = response.json().get("sha") if response.status_code == 200 else None
     
-    # Converte a lista de interações em uma string
     content = "\n".join(interactions)
-    
-    # Codifica o conteúdo em base64
     encoded_content = base64.b64encode(content.encode("utf-8")).decode("utf-8")
     
-    # Envia a requisição para atualizar o arquivo
     data = {
         "message": "Atualizando interações",
         "content": encoded_content,
@@ -102,17 +106,40 @@ def post_contains_hashtags(post: Dict, hashtags: List[str]) -> bool:
     content = post.get('record', {}).get('text', '').lower()
     return any(hashtag.lower() in content for hashtag in hashtags)
 
+def is_safe_content(post: Dict) -> bool:
+    """Verifica se o conteúdo do post é seguro (não contém palavras adultas)."""
+    content = post.get('record', {}).get('text', '').lower()
+    return not any(keyword in content for keyword in ADULT_KEYWORDS)
+
+def is_not_nsfw(post: Dict) -> bool:
+    """Verifica se o post não está marcado como NSFW."""
+    labels = post.get('labels', [])
+    return not any(label.get('val', '').lower() == 'nsfw' for label in labels)
+
+def is_legitimate_account(author: Dict) -> bool:
+    """Verifica se a conta parece legítima (não adulta)."""
+    handle = author.get('handle', '').lower()
+    display_name = author.get('displayName', '').lower()
+    description = author.get('description', '').lower()
+    
+    suspicious_keywords = ["nsfw", "adult", "onlyfans", "porn", "18+", "venda", "conteúdo adulto"]
+    
+    # Verifica se a conta está na lista de banidas
+    if handle in BANNED_ACCOUNTS:
+        return False
+        
+    return not any(keyword in display_name or keyword in description 
+                  for keyword in suspicious_keywords)
+
 def search_posts_by_hashtags(client: Client, hashtags: List[str], since: str, until: str) -> Dict:
     """Busca posts contendo as hashtags fornecidas dentro de um intervalo de tempo."""
     cleaned_hashtags = [hashtag.replace('#', '').lower() for hashtag in hashtags]
     hashtag_query = " OR ".join(cleaned_hashtags)
-    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchposts"  # Note o "searchposts" em minúsculas
+    url = "https://public.api.bsky.app/xrpc/app.bsky.feed.searchposts"
     
-    # Obtém o token de acesso da sessão
     access_jwt = client._session.access_jwt
     headers = {"Authorization": f"Bearer {access_jwt}"}
     
-    # Parâmetros da requisição
     params = {
         "q": hashtag_query,
         "limit": 50,
@@ -122,16 +149,13 @@ def search_posts_by_hashtags(client: Client, hashtags: List[str], since: str, un
     }
 
     try:
-        # Faz a requisição COM autenticação
         response = requests.get(url, headers=headers, params=params)
         
-        # Verifica o status da resposta
         if response.status_code == 200:
             return response.json()
         else:
             print(f"Erro ao buscar posts para {hashtag_query}: {response.status_code}")
             print(f"Detalhes do erro: {response.text}")
-            print(f"Headers da resposta: {response.headers}")
             return {}
     except requests.exceptions.RequestException as e:
         print(f"Erro na requisição: {e}")
@@ -142,7 +166,7 @@ def like_post_bluesky(client: Client, uri: str, cid: str, interactions):
     if f"like:{uri}" not in interactions:
         client.like(uri=uri, cid=cid)
         interactions.append(f"like:{uri}")
-        save_interactions(interactions)  # Salva as interações após cada like
+        save_interactions(interactions)
         print(f"Post curtido no Bluesky: {uri}")
     else:
         print(f"Post já curtido anteriormente: {uri}")
@@ -152,7 +176,7 @@ def repost_post_bluesky(client: Client, uri: str, cid: str, interactions):
     if f"repost:{uri}" not in interactions:
         client.repost(uri=uri, cid=cid)
         interactions.append(f"repost:{uri}")
-        save_interactions(interactions)  # Salva as interações após cada repost
+        save_interactions(interactions)
         print(f"Post repostado no Bluesky: {uri}")
     else:
         print(f"Post já repostado anteriormente: {uri}")
@@ -161,14 +185,14 @@ if __name__ == "__main__":
     interactions = load_interactions()
     bsky_client = bsky_login_session(PDS_URL, BSKY_HANDLE, BSKY_PASSWORD)
 
-    # Define hashtags e palavras-chave para busca
-    hashtags = ["#cat", "#dog", "#gato", "#cachorro"]
+    # Define hashtags para busca (gatos e cachorros)
+    hashtags = ["#cat", "#dog", "#gato", "#cachorro", "#cats", "#dogs", "#kitty", "#puppy"]
 
-    # Calcula as datas de ontem e hoje no formato ISO com timezone-aware completo
+    # Calcula o intervalo de tempo para busca
     today = datetime.now(timezone.utc)
     yesterday = today - timedelta(days=1)
-    since = yesterday.isoformat()  # YYYY-MM-DDTHH:MM:SS+00:00
-    until = today.isoformat()      # YYYY-MM-DDTHH:MM:SS+00:00
+    since = yesterday.isoformat()
+    until = today.isoformat()
 
     actions_per_hour = HOURLY_LIMIT
     action_counter = 0
@@ -179,25 +203,31 @@ if __name__ == "__main__":
             search_results = search_posts_by_hashtags(bsky_client, [hashtag], since, until)
             if not search_results.get('posts'):
                 print(f"Nenhum resultado encontrado para {hashtag} no Bluesky.")
-            else:
-                for post in search_results["posts"]:
-                    uri = post.get('uri')
-                    cid = post.get('cid')
-                    author = post.get('author', {})
-
-                    # Evita interagir com posts do próprio bot
-                    if author.get('displayName', '') == BOT_NAME:
-                        continue
-
-                    if post_contains_hashtags(post, [hashtag]):
-                        if action_counter < actions_per_hour:
-                            like_post_bluesky(bsky_client, uri, cid, interactions)
-                            repost_post_bluesky(bsky_client, uri, cid, interactions)
-                            action_counter += 2  # Conta como duas ações (like e repost)
-
+                continue
+                
+            for post in search_results["posts"]:
+                uri = post.get('uri')
+                cid = post.get('cid')
+                author = post.get('author', {})
+                
+                # Verificações de segurança
+                if (author.get('displayName', '') == BOT_NAME or 
+                    not is_safe_content(post) or 
+                    not is_not_nsfw(post) or 
+                    not is_legitimate_account(author)):
+                    print(f"Post filtrado como inapropriado: {uri}")
+                    continue
+                
+                if post_contains_hashtags(post, [hashtag]):
+                    if action_counter < actions_per_hour:
+                        like_post_bluesky(bsky_client, uri, cid, interactions)
+                        repost_post_bluesky(bsky_client, uri, cid, interactions)
+                        action_counter += 2
+                    
                     if action_counter >= actions_per_hour:
                         print("Limite de ações por hora atingido no Bluesky.")
                         break
+                        
         except requests.exceptions.HTTPError as e:
             print(f"Erro ao buscar posts para {hashtag} no Bluesky: {e}")
 
