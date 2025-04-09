@@ -169,3 +169,4 @@ repost:at://did:plc:f5xsjnzgx7qadmxx6wxy7oje/app.bsky.feed.post/3lmeojpka522x
 like:at://did:plc:hszcez3a5y6pkwtr3frf6iaq/app.bsky.feed.post/3lmeohtlavs2m
 repost:at://did:plc:hszcez3a5y6pkwtr3frf6iaq/app.bsky.feed.post/3lmeohtlavs2m
 like:at://did:plc:dldzauinm6ae2yttsyjis5il/app.bsky.feed.post/3lmeob7fs7k2z
+repost:at://did:plc:dldzauinm6ae2yttsyjis5il/app.bsky.feed.post/3lmeob7fs7k2z
