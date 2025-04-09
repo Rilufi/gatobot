@@ -768,3 +768,4 @@ like:at://did:plc:3jbm4zfm3mcaty6gduy7wxw4/app.bsky.feed.post/3lmfqh4dh522s
 repost:at://did:plc:3jbm4zfm3mcaty6gduy7wxw4/app.bsky.feed.post/3lmfqh4dh522s
 like:at://did:plc:3zb7m46q5w2yprhnxdpj64bw/app.bsky.feed.post/3lmfqg7g2tc2t
 repost:at://did:plc:3zb7m46q5w2yprhnxdpj64bw/app.bsky.feed.post/3lmfqg7g2tc2t
+like:at://did:plc:s6x7tzpmsr2wchbvhjxgixvj/app.bsky.feed.post/3lmfqfl46wk2k
