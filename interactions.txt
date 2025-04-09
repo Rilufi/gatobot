@@ -181,3 +181,4 @@ repost:at://did:plc:qg4cwu5laukvtsnem2xebs7g/app.bsky.feed.post/3lmeoyeealk2s
 like:at://did:plc:qg4cwu5laukvtsnem2xebs7g/app.bsky.feed.post/3lmeovnswgc2s
 repost:at://did:plc:qg4cwu5laukvtsnem2xebs7g/app.bsky.feed.post/3lmeovnswgc2s
 like:at://did:plc:6so2r33hjmtjootm6o47oeap/app.bsky.feed.post/3lmeodomdqk2o
+repost:at://did:plc:6so2r33hjmtjootm6o47oeap/app.bsky.feed.post/3lmeodomdqk2o
