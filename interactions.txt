@@ -570,3 +570,4 @@ like:at://did:plc:fdoysqwfvzvmm2nuuwx24l6a/app.bsky.feed.post/3lmfcpcbbgk2a
 repost:at://did:plc:fdoysqwfvzvmm2nuuwx24l6a/app.bsky.feed.post/3lmfcpcbbgk2a
 like:at://did:plc:zcqduz2kmmfcxnpoqteshwif/app.bsky.feed.post/3lmfhfm7zt22p
 repost:at://did:plc:zcqduz2kmmfcxnpoqteshwif/app.bsky.feed.post/3lmfhfm7zt22p
+like:at://did:plc:acykt7ior7dul6zvh2adaf4n/app.bsky.feed.post/3lmfhd5kuyk2w
