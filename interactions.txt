@@ -12592,3 +12592,4 @@ like:at://did:plc:edsatrwftxadtbnoyfe7ppoi/app.bsky.feed.post/3ln6snyoruc2m
 repost:at://did:plc:edsatrwftxadtbnoyfe7ppoi/app.bsky.feed.post/3ln6snyoruc2m
 like:at://did:plc:6sp2mdlfwvy25tmr6dcgyi4e/app.bsky.feed.post/3ln6snlcdvk2f
 repost:at://did:plc:6sp2mdlfwvy25tmr6dcgyi4e/app.bsky.feed.post/3ln6snlcdvk2f
+like:at://did:plc:rdvr7a7kglqmgmt7kvpk5izf/app.bsky.feed.post/3ln6smdgvh22a
