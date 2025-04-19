@@ -11460,3 +11460,4 @@ like:at://did:plc:c2obfzi2wtr7ddwxhuqrmwxr/app.bsky.feed.post/3ln52l6cwws2i
 repost:at://did:plc:c2obfzi2wtr7ddwxhuqrmwxr/app.bsky.feed.post/3ln52l6cwws2i
 like:at://did:plc:ggmzykn2ivuw25rl47nwvjai/app.bsky.feed.post/3ln52jcd4ek2a
 repost:at://did:plc:ggmzykn2ivuw25rl47nwvjai/app.bsky.feed.post/3ln52jcd4ek2a
+like:at://did:plc:yaysms4uf6gxebr55ve2g4jp/app.bsky.feed.post/3ln52evgzlc2w
