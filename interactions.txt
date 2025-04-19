@@ -12400,3 +12400,4 @@ like:at://did:plc:pt22eaqcdwaryzyvlxzehgvw/app.bsky.feed.post/3ln6ia4pick2s
 repost:at://did:plc:pt22eaqcdwaryzyvlxzehgvw/app.bsky.feed.post/3ln6ia4pick2s
 like:at://did:plc:g4f5c7bltvz2aspsh7jhpsth/app.bsky.feed.post/3ln6i3kfxpk2o
 repost:at://did:plc:g4f5c7bltvz2aspsh7jhpsth/app.bsky.feed.post/3ln6i3kfxpk2o
+like:at://did:plc:zptocyqu3pvo6i5yhbf6jdzu/app.bsky.feed.post/3ln6hyi6czs2u
