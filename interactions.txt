@@ -12288,3 +12288,4 @@ like:at://did:plc:3gqjc6lavbb2vr5q6d4vf2la/app.bsky.feed.post/3ln6buvgzjs2v
 repost:at://did:plc:3gqjc6lavbb2vr5q6d4vf2la/app.bsky.feed.post/3ln6buvgzjs2v
 like:at://did:plc:lq6hzfm5kwu47cdtywenqzes/app.bsky.feed.post/3ln6aa2tmuk2a
 repost:at://did:plc:lq6hzfm5kwu47cdtywenqzes/app.bsky.feed.post/3ln6aa2tmuk2a
+like:at://did:plc:6so2r33hjmtjootm6o47oeap/app.bsky.feed.post/3ln6a7snvd22l
