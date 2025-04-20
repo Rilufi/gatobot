@@ -600,3 +600,4 @@ like:at://did:plc:vzrpc4cuulo5uzamnfiayg5h/app.bsky.feed.post/3lnbt7tjzjc25
 repost:at://did:plc:vzrpc4cuulo5uzamnfiayg5h/app.bsky.feed.post/3lnbt7tjzjc25
 like:at://did:plc:5h45mwxvbdqos2dpq5gncp26/app.bsky.feed.post/3lnbrcg3hk22u
 repost:at://did:plc:5h45mwxvbdqos2dpq5gncp26/app.bsky.feed.post/3lnbrcg3hk22u
+like:at://did:plc:yoguk63stm63wgr3jtk4hhup/app.bsky.feed.post/3lnbthxf4jk25
