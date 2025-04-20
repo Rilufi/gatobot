@@ -120,3 +120,4 @@ like:at://did:plc:4nvgadxvmaoscpbd43a6rz4k/app.bsky.feed.post/3lnay6geunc2n
 repost:at://did:plc:4nvgadxvmaoscpbd43a6rz4k/app.bsky.feed.post/3lnay6geunc2n
 like:at://did:plc:pcjiifclff6jr7y6llbov7e6/app.bsky.feed.post/3lnay4zy4rk2d
 repost:at://did:plc:pcjiifclff6jr7y6llbov7e6/app.bsky.feed.post/3lnay4zy4rk2d
+like:at://did:plc:sedltypzldfaojskwhgx4tmd/app.bsky.feed.post/3lnaxygzpac2t
