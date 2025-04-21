@@ -1088,3 +1088,4 @@ like:at://did:plc:lwcw3ii3wwo65x7ephx3qzpa/app.bsky.feed.post/3lncubaepic2h
 repost:at://did:plc:lwcw3ii3wwo65x7ephx3qzpa/app.bsky.feed.post/3lncubaepic2h
 like:at://did:plc:b43eyycwid5bowlv5cstd7q5/app.bsky.feed.post/3lncsu5y7oc2f
 repost:at://did:plc:b43eyycwid5bowlv5cstd7q5/app.bsky.feed.post/3lncsu5y7oc2f
+like:at://did:plc:k64e2jvssmchrv5lfnjbg6ke/app.bsky.feed.post/3lncv4vnwnc2c
