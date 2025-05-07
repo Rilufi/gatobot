@@ -15,15 +15,20 @@ jobs:
 
     steps:
       - name: Checkout 🛎
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Keep this repo alive
+      - name: Set up Git identity
         run: |
-          git commit --allow-empty -m "Keepalive commit"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Make keepalive commit
+        run: |
+          git commit --allow-empty -m "Keepalive commit - $(date)"
           git push
 
       - name: Set up Python 🐍
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: 3.x
 
